@@ -24,46 +24,52 @@ test('review, edit, retry saving and discard AI drafts across screen sizes', asy
       })
     )
   );
-  await page.route(/(?:localhost:8001|\/api\/)/, async (route) => {
-    const path = new URL(route.request().url()).pathname.replace(/^\/api/, '');
-    let data: unknown = [];
-    if (path === '/projects/1') data = { id: 1, name: 'AI 测试项目', userId: 1, isPublic: false };
-    if (path === '/folders') data = [{ id: 1, name: '登录模块', projectId: 1, parentFolderId: null }];
-    if (path === '/members/check') data = [{ projectId: 1, isOwner: true, role: 0 }];
-    if (path === '/cases') data = savedCases;
-    if (path === '/cases/ai/generate') {
-      generated++;
-      expect(route.request().postDataJSON()).toEqual({ requirements: '密码错误时拒绝登录' });
-      data = { cases: [draft, { ...draft, title: '待移除草稿' }] };
-    }
-    if (path === '/cases/ai/save') {
-      saveRequests++;
-      if (saveRequests === 1) {
-        await route.fulfill({ status: 500, json: { code: 'saveFailed' } });
-        return;
+  await page.route(
+    (url) =>
+      url.origin === new URL(process.env.E2E_API_URL || 'http://localhost:8011').origin ||
+      url.pathname.startsWith('/api/'),
+    async (route) => {
+      const path = new URL(route.request().url()).pathname.replace(/^\/api/, '');
+      let data: unknown = [];
+      if (path === '/projects/1') data = { id: 1, name: 'AI 测试项目', userId: 1, isPublic: false };
+      if (path === '/folders') data = [{ id: 1, name: '登录模块', projectId: 1, parentFolderId: null }];
+      if (path === '/members/check') data = [{ projectId: 1, isOwner: true, role: 0 }];
+      if (path === '/cases') data = savedCases;
+      if (path === '/cases/ai/generate') {
+        generated++;
+        expect(route.request().postDataJSON()).toEqual({ requirements: '密码错误时拒绝登录' });
+        data = { cases: [draft, { ...draft, title: '待移除草稿' }] };
       }
-      const body = route.request().postDataJSON();
-      expect(body.reviewed).toBe(true);
-      expect(body.cases).toHaveLength(1);
-      expect(body.cases[0]).toMatchObject({
-        title: '已编辑登录用例',
-        steps: [{ step: '提交错误密码', result: '提示登录失败' }],
-      });
-      savedCases = body.cases.map((item: Record<string, unknown>) => ({
-        ...item,
-        id: 1,
-        caseNo: 1,
-        folderId: 1,
-        state: 0,
-        template: 1,
-        type: 0,
-        automationStatus: 1,
-      }));
-      data = { cases: savedCases };
+      if (path === '/cases/ai/save') {
+        saveRequests++;
+        if (saveRequests === 1) {
+          await route.fulfill({ status: 500, json: { code: 'saveFailed' } });
+          return;
+        }
+        const body = route.request().postDataJSON();
+        expect(body.reviewed).toBe(true);
+        expect(body.cases).toHaveLength(1);
+        expect(body.cases[0]).toMatchObject({
+          title: '已编辑登录用例',
+          priority: 2,
+          steps: [{ step: '提交错误密码', result: '提示登录失败' }],
+        });
+        savedCases = body.cases.map((item: Record<string, unknown>) => ({
+          ...item,
+          id: 1,
+          caseNo: 1,
+          folderId: 1,
+          state: 0,
+          template: 1,
+          type: 0,
+          automationStatus: 1,
+        }));
+        data = { cases: savedCases };
+      }
+      if (path === '/cases/1') data = { ...savedCases[0], Steps: [], Tags: [], Attachments: [] };
+      await route.fulfill({ json: data });
     }
-    if (path === '/cases/1') data = { ...savedCases[0], Steps: [], Tags: [], Attachments: [] };
-    await route.fulfill({ json: data });
-  });
+  );
   await page.goto('/zh-CN/projects/1/folders/1/cases');
   await page.getByRole('button', { name: 'AI 生成用例', exact: true }).click();
   const dialog = page.getByRole('dialog');
@@ -80,6 +86,7 @@ test('review, edit, retry saving and discard AI drafts across screen sizes', asy
   await dialog.getByLabel('用例名称').fill('已编辑登录用例');
   await expect(review).not.toBeChecked();
   await dialog.getByLabel('1. 测试步骤').fill('提交错误密码');
+  await dialog.getByRole('combobox', { name: /优先级/ }).selectOption('2');
   for (const width of [320, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     const box = await dialog.boundingBox();
