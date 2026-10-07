@@ -1,8 +1,13 @@
 'use client';
+import { useState } from 'react';
 import type { AgentTask } from '@/types/agent';
 import { agentStateLabels } from '@/types/agent';
 
 export default function AgentReport({ task }: { task: AgentTask }) {
+  const [onlyProblems, setOnlyProblems] = useState(false);
+  const visibleCases = task.plan.cases.filter(
+    (item) => !onlyProblems || task.results.find((result) => result.caseId === item.caseId)?.status !== 'passed'
+  );
   const labels: Record<string, string> = { passed: '通过', failed: '失败', error: '请求异常', skipped: '未执行' };
   return (
     <section className="space-y-4" aria-label="Agent 执行报告">
@@ -104,11 +109,29 @@ export default function AgentReport({ task }: { task: AgentTask }) {
           {task.error}。已有执行记录已保留。
         </p>
       )}
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          className="h-4 w-4 accent-primary"
+          checked={onlyProblems}
+          onChange={(event) => setOnlyProblems(event.target.checked)}
+        />
+        仅看失败与未执行
+      </label>
+      {visibleCases.length === 0 && (
+        <p role="status" className="text-sm text-default-600">
+          本次没有失败或未执行的用例。
+        </p>
+      )}
       <div className="space-y-2">
-        {task.plan.cases.map((item) => {
+        {visibleCases.map((item) => {
           const result = task.results.find((entry) => entry.caseId === item.caseId);
           return (
-            <details key={item.caseId} className="rounded-medium border border-default-200 p-3">
+            <details
+              key={`${onlyProblems}-${item.caseId}`}
+              open={onlyProblems || undefined}
+              className="rounded-medium border border-default-200 p-3"
+            >
               <summary className="cursor-pointer break-words text-sm font-medium">
                 #{item.caseId} {result?.title || item.title} ·{' '}
                 {result ? labels[result.status] || result.status : '等待执行'}
@@ -152,7 +175,10 @@ export default function AgentReport({ task }: { task: AgentTask }) {
                       请求: result.request,
                       实际响应: result.response,
                     }).map(([label, value]) => (
-                      <details key={label}>
+                      <details
+                        key={label}
+                        open={(onlyProblems && label === '实际响应' && !!result.response) || undefined}
+                      >
                         <summary className="cursor-pointer text-primary">{label}</summary>
                         <pre className="mt-2 max-h-80 overflow-auto rounded-medium bg-default-100 p-3 text-xs">
                           {JSON.stringify(value, null, 2)}

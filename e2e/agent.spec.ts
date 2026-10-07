@@ -94,6 +94,33 @@ test('real Agent flow: missing information, confirmation, HTTP results, history 
     .click();
   await expect(report.getByRole('cell', { name: '100', exact: true })).toBeVisible();
   await expect(report.getByRole('cell', { name: '90', exact: true })).toBeVisible();
+  await report.getByRole('checkbox', { name: '仅看失败与未执行' }).check();
+  await expect(report.locator('summary').filter({ hasText: new RegExp(`^#${seeded.caseIds[0]} `) })).toHaveCount(0);
+  const failedCase = report
+    .locator('details')
+    .filter({ has: page.locator('summary', { hasText: new RegExp(`^#${seeded.caseIds[2]} `) }) })
+    .first();
+  await expect(failedCase.getByRole('cell', { name: '90', exact: true })).toBeVisible();
+  await expect(
+    failedCase
+      .locator('details')
+      .filter({ has: page.locator('summary', { hasText: '实际响应' }) })
+      .locator('pre')
+  ).toBeVisible();
+  await report.getByText('模型调用与 Token 用量', { exact: true }).click();
+  await expect(report.getByRole('table', { name: '模型用量' })).toBeVisible();
+  expect(task.measurements.map((item: { phase: string }) => item.phase)).toEqual(['prepare', 'execute']);
+  expect(
+    task.measurements.every(
+      (item: { calls: number; timedCalls: number }) => item.calls > 0 && item.timedCalls === item.calls
+    )
+  ).toBe(true);
+  for (const width of [320, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    expect(await dialog.evaluate((element) => element.scrollWidth > element.clientWidth + 1)).toBe(false);
+  }
+  await report.getByRole('checkbox', { name: '仅看失败与未执行' }).uncheck();
+  await expect(report.locator('summary').filter({ hasText: new RegExp(`^#${seeded.caseIds[0]} `) })).toBeVisible();
   const downloaded = page.waitForEvent('download');
   await dialog.getByRole('button', { name: '导出本次 Excel 报告' }).click();
   await (await downloaded).saveAs(testInfo.outputPath('agent-report.xlsx'));
