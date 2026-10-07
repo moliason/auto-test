@@ -1,5 +1,4 @@
 import express from 'express';
-const router = express.Router();
 import { DataTypes } from 'sequelize';
 import defineRunCase from '../../models/runCases.js';
 import defineRun from '../../models/runs.js';
@@ -9,6 +8,7 @@ import authMiddleware from '../../middleware/auth.js';
 import editableMiddleware from '../../middleware/verifyEditable.js';
 
 export default function (sequelize) {
+  const router = express.Router();
   const { verifySignedIn } = authMiddleware(sequelize);
   const { verifyProjectReporterFromRunId } = editableMiddleware(sequelize);
   const RunCase = defineRunCase(sequelize, DataTypes);
@@ -58,61 +58,67 @@ export default function (sequelize) {
   router.post('/update', verifySignedIn, verifyProjectReporterFromRunId, async (req, res) => {
     const runId = req.query.runId;
     const runCases = req.body;
-    const t = await sequelize.transaction();
-
-    const createRunCase = async (runCase) => {
-      const newRunCase = await RunCase.create(
-        {
-          runId: runId,
-          caseId: runCase.caseId,
-          status: runCase.status,
-        },
-        { transaction: t }
-      );
-      return newRunCase;
-    };
-
-    const deleteRunCase = async (runCase) => {
-      await RunCase.destroy({
-        where: { runId: runId, caseId: runCase.caseId },
-        transaction: t,
-      });
-      return null;
-    };
-
-    const updateRunCase = async (runCase) => {
-      await RunCase.update(
-        {
-          status: runCase.status,
-        },
-        {
-          where: { id: runCase.id },
-          transaction: t,
-        }
-      );
-      return runCase;
-    };
+    if (
+      !Array.isArray(runCases) ||
+      runCases.some(
+        (item) =>
+          !item ||
+          !Number.isSafeInteger(item.caseId) ||
+          item.caseId < 1 ||
+          !['new', 'deleted', 'changed', 'notChanged'].includes(item.editState) ||
+          (item.editState !== 'new' &&
+            !(item.editState === 'deleted' && item.id === -1) &&
+            (!Number.isSafeInteger(item.id) || item.id < 1)) ||
+          (item.editState !== 'deleted' && (!Number.isInteger(item.status) || item.status < 0 || item.status > 4))
+      )
+    )
+      return res.status(400).json({ error: '运行用例或状态格式无效' });
 
     try {
-      const results = await Promise.all(
-        runCases.map(async (step) => {
-          if (step.editState === 'new') {
-            return createRunCase(step);
-          } else if (step.editState === 'deleted') {
-            return deleteRunCase(step);
-          } else if (step.editState === 'changed') {
-            return updateRunCase(step);
-          } else if (step.editState === 'notChanged') {
-            return step;
+      const results = await sequelize.transaction(async (transaction) => {
+        const run = await Run.findByPk(runId, { transaction });
+        const ids = [...new Set(runCases.map((item) => item.caseId))];
+        const count = await Case.count({
+          where: { id: ids },
+          include: [{ model: Folder, where: { projectId: run.projectId }, required: true }],
+          transaction,
+        });
+        if (count !== ids.length) throw Object.assign(new Error('用例不属于当前项目'), { status: 400 });
+        const results = [];
+        for (const item of runCases) {
+          // A case selected and then deselected before saving has never been persisted.
+          if (item.editState === 'deleted' && item.id === -1) continue;
+          if (item.editState === 'new') {
+            results.push(
+              await RunCase.create(
+                { runId, caseId: item.caseId, status: item.status, executionSource: 'manual', agentTaskId: null },
+                { transaction }
+              )
+            );
+            continue;
           }
-        })
-      );
-
-      await t.commit();
-      res.json(results.filter((result) => result !== null));
+          const saved = await RunCase.findOne({
+            where: { id: item.id, runId, caseId: item.caseId },
+            transaction,
+            lock: transaction.LOCK.UPDATE,
+          });
+          if (!saved) throw Object.assign(new Error('运行用例已变化或不属于当前运行，请重新加载'), { status: 409 });
+          if (item.editState === 'deleted') await saved.destroy({ transaction });
+          else {
+            if (item.editState === 'changed')
+              await saved.update(
+                { status: item.status, executionSource: 'manual', agentTaskId: null },
+                { transaction }
+              );
+            results.push(saved);
+          }
+        }
+        return results;
+      });
+      res.json(results);
     } catch (error) {
-      console.error(error);
-      await t.rollback();
+      if (error.status) return res.status(error.status).json({ error: error.message });
+      console.error('Failed to update run cases');
       res.status(500).send('Internal Server Error');
     }
   });
