@@ -20,12 +20,25 @@ First, clone the repository.
 git clone https://github.com/moliason/Test-platfrom.git
 ```
 
+## Start a local database
+
+Run the PostgreSQL service from the repository root:
+
+```bash
+docker compose up -d --wait postgres
+```
+
+The database is available at `127.0.0.1:5433`. Its default database name, username, and password are all `unittcms`. Data is stored in the `postgres-data` Docker volume.
+
 ## Run backend server
 
-Place the .env file at `backend/.env`.
+Copy `backend/.env.example` to `backend/.env`. With the default Docker database settings, use:
 
 ```.env title="backend/.env"
 FRONTEND_ORIGIN=http://localhost:8000
+PORT=8001
+DATABASE_URL=postgres://unittcms:unittcms@127.0.0.1:5433/unittcms
+SECRET_KEY=change-this-key-for-local-development
 ```
 
 Move to backend directory, then install dependencies.

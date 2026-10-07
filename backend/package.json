@@ -6,10 +6,10 @@
   "scripts": {
     "start": "node --env-file-if-exists=.env dist/index.js",
     "dev": "tsoa spec-and-routes && concurrently \"nodemon --config nodemon-tsoa.json\" \"nodemon index.ts\"",
-    "build": "tsoa spec-and-routes && tsc && mkdir -p dist/public && cp public/swagger.json dist/public/",
-    "migrate": "sequelize db:migrate",
-    "seed": "sequelize db:seed:all",
-    "drop": "sequelize db:migrate:undo:all"
+    "build": "tsoa spec-and-routes && tsc && node -e \"const fs = require('node:fs'); fs.mkdirSync('dist/public', { recursive: true }); fs.copyFileSync('public/swagger.json', 'dist/public/swagger.json');\"",
+    "migrate": "node --env-file-if-exists=.env node_modules/sequelize-cli/lib/sequelize db:migrate",
+    "seed": "node --env-file-if-exists=.env node_modules/sequelize-cli/lib/sequelize db:seed:all",
+    "drop": "node --env-file-if-exists=.env node_modules/sequelize-cli/lib/sequelize db:migrate:undo:all"
   },
   "author": "",
   "license": "ISC",
