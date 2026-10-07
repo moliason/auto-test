@@ -93,10 +93,10 @@ export default function AgentReport({ task }: { task: AgentTask }) {
         )}
       </details>
       {task.plan.notes && (
-        <p className="whitespace-pre-wrap break-words text-sm">
-          <strong>计划说明与业务规则补充：</strong>
-          {task.plan.notes}
-        </p>
+        <details>
+          <summary className="cursor-pointer text-sm font-medium">计划说明与业务规则补充</summary>
+          <p className="mt-2 whitespace-pre-wrap break-words text-sm">{task.plan.notes}</p>
+        </details>
       )}
       <details>
         <summary className="cursor-pointer text-sm font-medium">执行时测试环境</summary>
