@@ -70,6 +70,7 @@ import { buildFolderTree } from '@/utils/buildFolderTree';
 import { applyBulkRunCaseChanges, groupRunCaseAssigneeUpdates } from '@/utils/runCaseBulkUpdates';
 import { TagType } from '@/types/tag';
 import StickyHorizontalScrollbar from '@/components/StickyHorizontalScrollbar';
+import AgentDialog from './AgentDialog';
 
 const defaultTestRun = {
   id: 0,
@@ -116,6 +117,7 @@ export default function RunEditor({
   const [isNameInvalid, setIsNameInvalid] = useState<boolean>(false);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [agentOpen, setAgentOpen] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<number[]>([]);
   const [tagFilter, setTagFilter] = useState<number[]>([]);
@@ -559,6 +561,24 @@ export default function RunEditor({
         </div>
 
         <Divider className="my-6" />
+        {isProjectReporter && (
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <Button
+              size="sm"
+              color="primary"
+              variant="flat"
+              isDisabled={isDirty || isUpdating}
+              onPress={() => setAgentOpen(true)}
+            >
+              接口测试 Agent
+            </Button>
+            <p className="text-xs text-default-500">
+              {isDirty
+                ? '请先保存运行中的修改，再发起 Agent 测试。'
+                : '勾选用例后整理测试计划，或打开面板查看历史报告。'}
+            </p>
+          </div>
+        )}
         <div className="flex items-center justify-between">
           <h6 className="h-8 font-bold">{messages.selectTestCase}</h6>
           <div className="flex items-center gap-2">
@@ -674,6 +694,29 @@ export default function RunEditor({
           </div>
         </div>
       </div>
+      {agentOpen && (
+        <AgentDialog
+          runId={runId}
+          token={tokenContext.token.access_token}
+          caseIds={selectedCaseIds.filter((id) =>
+            testCases.some(
+              (item) =>
+                item.id === id && (item.RunCases?.[0]?.id || 0) > 0 && item.RunCases?.[0]?.editState !== 'deleted'
+            )
+          )}
+          canManage={isManager}
+          canEditCase={isProjectDeveloper}
+          onClose={() => {
+            setAgentOpen(false);
+            void fetchRunAndStatusCount();
+            void initTestCases();
+          }}
+          onResults={() => {
+            void fetchRunAndStatusCount();
+            void initTestCases();
+          }}
+        />
+      )}
     </>
   );
 }

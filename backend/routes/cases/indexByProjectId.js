@@ -134,6 +134,8 @@ export default function (sequelize) {
                 'runId',
                 'status',
                 'assigneeUserId',
+                'executionSource',
+                'agentTaskId',
                 [
                   sequelize.literal(
                     `(SELECT COUNT(*) FROM ${commentsTable} WHERE ${commentsCommentableType} = ` +

@@ -47,6 +47,8 @@ type RunCaseType = {
   editState: 'notChanged' | 'changed' | 'new' | 'deleted';
   commentCount?: number;
   assigneeUserId: number | null;
+  executionSource?: 'manual' | 'agent';
+  agentTaskId?: number | null;
 };
 
 type CaseAttachmentType = {

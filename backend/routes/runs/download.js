@@ -78,6 +78,7 @@ export default function (sequelize) {
             ['开始时间', task.startedAt?.toISOString() || '尚未开始'],
             ['结束时间', task.finishedAt?.toISOString() || '尚未结束'],
             ['测试范围（用例编号）', task.plan.cases.map((item) => item.caseId).join(', ')],
+            ['计划说明与业务规则补充', task.plan.notes || ''],
             ['测试环境（敏感值已隐藏）', JSON.stringify(redact(task.plan.environment), null, 2)],
             ['用例总数', summary.total],
             ['通过', summary.passed],

@@ -246,31 +246,42 @@ export default function TestCaseSelector({
         );
       case 'runStatus':
         return (
-          <Dropdown>
-            <DropdownTrigger>
-              <Button
-                isIconOnly
-                radius="full"
-                size="sm"
-                variant="light"
-                title={isIncluded ? testRunCaseStatusMessages[testRunCaseStatus[runStatus].uid] : undefined}
-                isDisabled={!isIncluded || isDisabled}
-              >
-                {isIncluded ? <RunCaseStatus uid={testRunCaseStatus[runStatus].uid} /> : '-'}
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu disabledKeys={disabledStatusKeys} aria-label="test case actions">
-              {testRunCaseStatus.map((runCaseStatus, index) => (
-                <DropdownItem
-                  key={runCaseStatus.uid}
-                  startContent={<RunCaseStatus uid={runCaseStatus.uid} />}
-                  onPress={() => onChangeStatus(testCase.id, index)}
+          <div className="flex flex-col items-center gap-1">
+            <Dropdown>
+              <DropdownTrigger>
+                <Button
+                  isIconOnly
+                  radius="full"
+                  size="sm"
+                  variant="light"
+                  title={isIncluded ? testRunCaseStatusMessages[testRunCaseStatus[runStatus].uid] : undefined}
+                  isDisabled={!isIncluded || isDisabled}
                 >
-                  {testRunCaseStatusMessages[runCaseStatus.uid]}
-                </DropdownItem>
-              ))}
-            </DropdownMenu>
-          </Dropdown>
+                  {isIncluded ? <RunCaseStatus uid={testRunCaseStatus[runStatus].uid} /> : '-'}
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu disabledKeys={disabledStatusKeys} aria-label="test case actions">
+                {testRunCaseStatus.map((runCaseStatus, index) => (
+                  <DropdownItem
+                    key={runCaseStatus.uid}
+                    startContent={<RunCaseStatus uid={runCaseStatus.uid} />}
+                    onPress={() => onChangeStatus(testCase.id, index)}
+                  >
+                    {testRunCaseStatusMessages[runCaseStatus.uid]}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+            {isIncluded && runStatus !== 0 && (
+              <span className="whitespace-nowrap text-xs text-default-500">
+                {testCase.RunCases?.[0]?.editState === 'changed'
+                  ? '人工（待保存）'
+                  : testCase.RunCases?.[0]?.executionSource === 'agent'
+                    ? `Agent #${testCase.RunCases[0].agentTaskId}`
+                    : '人工'}
+              </span>
+            )}
+          </div>
         );
       case 'assignee': {
         const runCaseId = testCase.RunCases && testCase.RunCases.length > 0 ? testCase.RunCases[0].id : null;
