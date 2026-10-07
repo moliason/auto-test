@@ -1,7 +1,32 @@
 import { describe, expect, it } from 'vitest';
-import { modelMeasurements } from './measurements.js';
+import { modelMeasurements, executionMeasurements } from './measurements.js';
 
 describe('model measurement summaries', () => {
+  it('separates requests, committed evidence saves and report time without filling historical gaps', () => {
+    const result = executionMeasurements({
+      results: [
+        { request: { method: 'GET' }, durationMs: 100 },
+        { request: { method: 'POST' }, durationMs: 25 },
+        { request: null, durationMs: 0 },
+      ],
+      events: [
+        { type: 'evidence_saved', caseId: 1, durationMs: 5 },
+        { type: 'evidence_saved', caseId: 2, durationMs: 0 },
+        { type: 'tool_finished', name: 'submit_report', ok: false, reportDurationMs: 99 },
+        { type: 'tool_finished', name: 'submit_report', ok: true, reportDurationMs: 200 },
+      ],
+    });
+    expect(result).toEqual({
+      requests: { durationMs: 125, recorded: 2, total: 2 },
+      persistence: { durationMs: 5, recorded: 2, total: 3 },
+      reportDurationMs: 200,
+    });
+    expect(executionMeasurements({ results: [{ request: null, durationMs: 0 }], events: [] })).toEqual({
+      requests: { durationMs: null, recorded: 0, total: 0 },
+      persistence: { durationMs: null, recorded: 0, total: 1 },
+      reportDurationMs: null,
+    });
+  });
   it('keeps missing historical measurements unknown and does not count tools as models', () => {
     const [prepare, execute] = modelMeasurements([
       { type: 'model', phase: 'prepare' },

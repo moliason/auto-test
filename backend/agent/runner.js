@@ -81,6 +81,7 @@ export async function runAgent(
   const results = [...task.results];
   let read = false;
   let resultsRead = false;
+  let reportStarted = null;
   let toolCount = 0;
   let finished = false;
   const messages = [
@@ -252,9 +253,22 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
                 extracted.set(item.caseId, result.extractedVariables);
                 secrets.push(...result.secrets.filter((value) => !secrets.includes(value)));
               }
+              const saveStarted = performance.now();
               output = await persistEvidence(sequelize, task.id, item, evidence, secrets);
+              await task.update({
+                events: [
+                  ...task.events,
+                  {
+                    type: 'evidence_saved',
+                    caseId: item.caseId,
+                    at: new Date().toISOString(),
+                    durationMs: Math.round(performance.now() - saveStarted),
+                  },
+                ],
+              });
               results.push(output);
               resultsRead = false;
+              reportStarted = null;
             }
             output = {
               caseId: output.caseId,
@@ -264,6 +278,7 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
             };
           } else if (call.function.name === 'get_results') {
             resultsRead = results.length === task.plan.cases.length;
+            if (resultsRead && reportStarted === null) reportStarted = performance.now();
             output = {
               summary: reportSummary({ plan: task.plan, results }),
               cases: results.map((result) => ({
@@ -304,6 +319,9 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
               type: 'tool_finished',
               name: call.function.name,
               ok: !safeOutput.error,
+              ...(call.function.name === 'submit_report' && finished && reportStarted !== null
+                ? { reportDurationMs: Math.round(performance.now() - reportStarted) }
+                : {}),
               ...(safeOutput.error ? { error: safeOutput.error } : {}),
             },
           ],
@@ -321,6 +339,7 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
     if (mode === 'execute') {
       for (const item of task.plan.cases)
         if (!results.some((result) => result.caseId === item.caseId)) {
+          const saveStarted = performance.now();
           const record = await persistEvidence(
             sequelize,
             task.id,
@@ -337,6 +356,17 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
             },
             secrets
           );
+          await task.update({
+            events: [
+              ...task.events,
+              {
+                type: 'evidence_saved',
+                caseId: item.caseId,
+                at: new Date().toISOString(),
+                durationMs: Math.round(performance.now() - saveStarted),
+              },
+            ],
+          });
           results.push(record);
         }
     }

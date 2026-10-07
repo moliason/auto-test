@@ -22,3 +22,32 @@ export function modelMeasurements(events = []) {
     };
   });
 }
+
+export function executionMeasurements(task) {
+  const requests = task.results.filter((result) => result.request !== null && result.request !== undefined);
+  const timedRequests = requests.filter((result) => Number.isFinite(result.durationMs) && result.durationMs >= 0);
+  const saves = task.events.filter(
+    (event) => event.type === 'evidence_saved' && Number.isFinite(event.durationMs) && event.durationMs >= 0
+  );
+  const report = task.events.find(
+    (event) =>
+      event.type === 'tool_finished' &&
+      event.name === 'submit_report' &&
+      event.ok &&
+      Number.isFinite(event.reportDurationMs) &&
+      event.reportDurationMs >= 0
+  );
+  return {
+    requests: {
+      durationMs: timedRequests.length ? timedRequests.reduce((sum, result) => sum + result.durationMs, 0) : null,
+      recorded: timedRequests.length,
+      total: requests.length,
+    },
+    persistence: {
+      durationMs: saves.length ? saves.reduce((sum, event) => sum + event.durationMs, 0) : null,
+      recorded: saves.length,
+      total: task.results.length,
+    },
+    reportDurationMs: report?.reportDurationMs ?? null,
+  };
+}

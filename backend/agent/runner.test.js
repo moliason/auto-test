@@ -142,6 +142,12 @@ describe('Agent plans and controlled HTTP tools', () => {
     ]);
     expect(task.results[6].request).toBeNull();
     expect(task.results[6].reason).toContain('#6');
+    const saves = task.events.filter((event) => event.type === 'evidence_saved');
+    expect(saves.map((event) => event.caseId)).toEqual([1, 2, 3, 4, 5, 6, 7]); // Repeated execute_case does not save twice.
+    expect(saves.every((event) => event.durationMs >= 0)).toBe(true);
+    expect(
+      task.events.find((event) => event.name === 'submit_report' && event.type === 'tool_finished').reportDurationMs
+    ).toBeGreaterThanOrEqual(0);
     expect(reportSummary(task)).toEqual({ total: 7, passed: 2, failed: 4, unexecuted: 1, requestErrors: 2 });
     expect(JSON.stringify(task.results)).not.toContain('demo-token');
     expect((await db.models.RunCase.findAll({ order: [['caseId', 'ASC']] })).map((item) => item.status)).toEqual([
@@ -185,6 +191,8 @@ describe('Agent plans and controlled HTTP tools', () => {
     expect(task.results.map((item) => item.status)).toEqual(['passed', 'skipped']);
     expect(task.results[0].response.status).toBe(200);
     expect(task.results[1].reason).toContain('任务中止');
+    expect(task.events.filter((event) => event.type === 'evidence_saved').map((event) => event.caseId)).toEqual([1, 2]);
+    expect(task.events.some((event) => event.reportDurationMs !== undefined)).toBe(false);
     const lastCall = task.events.filter((event) => event.type === 'model').at(-1);
     expect(lastCall).toMatchObject({ phase: 'execute', outcome: 'failed', usage: null });
   });
