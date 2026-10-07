@@ -5,6 +5,7 @@ import authMiddleware from '../../middleware/auth.js';
 import editableMiddleware from '../../middleware/verifyEditable.js';
 import defineCase from '../../models/cases.js';
 import defineRun from '../../models/runs.js';
+import tasksRoute from './tasks.js';
 
 export default function (sequelize) {
   const router = express.Router();
@@ -14,6 +15,7 @@ export default function (sequelize) {
   const Case = defineCase(sequelize, DataTypes);
   const Run = defineRun(sequelize, DataTypes);
   router.use(verifySignedIn);
+  router.use(tasksRoute(sequelize));
   router.param('caseId', (req, res, next, value) =>
     /^[1-9]\d*$/.test(value) ? next() : res.status(400).json({ error: '用例编号无效' })
   );

@@ -1,0 +1,93 @@
+[
+  {
+    "id": 1,
+    "title": "正常登录并提取 Token",
+    "preConditions": "本地示例服务已启动",
+    "expectedResults": "返回 200，包含 token，用户 ID 为 7",
+    "executionInfo": {
+      "method": "POST",
+      "path": "/login",
+      "body": { "username": "demo", "password": "demo-password" },
+      "assertions": [
+        { "type": "status", "expected": 200 },
+        { "type": "jsonExists", "path": "/token" },
+        { "type": "jsonEquals", "path": "/user/id", "expected": 7 }
+      ],
+      "extract": [{ "name": "TOKEN", "path": "/token", "secret": true }]
+    }
+  },
+  {
+    "id": 2,
+    "title": "使用 Token 查询用户",
+    "preConditions": "正常登录成功",
+    "expectedResults": "返回用户 ID 7",
+    "executionInfo": {
+      "method": "GET",
+      "path": "/profile",
+      "headers": { "Authorization": "Bearer {{TOKEN}}" },
+      "dependsOn": [1],
+      "assertions": [
+        { "type": "status", "expected": 200 },
+        { "type": "jsonEquals", "path": "/id", "expected": 7 }
+      ]
+    }
+  },
+  {
+    "id": 3,
+    "title": "总额应为 100（已知缺陷）",
+    "preConditions": "本地示例服务已启动",
+    "expectedResults": "业务要求 total 为 100",
+    "executionInfo": {
+      "method": "GET",
+      "path": "/broken-total",
+      "assertions": [{ "type": "jsonEquals", "path": "/total", "expected": 100 }]
+    }
+  },
+  {
+    "id": 4,
+    "title": "慢请求超时记录",
+    "preConditions": "测试环境请求超时设置为 500 毫秒",
+    "expectedResults": "若接口在超时前响应，应返回 200；超时应记录请求异常",
+    "executionInfo": { "method": "GET", "path": "/slow", "assertions": [{ "type": "status", "expected": 200 }] }
+  },
+  {
+    "id": 5,
+    "title": "连接断开记录",
+    "preConditions": "本地示例服务已启动",
+    "expectedResults": "正常响应应为 200；断连应记录请求异常",
+    "executionInfo": { "method": "GET", "path": "/disconnect", "assertions": [{ "type": "status", "expected": 200 }] }
+  },
+  {
+    "id": 6,
+    "title": "登录前置失败示例",
+    "preConditions": "使用错误密码以演示前置失败",
+    "expectedResults": "此流程要求登录成功，错误密码导致不符合预期",
+    "executionInfo": {
+      "method": "POST",
+      "path": "/login",
+      "body": { "username": "demo", "password": "wrong-password" },
+      "assertions": [{ "type": "status", "expected": 200 }],
+      "extract": [{ "name": "FAILED_TOKEN", "path": "/token", "secret": true }]
+    }
+  },
+  {
+    "id": 7,
+    "title": "失败前置后的查询应跳过",
+    "preConditions": "登录前置失败示例必须先通过",
+    "expectedResults": "只有前置登录成功才查询用户",
+    "executionInfo": {
+      "method": "GET",
+      "path": "/profile",
+      "headers": { "Authorization": "Bearer {{FAILED_TOKEN}}" },
+      "dependsOn": [6],
+      "assertions": [{ "type": "status", "expected": 200 }]
+    }
+  },
+  {
+    "id": 8,
+    "title": "缺失接口信息，需人工补充",
+    "preConditions": "本地示例服务已启动",
+    "expectedResults": "健康检查返回 HTTP 200",
+    "executionInfo": null
+  }
+]

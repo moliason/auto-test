@@ -94,6 +94,8 @@ async function startServer() {
     // Import the backend app
     const backendAppModule = await import('./backend/server.js');
     const backendApp = backendAppModule.default || backendAppModule;
+    const { recoverAgentTasks } = await import('./backend/agent/runner.js');
+    await recoverAgentTasks(backendAppModule.sequelize);
 
     console.log(`Mounting backend API at: ${API_PATH}`);
     server.use(API_PATH, backendApp);

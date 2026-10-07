@@ -5,6 +5,7 @@ export default function defineAgentTask(sequelize, DataTypes) {
       runId: { type: DataTypes.INTEGER, allowNull: false },
       createdBy: { type: DataTypes.INTEGER, allowNull: true },
       state: { type: DataTypes.STRING, allowNull: false, defaultValue: 'preparing' },
+      version: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 1 },
       plan: { type: DataTypes.JSONB, allowNull: false, defaultValue: {} },
       results: { type: DataTypes.JSONB, allowNull: false, defaultValue: [] },
       events: { type: DataTypes.JSONB, allowNull: false, defaultValue: [] },
