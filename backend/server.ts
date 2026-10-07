@@ -22,6 +22,7 @@ app.use(cors(corsOptions));
 
 // enable json middleware
 app.use('/runcases/update', express.json({ limit: '2mb' }));
+app.use('/cases/ai/save', express.json({ limit: '256kb' }));
 app.use(express.json());
 
 // enable rate limiter
@@ -118,6 +119,8 @@ import casesEditRoute from './routes/cases/edit.js';
 import casesDeleteRoute from './routes/cases/delete.js';
 import casesCloneRoute from './routes/cases/clone.js';
 import casesImportRoute from './routes/cases/import.js';
+import casesAiRoute from './routes/cases/ai.js';
+app.use('/cases', casesAiRoute(sequelize));
 app.use('/cases', casesDownloadRoute(sequelize));
 app.use('/cases', casesMoveRoute(sequelize));
 app.use('/cases', casesIndexRoute(sequelize));

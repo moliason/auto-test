@@ -26,9 +26,11 @@ import {
   ListPlus,
 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import TestCaseFilter from './TestCaseFilter';
 import { CaseTreeContext } from '../../CaseTreeProvider';
 import CaseDialog from './CaseDialog';
+import AiCaseDialog from './AiCaseDialog';
 import CaseMoveDialog from './CaseMoveDialog';
 import CaseImportDialog from './CaseImportDialog';
 import DeleteConfirmDialog from '@/components/DeleteConfirmDialog';
@@ -73,6 +75,8 @@ export default function CasesPane({
   const isDisabled = !context.isProjectDeveloper(Number(projectId));
   const [showFilter, setShowFilter] = useState(false);
   const [isCaseDialogOpen, setIsCaseDialogOpen] = useState(false);
+  const [isAiDialogOpen, setIsAiDialogOpen] = useState(false);
+  const ai = useTranslations('AiCases');
   const params = new URLSearchParams(searchParamsString);
   const searchFilter = params.get('search') ?? '';
   const priorityFilter = parseQueryParam(params.get('priority'));
@@ -334,10 +338,26 @@ export default function CasesPane({
           >
             {messages.newTestCase}
           </Button>
+          <Button size="sm" variant="bordered" isDisabled={isDisabled} onPress={() => setIsAiDialogOpen(true)}>
+            {ai('title')}
+          </Button>
         </div>
       </div>
 
       <CaseDialog isOpen={isCaseDialogOpen} onCancel={closeDialog} onSubmit={onSubmit} messages={messages} />
+      {isAiDialogOpen && (
+        <AiCaseDialog
+          key={folderId}
+          folderId={folderId}
+          token={accessToken}
+          onClose={() => setIsAiDialogOpen(false)}
+          onSaved={() => {
+            setIsAiDialogOpen(false);
+            void refreshCases();
+            addToast({ title: ai('saved'), color: 'success' });
+          }}
+        />
+      )}
       <RunDialog
         isOpen={isRunDialogOpen}
         editingRun={null}

@@ -66,6 +66,20 @@ Start backend server.
 npm run start
 ```
 
+### AI case drafts (DeepSeek)
+
+Set `DEEPSEEK_API_KEY` in the backend environment or `backend/.env`, then restart the backend.
+`DEEPSEEK_MODEL` defaults to `deepseek-flash`. Never put the key in frontend configuration.
+
+In a project's case folder, choose **AI case drafts** (中文：**AI 生成用例**). Enter text requirements to generate up to six drafts.
+Review and edit titles, priorities, preconditions, steps and expected results, remove unwanted cases, then check the review box and save.
+Missing business rules are marked for confirmation. The generated cases use the existing step template; they are not automatically executed.
+Only project members with case editing permission can generate or save drafts. Saving inserts all cases and steps in one database transaction.
+
+The backend exposes `POST /cases/ai/generate?folderId=...` with `{ "requirements": "..." }`,
+and `POST /cases/ai/save?folderId=...` with `{ "cases": [...], "reviewed": true }`. Both require the existing bearer token.
+Generation has a 60-second timeout and does not write to the database. Unsaved drafts are discarded when the dialog is closed.
+
 ## Run frontend server
 
 Move to frontend directory, then install dependencies.

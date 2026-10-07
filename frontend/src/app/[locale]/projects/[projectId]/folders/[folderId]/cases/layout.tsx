@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { useTranslations } from 'next-intl';
+import { NextIntlClientProvider, useMessages, useTranslations } from 'next-intl';
 import CasesWorkspace from './CasesWorkspace';
 import { PriorityMessages } from '@/types/priority';
 import { TestTypeMessages } from '@/types/testType';
@@ -13,6 +13,7 @@ export default function CasesLayout({
   params: { projectId: string; folderId: string; locale: string };
 }) {
   const t = useTranslations('Cases');
+  const aiMessages = useMessages().AiCases;
   const runs = useTranslations('Runs');
   const messages = {
     createRun: t('create_run'),
@@ -78,24 +79,26 @@ export default function CasesLayout({
   const testTypeMessages: TestTypeMessages = {};
 
   return (
-    <CasesWorkspace
-      projectId={params.projectId}
-      folderId={params.folderId}
-      locale={params.locale as LocaleCodeType}
-      messages={messages}
-      priorityMessages={priorityMessages}
-      testTypeMessages={testTypeMessages}
-      runDialogMessages={{
-        run: t('create_run'),
-        runName: runs('run_name'),
-        runDescription: runs('run_description'),
-        close: runs('close'),
-        create: runs('create'),
-        update: runs('update'),
-        pleaseEnter: runs('please_enter'),
-      }}
-    >
-      {children}
-    </CasesWorkspace>
+    <NextIntlClientProvider locale={params.locale} messages={{ AiCases: aiMessages }}>
+      <CasesWorkspace
+        projectId={params.projectId}
+        folderId={params.folderId}
+        locale={params.locale as LocaleCodeType}
+        messages={messages}
+        priorityMessages={priorityMessages}
+        testTypeMessages={testTypeMessages}
+        runDialogMessages={{
+          run: t('create_run'),
+          runName: runs('run_name'),
+          runDescription: runs('run_description'),
+          close: runs('close'),
+          create: runs('create'),
+          update: runs('update'),
+          pleaseEnter: runs('please_enter'),
+        }}
+      >
+        {children}
+      </CasesWorkspace>
+    </NextIntlClientProvider>
   );
 }
