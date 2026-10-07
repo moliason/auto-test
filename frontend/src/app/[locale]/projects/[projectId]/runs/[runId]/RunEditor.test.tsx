@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { describe, expect, it, vi } from 'vitest';
 import RunEditor from './RunEditor';
 import type { RunMessages } from '@/types/run';
+import type { CaseType } from '@/types/case';
 
 (globalThis as typeof globalThis & { React: typeof React }).React = React;
 (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -72,8 +73,8 @@ vi.mock('../runsControl', () => ({
     { id: 3, folderId: 9, RunCases: [{ id: 13, status: 0 }] },
   ]),
   includeExcludeTestCases: vi.fn((_include, keys, _runId, cases) =>
-    cases.map((item) =>
-      keys.includes(item.id) ? { ...item, RunCases: [{ ...item.RunCases[0], editState: 'deleted' }] } : item
+    cases.map((item: CaseType) =>
+      keys.includes(item.id) ? { ...item, RunCases: [{ ...item.RunCases?.[0], editState: 'deleted' }] } : item
     )
   ),
   changeStatus: vi.fn((_caseId, _status, cases) => cases),
