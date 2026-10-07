@@ -1,0 +1,76 @@
+{
+  "checkedAt": "2026-10-07T07:16:19.284Z",
+  "scope": "既有演示服务上的平台计量验证，不计入实际业务三轮或真实人工效率数据",
+  "runId": 9,
+  "taskId": 7,
+  "summary": {
+    "total": 8,
+    "passed": 3,
+    "failed": 4,
+    "unexecuted": 1,
+    "requestErrors": 2
+  },
+  "executionMeasurements": {
+    "requests": {
+      "durationMs": 535,
+      "recorded": 7,
+      "total": 7
+    },
+    "persistence": {
+      "durationMs": 115,
+      "recorded": 8,
+      "total": 8
+    },
+    "reportDurationMs": 5379
+  },
+  "modelMeasurements": [
+    {
+      "phase": "prepare",
+      "calls": 2,
+      "completedCalls": 2,
+      "failedCalls": 0,
+      "durationMs": 4074,
+      "timedCalls": 2,
+      "tokens": {
+        "prompt_tokens": {
+          "value": 2704,
+          "recordedCalls": 2
+        },
+        "completion_tokens": {
+          "value": 848,
+          "recordedCalls": 2
+        },
+        "total_tokens": {
+          "value": 3552,
+          "recordedCalls": 2
+        }
+      }
+    },
+    {
+      "phase": "execute",
+      "calls": 6,
+      "completedCalls": 6,
+      "failedCalls": 0,
+      "durationMs": 10392,
+      "timedCalls": 6,
+      "tokens": {
+        "prompt_tokens": {
+          "value": 12944,
+          "recordedCalls": 6
+        },
+        "completion_tokens": {
+          "value": 1399,
+          "recordedCalls": 6
+        },
+        "total_tokens": {
+          "value": 14343,
+          "recordedCalls": 6
+        }
+      }
+    }
+  ],
+  "excelMatchesApi": true,
+  "oldPersistenceAndReportRemainUnknown": true,
+  "browser": "生产构建真实流程通过，320/768/1024/1440 宽度检查通过",
+  "implementationCommit": "1d6ccac081a48249e424cc6fb719e0a4ff77a2f1"
+}
