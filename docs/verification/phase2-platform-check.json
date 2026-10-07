@@ -1,0 +1,81 @@
+{
+  "checkedAt": "2026-10-07T07:04:48.419Z",
+  "scope": "平台改进验证，既有演示服务；不计为实际业务验收或真实人工效率数据",
+  "taskId": 6,
+  "runId": 8,
+  "provider": "DeepSeek",
+  "model": "deepseek-flash",
+  "summary": {
+    "total": 8,
+    "passed": 3,
+    "failed": 4,
+    "unexecuted": 1,
+    "requestErrors": 2
+  },
+  "measurements": [
+    {
+      "phase": "prepare",
+      "calls": 2,
+      "completedCalls": 2,
+      "failedCalls": 0,
+      "durationMs": 6073,
+      "timedCalls": 2,
+      "tokens": {
+        "prompt_tokens": {
+          "value": 2699,
+          "recordedCalls": 2
+        },
+        "completion_tokens": {
+          "value": 1256,
+          "recordedCalls": 2
+        },
+        "total_tokens": {
+          "value": 3955,
+          "recordedCalls": 2
+        }
+      }
+    },
+    {
+      "phase": "execute",
+      "calls": 5,
+      "completedCalls": 5,
+      "failedCalls": 0,
+      "durationMs": 10210,
+      "timedCalls": 5,
+      "tokens": {
+        "prompt_tokens": {
+          "value": 10759,
+          "recordedCalls": 5
+        },
+        "completion_tokens": {
+          "value": 1425,
+          "recordedCalls": 5
+        },
+        "total_tokens": {
+          "value": 12184,
+          "recordedCalls": 5
+        }
+      }
+    }
+  ],
+  "excelMatchesApi": true,
+  "oldTaskUsageRemainsUnknown": true,
+  "browser": {
+    "failureFilter": true,
+    "responseExpanded": true,
+    "keyboardFocusWithinDialog": true,
+    "widths": [320, 768, 1024, 1440],
+    "longNotesCollapsedAndExpandable": true
+  },
+  "verification": {
+    "vitest": {
+      "files": 60,
+      "tests": 262
+    },
+    "playwright": {
+      "tests": 2
+    },
+    "backendBuild": "passed",
+    "frontendBuild": "passed"
+  }
+}
