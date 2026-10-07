@@ -39,3 +39,9 @@ node demo/server.mjs
 任务完成状态表示执行与整理已结束，不表示全部测试通过。可通过 `/runs/download/<runId>?type=xlsx&agentTaskId=<taskId>` 导出指定历史报告（需要原平台登录凭据及项目权限）。重复创建 Agent 任务会保留此前快照、证据和报告。
 
 开发测试 `backend/agent/runner.test.js` 模拟模型工具选择，HTTP 请求实际发往本地示例服务。完整界面演示和真实模型联调状态以根目录 `docs/agent-status.md` 为准。
+
+## 浏览器完整验证
+
+`npm run e2e:agent` 会创建新的演示数据，通过真实页面完成缺失信息补充、确认、执行、历史查看和 Excel 下载，并检查四种窗口宽度。测试会调用已启动后端配置的真实模型，需要可用模型接口。默认前端为 `http://localhost:8010`、后端为 `http://localhost:8011`，可通过 `E2E_BASE_URL` 和 `E2E_API_URL` 修改；两者须与前端接口配置及后端 CORS 配置一致。
+
+本机使用已安装的 Microsoft Edge；其他环境可设置 `PLAYWRIGHT_CHANNEL=chromium` 并先运行 `npx playwright install chromium`。执行前启动数据库、后端、前端和 `node demo/server.mjs`。截图与导出文件保存在被 Git 忽略的 `test-results` 目录。

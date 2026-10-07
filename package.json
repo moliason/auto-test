@@ -10,6 +10,7 @@
     "coverage": "vitest run --coverage",
     "e2e:docker": "playwright test --config playwright.docker.config.ts",
     "e2e:dev": "playwright test --config playwright.dev.config.ts",
+    "e2e:agent": "playwright test --config playwright.agent.config.ts",
     "report": "playwright show-report",
     "lint": "eslint",
     "lint:fix": "eslint --fix"
