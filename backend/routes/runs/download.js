@@ -17,6 +17,7 @@ import editableMiddleware from '../../middleware/verifyEditable.js';
 import defineAgentTask from '../../models/agentTasks.js';
 import { reportSummary } from '../../agent/plan.js';
 import { redact } from '../../agent/execution.js';
+import { modelMeasurements } from '../../agent/measurements.js';
 
 export default function (sequelize) {
   const router = express.Router();
@@ -152,6 +153,65 @@ export default function (sequelize) {
             ['模型总结与原因推测', task.analysis || '尚未生成分析，已有执行记录仍可查看。'],
           ]);
           analysis.columns = [{ width: 30 }, { width: 110 }];
+          const usage = workbook.addWorksheet('模型用量');
+          usage.addRow([
+            '说明',
+            '次数包含失败或中断的调用；耗时为客户端等待模型的时长。仅汇总接口已返回的 Token，缺失不按 0 计算；旧任务未采集的数值不补估。',
+          ]);
+          usage.addRow([
+            '阶段',
+            '调用次数',
+            '成功响应',
+            '失败响应',
+            '已记录耗时(ms)',
+            '已计时调用数',
+            '输入 Token',
+            '输入已记录次数',
+            '输出 Token',
+            '输出已记录次数',
+            '总 Token',
+            '总 Token 已记录次数',
+          ]);
+          for (const measurement of modelMeasurements(task.events)) {
+            usage.addRow([
+              measurement.phase === 'prepare' ? '准备' : '执行',
+              measurement.calls,
+              measurement.completedCalls,
+              measurement.failedCalls,
+              measurement.durationMs ?? '未记录',
+              measurement.timedCalls,
+              ...['prompt_tokens', 'completion_tokens', 'total_tokens'].flatMap((field) => [
+                measurement.tokens[field].value ?? '未记录',
+                measurement.tokens[field].recordedCalls,
+              ]),
+            ]);
+          }
+          usage.addRow([]);
+          usage.addRow([
+            '阶段',
+            '序号',
+            '开始时间',
+            '结束时间',
+            '结果',
+            '耗时(ms)',
+            '输入 Token',
+            '输出 Token',
+            '总 Token',
+          ]);
+          for (const event of task.events.filter((entry) => entry.type === 'model')) {
+            usage.addRow([
+              event.phase,
+              event.call,
+              event.at,
+              event.finishedAt || '未记录',
+              event.outcome || '未记录',
+              event.durationMs ?? '未记录',
+              event.usage?.prompt_tokens ?? '未记录',
+              event.usage?.completion_tokens ?? '未记录',
+              event.usage?.total_tokens ?? '未记录',
+            ]);
+          }
+          usage.columns = Array.from({ length: 12 }, (_, index) => ({ width: index === 0 ? 18 : 24 }));
           for (const sheet of workbook.worksheets) {
             sheet.views = [{ state: 'frozen', ySplit: 1 }];
             sheet.getRow(1).font = { bold: true };

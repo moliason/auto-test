@@ -28,6 +28,19 @@ beforeEach(async () => {
     state: 'completed',
     startedAt: new Date(),
     finishedAt: new Date(),
+    events: [
+      {
+        type: 'model',
+        phase: 'prepare',
+        call: 1,
+        at: '2026-10-07T00:00:00.000Z',
+        finishedAt: '2026-10-07T00:00:00.100Z',
+        outcome: 'completed',
+        durationMs: 100,
+        usage: { prompt_tokens: 20, completion_tokens: 5, total_tokens: 25 },
+      },
+      { type: 'model', phase: 'execute', call: 1, at: '2026-10-07T00:00:00.200Z' },
+    ],
     plan: {
       model: 'test-model',
       provider: 'test-provider',
@@ -110,6 +123,23 @@ describe('Agent historical Excel reports', () => {
     expect(JSON.stringify(book.getWorksheet('AI 分析').getSheetValues())).toContain('待核实推测');
     expect(JSON.stringify(book.model)).not.toContain('secret-not-for-export');
     expect(JSON.stringify(book.model)).not.toContain('Current changed title');
+    const usage = book.getWorksheet('模型用量');
+    expect(usage.getRow(3).values.slice(1)).toEqual(['准备', 1, 1, 0, 100, 1, 20, 1, 5, 1, 25, 1]);
+    expect(usage.getRow(4).values.slice(1)).toEqual([
+      '执行',
+      1,
+      0,
+      0,
+      '未记录',
+      0,
+      '未记录',
+      0,
+      '未记录',
+      0,
+      '未记录',
+      0,
+    ]);
+    expect(usage.getRow(7).values).toContain('2026-10-07T00:00:00.100Z');
   });
   it('restricts public-project evidence to reporters and prevents task ID swapping', async () => {
     await db.models.Project.update({ isPublic: true }, { where: { id: 1 } });

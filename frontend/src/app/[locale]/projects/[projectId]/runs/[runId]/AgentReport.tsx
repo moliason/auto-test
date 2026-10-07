@@ -43,6 +43,50 @@ export default function AgentReport({ task }: { task: AgentTask }) {
           <dd>{task.finishedAt ? new Date(task.finishedAt).toLocaleString() : '尚未结束'}</dd>
         </div>
       </dl>
+      <details>
+        <summary className="cursor-pointer text-sm font-medium">模型调用与 Token 用量</summary>
+        <p className="mt-2 text-xs text-default-500">
+          仅统计接口实际返回的用量；未记录不等于 0。括号为已记录次数 /
+          调用次数，部分记录不能代表完整消耗。耗时为等待模型响应的累计时长，不是人工操作时间。
+        </p>
+        {task.measurements ? (
+          <div className="mt-2 overflow-x-auto">
+            <table className="w-full text-left text-xs" aria-label="模型用量">
+              <thead>
+                <tr>
+                  {['阶段', '调用次数', '失败响应', '模型耗时(ms)', '输入 Token', '输出 Token', '总 Token'].map(
+                    (label) => (
+                      <th key={label} className="p-2 whitespace-nowrap">
+                        {label}
+                      </th>
+                    )
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {task.measurements.map((measurement) => (
+                  <tr key={measurement.phase} className="border-t border-default-200">
+                    <td className="p-2">{measurement.phase === 'prepare' ? '准备' : '执行'}</td>
+                    <td className="p-2">{measurement.calls}</td>
+                    <td className="p-2">{measurement.failedCalls}</td>
+                    <td className="p-2 whitespace-nowrap">
+                      {measurement.durationMs ?? '未记录'}（{measurement.timedCalls}/{measurement.calls}）
+                    </td>
+                    {['prompt_tokens', 'completion_tokens', 'total_tokens'].map((field) => (
+                      <td key={field} className="p-2 whitespace-nowrap">
+                        {measurement.tokens[field].value ?? '未记录'}（{measurement.tokens[field].recordedCalls}/
+                        {measurement.calls}）
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="mt-2 text-sm text-default-500">此记录尚未提供模型用量。</p>
+        )}
+      </details>
       {task.plan.notes && (
         <p className="whitespace-pre-wrap break-words text-sm">
           <strong>计划说明与业务规则补充：</strong>

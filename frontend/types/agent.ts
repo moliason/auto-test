@@ -42,6 +42,15 @@ export type AgentTask = {
     assertions: { type: string; path?: string; expected?: unknown; actual?: unknown; passed: boolean }[];
   }[];
   events: { at: string; type: string; name?: string; phase?: string; call?: number; ok?: boolean; error?: string }[];
+  measurements?: {
+    phase: string;
+    calls: number;
+    completedCalls: number;
+    failedCalls: number;
+    durationMs: number | null;
+    timedCalls: number;
+    tokens: Record<string, { value: number | null; recordedCalls: number }>;
+  }[];
   summary: { total: number; passed: number; failed: number; unexecuted: number; requestErrors: number };
 };
 

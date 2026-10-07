@@ -11,6 +11,7 @@ import defineStep from '../../models/steps.js';
 import defineCaseStep from '../../models/caseSteps.js';
 import { buildPlan, reportSummary } from '../../agent/plan.js';
 import { runAgent } from '../../agent/runner.js';
+import { modelMeasurements } from '../../agent/measurements.js';
 
 export default function (sequelize, { launch = runAgent } = {}) {
   const router = express.Router();
@@ -89,7 +90,9 @@ export default function (sequelize, { launch = runAgent } = {}) {
       void launch(sequelize, task.id, 'prepare').catch(() =>
         console.error('Agent background task could not persist state:', task.id)
       );
-      return res.status(202).json({ ...task.toJSON(), summary: reportSummary(task) });
+      return res
+        .status(202)
+        .json({ ...task.toJSON(), summary: reportSummary(task), measurements: modelMeasurements(task.events) });
     } catch {
       return res.status(500).json({ error: '创建 Agent 任务失败，请检查数据库及用例配置' });
     }
@@ -129,7 +132,7 @@ export default function (sequelize, { launch = runAgent } = {}) {
     try {
       const task = await Task.findOne({ where: { id: req.params.taskId, runId: req.params.runId } });
       if (!task) return res.status(404).json({ error: '任务不属于此测试运行或已删除' });
-      return res.json({ ...task.toJSON(), summary: reportSummary(task) });
+      return res.json({ ...task.toJSON(), summary: reportSummary(task), measurements: modelMeasurements(task.events) });
     } catch {
       return res.status(500).json({ error: '读取 Agent 任务失败' });
     }
@@ -174,7 +177,11 @@ export default function (sequelize, { launch = runAgent } = {}) {
         );
         return task;
       });
-      return res.json({ ...updated.toJSON(), summary: reportSummary(updated) });
+      return res.json({
+        ...updated.toJSON(),
+        summary: reportSummary(updated),
+        measurements: modelMeasurements(updated.events),
+      });
     } catch (error) {
       return res.status(error.status || 500).json({ error: error.status ? error.message : '保存计划失败' });
     }
@@ -232,7 +239,9 @@ export default function (sequelize, { launch = runAgent } = {}) {
       void launch(sequelize, task.id, 'execute').catch(() =>
         console.error('Agent background task could not persist state:', task.id)
       );
-      return res.status(202).json({ ...task.toJSON(), summary: reportSummary(task) });
+      return res
+        .status(202)
+        .json({ ...task.toJSON(), summary: reportSummary(task), measurements: modelMeasurements(task.events) });
     } catch (error) {
       if (error.name === 'SequelizeUniqueConstraintError')
         return res.status(409).json({ error: '此测试运行已有 Agent 正在执行' });
