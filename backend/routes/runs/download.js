@@ -17,7 +17,7 @@ import editableMiddleware from '../../middleware/verifyEditable.js';
 import defineAgentTask from '../../models/agentTasks.js';
 import { reportSummary } from '../../agent/plan.js';
 import { redact } from '../../agent/execution.js';
-import { modelMeasurements } from '../../agent/measurements.js';
+import { modelMeasurements, executionMeasurements } from '../../agent/measurements.js';
 
 export default function (sequelize) {
   const router = express.Router();
@@ -65,6 +65,7 @@ export default function (sequelize) {
           workbook.creator = 'Auto-test';
           workbook.title = `Agent 测试报告 #${task.id}`;
           const summary = reportSummary(task);
+          const timings = executionMeasurements(task);
           const overview = workbook.addWorksheet('执行概览');
           overview.addRows([
             ['项目', '记录'],
@@ -88,6 +89,15 @@ export default function (sequelize) {
             ['请求异常', summary.requestErrors],
             ['任务错误', task.error || ''],
             ['统计依据', '仅使用本次持久化执行记录，不使用当前人工状态或模型提供的数字'],
+            ['HTTP 与断言累计耗时(ms)', timings.requests.durationMs ?? '未记录'],
+            ['HTTP 计时覆盖（已记录/请求数）', `${timings.requests.recorded}/${timings.requests.total}`],
+            ['保存与回填累计耗时(ms)', timings.persistence.durationMs ?? '未记录'],
+            ['回填计时覆盖（已记录/结果数）', `${timings.persistence.recorded}/${timings.persistence.total}`],
+            ['报告整理耗时(ms)', timings.reportDurationMs ?? '未记录'],
+            [
+              '耗时口径',
+              'HTTP 包含响应读取和断言；保存与回填包含证据事务提交，不含计量日志写入；报告从首次读取完整结果至报告保存，包含期间模型等待。各项与模型耗时可能重叠，不能相加视为人工劳动时间。缺失计时不按零处理。',
+            ],
           ]);
           overview.columns = [{ width: 32 }, { width: 110 }];
           const cases = workbook.addWorksheet('用例结果');

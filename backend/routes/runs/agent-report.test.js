@@ -29,6 +29,8 @@ beforeEach(async () => {
     startedAt: new Date(),
     finishedAt: new Date(),
     events: [
+      { type: 'evidence_saved', caseId: 1, durationMs: 5 },
+      { type: 'tool_finished', name: 'submit_report', ok: true, reportDurationMs: 1200 },
       {
         type: 'model',
         phase: 'prepare',
@@ -113,6 +115,11 @@ describe('Agent historical Excel reports', () => {
       '未执行（含跳过）': 1,
       请求异常: 1,
       模型: 'test-model',
+      'HTTP 与断言累计耗时(ms)': 12,
+      'HTTP 计时覆盖（已记录/请求数）': '1/1',
+      '保存与回填累计耗时(ms)': 5,
+      '回填计时覆盖（已记录/结果数）': '1/3',
+      '报告整理耗时(ms)': 1200,
     });
     expect(book.getWorksheet('用例结果').getRow(2).values).toContain('Original 1');
     expect(book.getWorksheet('用例结果').getRow(2).values).toContain('通过');

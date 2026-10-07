@@ -48,6 +48,39 @@ export default function AgentReport({ task }: { task: AgentTask }) {
           <dd>{task.finishedAt ? new Date(task.finishedAt).toLocaleString() : '尚未结束'}</dd>
         </div>
       </dl>
+      {task.executionMeasurements && (
+        <details>
+          <summary className="cursor-pointer text-sm font-medium">执行与整理耗时</summary>
+          <dl className="mt-2 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
+            {[
+              ['HTTP 与断言累计', task.executionMeasurements.requests],
+              ['保存与回填累计', task.executionMeasurements.persistence],
+            ].map(([label, value]) => {
+              const timing = value as { durationMs: number | null; recorded: number; total: number };
+              return (
+                <div key={String(label)}>
+                  <dt className="font-medium">{String(label)}</dt>
+                  <dd>
+                    {timing.durationMs === null ? '未记录' : `${timing.durationMs} ms`}（{timing.recorded}/
+                    {timing.total} 条已记录）
+                  </dd>
+                </div>
+              );
+            })}
+            <div>
+              <dt className="font-medium">报告整理</dt>
+              <dd>
+                {task.executionMeasurements.reportDurationMs === null
+                  ? '未记录'
+                  : `${task.executionMeasurements.reportDurationMs} ms`}
+              </dd>
+            </div>
+          </dl>
+          <p className="mt-2 text-xs text-default-500">
+            回填包含证据事务提交，不含计量日志写入；报告从读取完整结果到保存，包含期间模型等待。各项与模型耗时可能重叠，不可相加作为人工劳动时间。未采集的旧记录保留为未知。
+          </p>
+        </details>
+      )}
       <details>
         <summary className="cursor-pointer text-sm font-medium">模型调用与 Token 用量</summary>
         <p className="mt-2 text-xs text-default-500">

@@ -51,6 +51,11 @@ export type AgentTask = {
     timedCalls: number;
     tokens: Record<string, { value: number | null; recordedCalls: number }>;
   }[];
+  executionMeasurements?: {
+    requests: { durationMs: number | null; recorded: number; total: number };
+    persistence: { durationMs: number | null; recorded: number; total: number };
+    reportDurationMs: number | null;
+  };
   summary: { total: number; passed: number; failed: number; unexecuted: number; requestErrors: number };
 };
 

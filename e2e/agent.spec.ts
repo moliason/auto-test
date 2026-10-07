@@ -87,6 +87,13 @@ test('real Agent flow: missing information, confirmation, HTTP results, history 
     'passed',
   ]);
   const report = dialog.getByRole('region', { name: 'Agent 执行报告' });
+  expect(task.executionMeasurements.requests).toMatchObject({ recorded: 7, total: 7 });
+  expect(task.executionMeasurements.persistence).toMatchObject({ recorded: 8, total: 8 });
+  expect(task.executionMeasurements.reportDurationMs).toBeGreaterThanOrEqual(0);
+  await report.getByText('执行与整理耗时', { exact: true }).click();
+  await expect(
+    report.getByText(`${task.executionMeasurements.persistence.durationMs} ms（8/8 条已记录）`, { exact: true })
+  ).toBeVisible();
   await expect(report.getByText('失败数量包含 2 条请求异常。', { exact: false })).toBeVisible();
   await report
     .locator('summary')

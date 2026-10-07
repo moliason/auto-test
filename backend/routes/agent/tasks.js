@@ -90,14 +90,12 @@ export default function (sequelize, { launch = runAgent } = {}) {
       void launch(sequelize, task.id, 'prepare').catch(() =>
         console.error('Agent background task could not persist state:', task.id)
       );
-      return res
-        .status(202)
-        .json({
-          ...task.toJSON(),
-          summary: reportSummary(task),
-          measurements: modelMeasurements(task.events),
-          executionMeasurements: executionMeasurements(task),
-        });
+      return res.status(202).json({
+        ...task.toJSON(),
+        summary: reportSummary(task),
+        measurements: modelMeasurements(task.events),
+        executionMeasurements: executionMeasurements(task),
+      });
     } catch {
       return res.status(500).json({ error: '创建 Agent 任务失败，请检查数据库及用例配置' });
     }
@@ -250,14 +248,12 @@ export default function (sequelize, { launch = runAgent } = {}) {
       void launch(sequelize, task.id, 'execute').catch(() =>
         console.error('Agent background task could not persist state:', task.id)
       );
-      return res
-        .status(202)
-        .json({
-          ...task.toJSON(),
-          summary: reportSummary(task),
-          measurements: modelMeasurements(task.events),
-          executionMeasurements: executionMeasurements(task),
-        });
+      return res.status(202).json({
+        ...task.toJSON(),
+        summary: reportSummary(task),
+        measurements: modelMeasurements(task.events),
+        executionMeasurements: executionMeasurements(task),
+      });
     } catch (error) {
       if (error.name === 'SequelizeUniqueConstraintError')
         return res.status(409).json({ error: '此测试运行已有 Agent 正在执行' });
