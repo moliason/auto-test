@@ -23,6 +23,7 @@ app.use(cors(corsOptions));
 // enable json middleware
 app.use('/runcases/update', express.json({ limit: '2mb' }));
 app.use('/cases/ai/save', express.json({ limit: '256kb' }));
+app.use('/agent', express.json({ limit: '2mb' }));
 app.use(express.json());
 
 // enable rate limiter
@@ -57,6 +58,9 @@ export const sequelize = sequelizeUrl
 
 // Register TSOA-generated routes (TypeScript controllers)
 RegisterRoutes(app);
+
+import agentRoute from './routes/agent/index.js';
+app.use('/agent', agentRoute(sequelize));
 
 // "users"
 import usersIndexRoute from './routes/users/index.js';

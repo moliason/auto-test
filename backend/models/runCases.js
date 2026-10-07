@@ -19,6 +19,15 @@ function defineRunCase(sequelize, DataTypes) {
         allowNull: true,
         defaultValue: null,
       },
+      executionSource: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'manual',
+      },
+      agentTaskId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
     },
     { tableName: 'runCases' }
   );

@@ -18,6 +18,10 @@ function defineRun(sequelize, DataTypes) {
         type: DataTypes.INTEGER,
         allowNull: true,
       },
+      agentEnvironment: {
+        type: DataTypes.JSONB,
+        allowNull: true,
+      },
       projectId: {
         type: DataTypes.INTEGER,
         allowNull: false,

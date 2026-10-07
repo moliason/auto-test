@@ -42,6 +42,10 @@ function defineCase(sequelize, DataTypes) {
         type: DataTypes.TEXT,
         allowNull: true,
       },
+      executionInfo: {
+        type: DataTypes.JSONB,
+        allowNull: true,
+      },
       folderId: {
         type: DataTypes.INTEGER,
         allowNull: false,

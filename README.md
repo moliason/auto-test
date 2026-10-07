@@ -1,3 +1,42 @@
+# Auto-test：接口测试 Agent 毕设
+
+基于现有 Test-platfrom 平台，复用项目、目录、测试运行、权限和报告，增加接口测试 Agent。来源及许可见 [SOURCE.md](SOURCE.md) 和 [LICENSE](LICENSE)。下方保留原平台介绍。
+
+**当前仍在开发，尚未完成完整 Agent 验收。** 已完成平台迁入、用例草稿生成、HTTP 执行器和执行配置接口；计划确认、工具调用调度、结果回填及报告还在接入。具体状态见 [开发与验收记录](docs/agent-status.md)。
+
+本地数据库使用独立的 Docker 卷，端口 **5433**，不占用原平台的 5432：
+
+```sh
+docker compose up -d --wait postgres
+cd backend
+# 首次运行：复制 .env.example 为 .env，设置自己的 SECRET_KEY
+npm ci
+npm run migrate
+npm run build
+npm start
+```
+
+DeepSeek 配置保存在后端环境或 `backend/.env`：`DEEPSEEK_API_KEY`、`DEEPSEEK_MODEL=deepseek-flash`、`DEEPSEEK_BASE_URL=https://api.deepseek.com`。不要提交真实密钥。本地兼容代理可通过这三个配置项指定，使用代理实际支持的模型名称；代理联调不能代表官方 DeepSeek 联调。
+
+本地被测服务（独立终端，仓库根目录）：
+
+```sh
+node demo/server.mjs
+```
+
+服务地址为 `http://127.0.0.1:4010`，包含登录、认证查询、故意返回错误总额、慢请求和断连接口。测试目标须列入后端 `TEST_AGENT_ALLOWED_ORIGINS`。认证值通过后端 `TEST_AGENT_SECRET_变量名` 设置，执行配置用 `{{变量名}}` 引用。
+
+核心验证（仓库根目录）：
+
+```sh
+npm ci
+npx vitest run backend/agent/execution.test.js backend/routes/agent/index.test.js backend/routes/cases/ai.test.js
+```
+
+执行器测试启动真实本地 HTTP 服务，模型测试使用模拟响应。这些检查不能替代完整 Agent 流程验收。
+
+---
+
 <p align="center">
   <img src="./frontend/public/favicon/test-platfrom.svg" width="96" height="96" alt="Test-platfrom" />
 </p>
