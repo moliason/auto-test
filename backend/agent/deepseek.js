@@ -27,11 +27,23 @@ export async function chatCompletion(messages, { tools, signal, json = false, ma
     if (!response.ok)
       throw Object.assign(new Error('模型调用失败，请检查后端配置、网络和账户额度'), { code: 'providerFailed' });
     const data = await response.json();
+    const usage = {};
+    for (const field of [
+      'prompt_tokens',
+      'completion_tokens',
+      'total_tokens',
+      'prompt_cache_hit_tokens',
+      'prompt_cache_miss_tokens',
+    ]) {
+      const value = data.usage?.[field];
+      if (Number.isSafeInteger(value) && value >= 0) usage[field] = value;
+    }
+    const recordedUsage = Object.keys(usage).length ? usage : null;
     const choice = data.choices?.[0];
     if (!choice?.message || !['stop', 'tool_calls'].includes(choice.finish_reason)) {
-      throw Object.assign(new Error('模型返回内容不完整或格式无效'), { code: 'invalidResponse' });
+      throw Object.assign(new Error('模型返回内容不完整或格式无效'), { code: 'invalidResponse', usage: recordedUsage });
     }
-    return choice;
+    return { ...choice, usage: recordedUsage };
   } catch (error) {
     if (error.code && ['notConfigured', 'providerFailed', 'invalidResponse'].includes(error.code)) throw error;
     if (['TimeoutError', 'AbortError'].includes(error.name))

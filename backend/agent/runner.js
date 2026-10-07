@@ -106,7 +106,26 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
       await task.update({
         events: [...task.events, { at: new Date().toISOString(), type: 'model', phase: mode, call: callIndex + 1 }],
       });
-      const choice = await completion(messages, { tools, signal, maxTokens: mode === 'prepare' ? 8192 : 4096 });
+      const eventIndex = task.events.length - 1;
+      const modelStarted = performance.now();
+      let choice;
+      let modelError;
+      try {
+        choice = await completion(messages, { tools, signal, maxTokens: mode === 'prepare' ? 8192 : 4096 });
+      } catch (error) {
+        modelError = error;
+        throw error;
+      } finally {
+        const events = [...task.events];
+        events[eventIndex] = {
+          ...events[eventIndex],
+          finishedAt: new Date().toISOString(),
+          durationMs: Math.round(performance.now() - modelStarted),
+          outcome: modelError ? 'failed' : 'completed',
+          usage: choice?.usage ?? modelError?.usage ?? null,
+        };
+        await task.update({ events });
+      }
       signal.throwIfAborted();
       const calls = choice.message?.tool_calls;
       if (!Array.isArray(calls) || !calls.length) {

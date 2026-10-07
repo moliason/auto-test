@@ -48,6 +48,35 @@ const tool = (name, args = {}) => ({
 });
 
 describe('Agent plans and controlled HTTP tools', () => {
+  it('persists phase, timings and provider usage including failures without changing old evidence', async () => {
+    const task = await db.models.AgentTask.create({
+      runId: 1,
+      plan: buildPlan(snapshots.slice(0, 1), environment),
+      events: [{ type: 'user_plan_edited', at: '2026-10-07T00:00:00.000Z' }],
+    });
+    const completion = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ...tool('read_cases'),
+        usage: { prompt_tokens: 20, completion_tokens: 5, total_tokens: 25 },
+      })
+      .mockRejectedValueOnce(
+        Object.assign(new Error('模型返回内容不完整或格式无效'), { usage: { total_tokens: 512 } })
+      );
+    await runAgent(db, task.id, 'prepare', { completion });
+    await task.reload();
+    expect(task.state).toBe('failed');
+    expect(task.events[0]).toEqual({ type: 'user_plan_edited', at: '2026-10-07T00:00:00.000Z' });
+    const calls = task.events.filter((event) => event.type === 'model');
+    expect(calls).toHaveLength(2);
+    expect(calls[0]).toMatchObject({ phase: 'prepare', call: 1, outcome: 'completed', usage: { total_tokens: 25 } });
+    expect(calls[1]).toMatchObject({ phase: 'prepare', call: 2, outcome: 'failed', usage: { total_tokens: 512 } });
+    for (const call of calls) {
+      expect(call.durationMs).toBeGreaterThanOrEqual(0);
+      expect(Date.parse(call.finishedAt)).toBeGreaterThanOrEqual(Date.parse(call.at));
+    }
+  });
+
   it('detects missing information, missing variables and circular dependencies', () => {
     expect(buildPlan(snapshots, environment).issues.join(' ')).toContain('#8');
     expect(buildPlan([snapshots[1]], environment).issues.join(' ')).toContain('前置用例 #1');
@@ -156,6 +185,8 @@ describe('Agent plans and controlled HTTP tools', () => {
     expect(task.results.map((item) => item.status)).toEqual(['passed', 'skipped']);
     expect(task.results[0].response.status).toBe(200);
     expect(task.results[1].reason).toContain('任务中止');
+    const lastCall = task.events.filter((event) => event.type === 'model').at(-1);
+    expect(lastCall).toMatchObject({ phase: 'execute', outcome: 'failed', usage: null });
   });
 
   it('rejects unknown cases, changed tool parameters and out-of-order dependencies, then stops at the limit', async () => {
