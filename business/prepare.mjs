@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { randomBytes } from 'node:crypto';
 import { parseEnv } from 'node:util';
+import { executionConfig } from './execution-config.mjs';
 
 const envPath = new URL('../backend/.env', import.meta.url);
 const env = parseEnv(readFileSync(envPath, 'utf8'));
@@ -25,7 +26,13 @@ async function api(path, method = 'GET', body) {
     body: body === undefined ? undefined : JSON.stringify(body),
     signal: AbortSignal.timeout(15000),
   });
-  if (!response.ok) throw new Error(`${method} ${path}: HTTP ${response.status}`);
+  if (!response.ok)
+    throw new Error(
+      `${method} ${path}: HTTP ${response.status}` +
+        (method === 'PUT' && path.endsWith('/environment')
+          ? '；若刚更新项目密钥授权，请重启后端后重跑准备脚本，已创建的运行会继续配置'
+          : '')
+    );
   return response.json();
 }
 accessToken = (
@@ -80,10 +87,7 @@ for (const fixture of fixtures) {
 }
 if (!state.configured) {
   for (const fixture of fixtures) {
-    const executionInfo = {
-      ...fixture.executionInfo,
-      dependsOn: (fixture.executionInfo.dependsOn || []).map((id) => state.caseIds[id - 1]),
-    };
+    const executionInfo = executionConfig(fixture, state.caseIds);
     await api(`/agent/cases/${state.caseIds[fixture.id - 1]}/execution`, 'PUT', {
       executionInfo: fixture.id === 5 ? null : executionInfo,
     });
@@ -91,6 +95,24 @@ if (!state.configured) {
   state.configured = true;
   writeFileSync(statePath, JSON.stringify(state, null, 2));
 }
+let envText = readFileSync(envPath, 'utf8');
+const grants = JSON.parse(env.TEST_AGENT_SECRET_GRANTS || '{}');
+if (!grants || typeof grants !== 'object' || Array.isArray(grants)) throw new Error('项目密钥授权配置必须是 JSON 对象');
+grants[state.projectId] = [...new Set([...(grants[state.projectId] || []), 'BIZ_PASSWORD', 'BIZ_WRONG_PASSWORD'])];
+const allowed = [...new Set([...(env.TEST_AGENT_ALLOWED_ORIGINS || '').split(',').filter(Boolean), baseUrl])];
+for (const [name, value] of Object.entries({
+  TEST_AGENT_ALLOWED_ORIGINS: allowed.join(','),
+  TEST_AGENT_SECRET_BIZ_PASSWORD: state.password,
+  TEST_AGENT_SECRET_BIZ_WRONG_PASSWORD:
+    fixtures.find((item) => item.id === 6)?.executionInfo.body.password || 'deliberately-wrong-password',
+  TEST_AGENT_SECRET_GRANTS: JSON.stringify(grants),
+})) {
+  const pattern = new RegExp(`^${name}=.*$`, 'm');
+  envText = pattern.test(envText)
+    ? envText.replace(pattern, () => `${name}=${value}`)
+    : `${envText.trimEnd()}\n${name}=${value}\n`;
+}
+writeFileSync(envPath, envText);
 for (const mode of ['agent', 'baseline']) {
   for (let round = 1; round <= (mode === 'agent' && process.argv.includes('--reuse-check') ? 4 : 3); round++) {
     const ids = state[`${mode}RunIds`];
@@ -114,7 +136,7 @@ for (const mode of ['agent', 'baseline']) {
             baseUrl,
             timeoutMs: 5000,
             variables: { BIZ_EMAIL: state.email, BIZ_PROJECT_NAME: `${state.studyId}-${mode}-${round}` },
-            secretVariables: ['BIZ_PASSWORD'],
+            secretVariables: ['BIZ_PASSWORD', 'BIZ_WRONG_PASSWORD'],
           },
         });
       state.configuredRunIds.push(ids[round - 1]);
@@ -122,18 +144,6 @@ for (const mode of ['agent', 'baseline']) {
     }
   }
 }
-let envText = readFileSync(envPath, 'utf8');
-const allowed = [...new Set([...(env.TEST_AGENT_ALLOWED_ORIGINS || '').split(',').filter(Boolean), baseUrl])];
-for (const [name, value] of Object.entries({
-  TEST_AGENT_ALLOWED_ORIGINS: allowed.join(','),
-  TEST_AGENT_SECRET_BIZ_PASSWORD: state.password,
-})) {
-  const pattern = new RegExp(`^${name}=.*$`, 'm');
-  envText = pattern.test(envText)
-    ? envText.replace(pattern, `${name}=${value}`)
-    : `${envText.trimEnd()}\n${name}=${value}\n`;
-}
-writeFileSync(envPath, envText);
 console.log(
   JSON.stringify(
     {

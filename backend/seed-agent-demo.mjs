@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { parseEnv } from 'node:util';
 import { Sequelize, DataTypes } from 'sequelize';
 import bcrypt from 'bcrypt';
 import { getSequelizeConfig } from './config/config.js';
@@ -25,6 +26,11 @@ const Run = defineRun(db, DataTypes),
   RunCase = defineRunCase(db, DataTypes);
 const fixtures = JSON.parse(readFileSync(new URL('../demo/cases.json', import.meta.url), 'utf8'));
 try {
+  const envPath = new URL('.env', import.meta.url);
+  let envText = existsSync(envPath) ? readFileSync(envPath, 'utf8') : '';
+  const grants = JSON.parse(parseEnv(envText).TEST_AGENT_SECRET_GRANTS || process.env.TEST_AGENT_SECRET_GRANTS || '{}');
+  if (!grants || typeof grants !== 'object' || Array.isArray(grants))
+    throw new Error('项目密钥授权配置必须是 JSON 对象');
   const email = process.env.ADMIN_EMAIL || 'admin666@local';
   const username = process.env.ADMIN_USERNAME || 'admin666';
   const [user, created] = await User.findOrCreate({
@@ -46,6 +52,9 @@ try {
     const folder = await Folder.create({ name: '接口回归演示', projectId: project.id }, { transaction });
     const cases = [];
     for (const fixture of fixtures) {
+      const executionInfo = structuredClone(fixture.executionInfo);
+      if (executionInfo?.body?.password)
+        executionInfo.body.password = fixture.id === 1 ? '{{DEMO_PASSWORD}}' : '{{DEMO_WRONG_PASSWORD}}';
       const item = await Case.create(
         {
           folderId: folder.id,
@@ -59,7 +68,7 @@ try {
           type: 0,
           automationStatus: 1,
           template: 1,
-          executionInfo: fixture.executionInfo,
+          executionInfo,
         },
         { transaction }
       );
@@ -76,7 +85,7 @@ try {
       cases.push(item);
     }
     for (let index = 0; index < fixtures.length; index++) {
-      const executionInfo = fixtures[index].executionInfo;
+      const executionInfo = cases[index].executionInfo;
       if (executionInfo?.dependsOn)
         await cases[index].update(
           {
@@ -94,7 +103,11 @@ try {
         description: '8 条示例：通过、断言失败、超时、断连、依赖跳过及缺失信息',
         projectId: project.id,
         state: 0,
-        agentEnvironment: { baseUrl: 'http://127.0.0.1:4010', timeoutMs: 500 },
+        agentEnvironment: {
+          baseUrl: 'http://127.0.0.1:4010',
+          timeoutMs: 500,
+          secretVariables: ['DEMO_PASSWORD', 'DEMO_WRONG_PASSWORD'],
+        },
       },
       { transaction }
     );
@@ -104,7 +117,21 @@ try {
     );
     return { projectId: project.id, runId: run.id, caseIds: cases.map((item) => item.id), missingCaseId: cases[7].id };
   });
+  grants[output.projectId] = ['DEMO_PASSWORD', 'DEMO_WRONG_PASSWORD'];
+  for (const [name, value] of Object.entries({
+    TEST_AGENT_SECRET_GRANTS: JSON.stringify(grants),
+    TEST_AGENT_SECRET_DEMO_PASSWORD: fixtures.find((item) => item.id === 1).executionInfo.body.password,
+    TEST_AGENT_SECRET_DEMO_WRONG_PASSWORD: fixtures.find((item) => item.id === 6).executionInfo.body.password,
+  })) {
+    const pattern = new RegExp(`^${name}=.*$`, 'm');
+    envText = pattern.test(envText)
+      ? envText.replace(pattern, () => `${name}=${value}`)
+      : `${envText.trimEnd()}\n${name}=${value}\n`;
+  }
+  writeFileSync(envPath, envText);
+  writeFileSync(new URL('.env.agent-demo.json', import.meta.url), JSON.stringify(output, null, 2));
   console.log(JSON.stringify({ ...output, username: user.username, userCreated: created }, null, 2));
+  console.log('请重启后端加载本项目演示密钥授权；真实值保存在忽略的后端环境文件中。');
   console.log('演示数据已创建。已有用户密码不会被修改。第 8 条用例需补充 GET /plain，断言 HTTP 200。');
 } catch (error) {
   console.error('创建演示数据失败，请检查数据库配置及迁移。', error.name);

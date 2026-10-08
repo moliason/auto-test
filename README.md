@@ -133,7 +133,7 @@ npm run build --prefix frontend
 npm run e2e:agent
 ```
 
-脚本默认使用前端 8010、后端 8011 和 Microsoft Edge，可配置 `E2E_BASE_URL`、`E2E_API_URL`、`PLAYWRIGHT_CHANNEL`，详见[演示说明](demo/README.md)。Agent 流程创建独立演示数据，使用配置的真实模型、执行真实 HTTP 请求并保存截图与 Excel；草稿编辑流程使用模拟 API 验证编辑和保存重试。自动化单元测试可以模拟模型响应；真实模型联调与最终验收状态见[验证记录](docs/agent-status.md)。
+脚本默认使用前端 8010、后端 8011 和 Microsoft Edge，可配置 `E2E_BASE_URL`、`E2E_API_URL`、`PLAYWRIGHT_CHANNEL`，详见[演示说明](demo/README.md)。Agent 流程使用最近一次 `demo:seed` 初始化的独立演示数据（初始化后须重启后端加载项目密钥授权），使用配置的真实模型、执行真实 HTTP 请求并保存截图与 Excel；草稿编辑流程使用模拟 API 验证编辑和保存重试。自动化单元测试可以模拟模型响应；真实模型联调与最终验收状态见[验证记录](docs/agent-status.md)。
 
 ## 来源与许可
 

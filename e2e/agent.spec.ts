@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { readFileSync } from 'node:fs';
 import { parseEnv } from 'node:util';
@@ -12,16 +11,18 @@ test('real Agent flow: missing information, confirmation, HTTP results, history 
 }, testInfo) => {
   const backend = path.resolve('backend');
   const env = parseEnv(readFileSync(path.join(backend, '.env'), 'utf8'));
-  const seedOutput = execFileSync(process.execPath, ['--env-file-if-exists=.env', 'seed-agent-demo.mjs'], {
-    cwd: backend,
-    encoding: 'utf8',
-  });
-  const seeded = JSON.parse(seedOutput.slice(0, seedOutput.indexOf('\n}') + 2));
+  // Seed before starting the backend so project grants are loaded in its process environment.
+  const seeded = JSON.parse(readFileSync(path.join(backend, '.env.agent-demo.json'), 'utf8'));
   const login = await request.post(`${api}/users/signin`, {
     data: { email: env.ADMIN_EMAIL || 'admin666@local', password: env.ADMIN_PASSWORD || '666666' },
   });
   expect(login.ok()).toBeTruthy();
   const token = await login.json();
+  const environment = await request.get(`${api}/agent/runs/${seeded.runId}/environment`, {
+    headers: { Authorization: `Bearer ${token.access_token}` },
+  });
+  expect(environment.ok()).toBeTruthy();
+  expect((await environment.json()).issues, '初始化演示后须重启后端加载项目授权').toEqual([]);
   await page.addInitScript((value) => localStorage.setItem('unittcms-auth-token', JSON.stringify(value)), token);
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));

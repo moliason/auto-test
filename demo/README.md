@@ -9,6 +9,8 @@ node demo/server.mjs
 
 初始化脚本每次创建独立的演示项目、目录和测试运行，输出真实编号，并将前置依赖映射到本次用例编号。它不会覆盖已有项目或历史执行记录。
 
+初始化会将演示密码写入被 Git 忽略的 `backend/.env`，并在 `TEST_AGENT_SECRET_GRANTS` 中授权给新项目。用例只保存变量引用。初始化完成后再启动或重启后端，加载本次授权；本次编号另存于忽略文件 `backend/.env.agent-demo.json`，供浏览器验收读取。
+
 默认创建本地管理员 `admin666@local`，密码 `666666`。可以先在 `backend/.env` 设置 `ADMIN_EMAIL`、`ADMIN_USERNAME`、`ADMIN_PASSWORD`；已经存在的账号会复用，密码和角色不会被修改。
 
 演示服务地址为 `http://127.0.0.1:4010`，运行环境已设置 500 毫秒请求超时。后端的 `TEST_AGENT_ALLOWED_ORIGINS` 必须包含该地址。模型接口通过后端 `DEEPSEEK_*` 配置，凭据不能写入前端。
@@ -42,6 +44,6 @@ node demo/server.mjs
 
 ## 浏览器完整验证
 
-`npm run e2e:agent` 会创建新的演示数据，通过真实页面完成缺失信息补充、确认、执行、历史查看和 Excel 下载，并检查四种窗口宽度。测试会调用已启动后端配置的真实模型，需要可用模型接口。默认前端为 `http://localhost:8010`、后端为 `http://localhost:8011`，可通过 `E2E_BASE_URL` 和 `E2E_API_URL` 修改；两者须与前端接口配置及后端 CORS 配置一致。
+`npm run e2e:agent` 使用最近一次初始化的演示数据（先重新执行 `demo:seed` 并重启后端），通过真实页面完成缺失信息补充、确认、执行、历史查看和 Excel 下载，并检查四种窗口宽度。测试会调用已启动后端配置的真实模型，需要可用模型接口。默认前端为 `http://localhost:8010`、后端为 `http://localhost:8011`，可通过 `E2E_BASE_URL` 和 `E2E_API_URL` 修改；两者须与前端接口配置及后端 CORS 配置一致。
 
 本机使用已安装的 Microsoft Edge；其他环境可设置 `PLAYWRIGHT_CHANNEL=chromium` 并先运行 `npx playwright install chromium`。执行前启动数据库、后端、前端和 `node demo/server.mjs`。截图与导出文件保存在被 Git 忽略的 `test-results` 目录。

@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { chromium } from '@playwright/test';
 import ExcelJS from '../backend/node_modules/exceljs/excel.js';
+import { executionConfig } from './execution-config.mjs';
 
 const root = new URL('./', import.meta.url);
 const state = JSON.parse(readFileSync(new URL('.env.study.json', root), 'utf8'));
@@ -99,7 +100,7 @@ try {
     if (round === 1) {
       assert.equal(task.state, 'needs_input');
       const missingId = state.caseIds[4];
-      const config = { ...fixtures[4].executionInfo, dependsOn: [state.caseIds[3]] };
+      const config = executionConfig(fixtures[4], state.caseIds);
       const { method, path, ...options } = config;
       await step('补充查询方法', 'supplement', () =>
         dialog.getByRole('combobox', { name: `HTTP 方法 #${missingId}`, exact: true }).selectOption(method)
@@ -140,12 +141,9 @@ try {
     const confirmedTask = await (await fetch(`${baseUrl}/agent/runs/${runId}/tasks/${created.id}`, { headers })).json();
     for (const item of confirmedTask.plan.cases) {
       const fixture = fixtures[state.caseIds.indexOf(item.caseId)];
+      const expectedConfig = executionConfig(fixture, state.caseIds);
       for (const key of ['method', 'path', 'body', 'query', 'headers', 'assertions', 'extract'])
-        assert.deepEqual(
-          item.executionInfo[key],
-          fixture.executionInfo[key],
-          `Frozen oracle mismatch #${item.caseId} ${key}`
-        );
+        assert.deepEqual(item.executionInfo[key], expectedConfig[key], `Frozen oracle mismatch #${item.caseId} ${key}`);
       assert.deepEqual(
         item.executionInfo.dependsOn || [],
         (fixture.executionInfo.dependsOn || []).map((id) => state.caseIds[id - 1])
