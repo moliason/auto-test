@@ -79,7 +79,7 @@ export default function (sequelize, { launch = runAgent } = {}) {
         };
       });
       const plan = {
-        ...buildPlan(snapshots, run.agentEnvironment || {}),
+        ...buildPlan(snapshots, run.agentEnvironment || {}, null, '', run.projectId),
         interfaceDescription,
         model: process.env.DEEPSEEK_MODEL || 'deepseek-flash',
         provider: (process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com').startsWith('https://api.deepseek.com')
@@ -176,7 +176,13 @@ export default function (sequelize, { launch = runAgent } = {}) {
         try {
           plan = {
             ...task.plan,
-            ...buildPlan(task.plan.cases, run.agentEnvironment || {}, req.body.cases, req.body.notes || ''),
+            ...buildPlan(
+              task.plan.cases,
+              run.agentEnvironment || {},
+              req.body.cases,
+              req.body.notes || '',
+              run.projectId
+            ),
           };
         } catch (error) {
           throw Object.assign(error, { status: 400 });
@@ -222,12 +228,12 @@ export default function (sequelize, { launch = runAgent } = {}) {
         if (!current) throw Object.assign(new Error('任务不存在'), { status: 404 });
         if (current.state !== 'awaiting_confirmation' || current.version !== req.body.version)
           throw Object.assign(new Error('计划已变化、信息未补全或已经执行，请重新加载'), { status: 409 });
+        const run = await Run.findByPk(current.runId, { transaction });
         const plan = {
           ...current.plan,
-          ...buildPlan(current.plan.cases, current.plan.environment, null, current.plan.notes),
+          ...buildPlan(current.plan.cases, current.plan.environment, null, current.plan.notes, run.projectId),
         };
         if (plan.issues.length) throw Object.assign(new Error(plan.issues.join('；')), { status: 400 });
-        const run = await Run.findByPk(current.runId, { transaction });
         const ids = plan.cases.map((item) => item.caseId);
         const cases = await Case.count({
           where: { id: ids },

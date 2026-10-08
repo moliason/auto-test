@@ -10,11 +10,14 @@ import defineCase from '../../models/cases.js';
 import defineRun from '../../models/runs.js';
 import defineMember from '../../models/members.js';
 import agentRoute from './index.js';
+import editRunRoute from '../runs/edit.js';
 
 let app;
 let db;
 beforeEach(async () => {
   vi.stubEnv('SECRET_KEY', 'agent-test-only');
+  vi.stubEnv('TEST_AGENT_SECRET_GRANTS', JSON.stringify({ 1: ['TOKEN'] }));
+  vi.stubEnv('TEST_AGENT_SECRET_TOKEN', 'test-only-token');
   db = new Sequelize({ dialect: 'sqlite', storage: ':memory:', logging: false });
   const User = defineUser(db, DataTypes),
     Project = defineProject(db, DataTypes),
@@ -63,6 +66,7 @@ beforeEach(async () => {
   app = express();
   app.use(express.json());
   app.use('/agent', agentRoute(db));
+  app.use('/runs', editRunRoute(db));
 });
 afterEach(async () => {
   await db.close();
@@ -71,6 +75,33 @@ afterEach(async () => {
 const auth = (userId = 1) => `Bearer ${jwt.sign({ userId }, 'agent-test-only')}`;
 
 describe('Agent execution configuration permissions', () => {
+  it('cannot change a run project or set an environment through ordinary editing', async () => {
+    for (const body of [{ projectId: 2 }, { agentEnvironment: { secretVariables: ['TOKEN'] } }]) {
+      const response = await request(app).put('/runs/1').set('Authorization', auth(3)).send(body);
+      expect(response.status).toBe(400);
+    }
+    expect((await db.models.Run.findByPk(1)).projectId).toBe(1);
+    expect((await db.models.Run.findByPk(1)).agentEnvironment).toBeNull();
+    expect(
+      (
+        await request(app)
+          .put('/runs/1')
+          .set('Authorization', auth(3))
+          .send({ id: 1, projectId: 1, name: 'Edited', agentEnvironment: null })
+      ).status
+    ).toBe(200);
+  });
+  it('rejects another project secret name even for that project owner', async () => {
+    const response = await request(app)
+      .put('/agent/runs/2/environment')
+      .set('Authorization', auth(2))
+      .send({
+        environment: { baseUrl: 'http://127.0.0.1:4010', secretVariables: ['TOKEN'], projectId: 1 },
+      });
+    expect(response.status).toBe(400);
+    expect(JSON.stringify(response.body)).not.toContain('test-only-token');
+    expect((await db.models.Run.findByPk(2)).agentEnvironment).toBeNull();
+  });
   it('requires authentication and prevents cross-project case edits', async () => {
     expect((await request(app).put('/agent/cases/1/execution').send({ executionInfo: {} })).status).toBe(401);
     expect(

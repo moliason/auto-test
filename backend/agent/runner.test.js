@@ -48,6 +48,42 @@ const tool = (name, args = {}) => ({
 });
 
 describe('Agent plans and controlled HTTP tools', () => {
+  it('uses an explicitly authorized project secret for real HTTP execution', async () => {
+    vi.stubEnv('TEST_AGENT_SECRET_GRANTS', JSON.stringify({ 1: ['TOKEN'] }));
+    vi.stubEnv('TEST_AGENT_SECRET_TOKEN', 'demo-token');
+    const source = [{ ...snapshots[1], executionInfo: { ...snapshots[1].executionInfo, dependsOn: [] } }];
+    const task = await db.models.AgentTask.create({
+      runId: 1,
+      state: 'running',
+      plan: buildPlan(source, { ...environment, secretVariables: ['TOKEN'] }, null, '', 1),
+    });
+    const completion = vi
+      .fn()
+      .mockResolvedValueOnce(tool('read_cases'))
+      .mockResolvedValueOnce(tool('execute_case', { caseId: 2 }))
+      .mockResolvedValueOnce(tool('get_results'))
+      .mockResolvedValueOnce(tool('submit_report', { analysis: '授权认证调用成功' }));
+    await runAgent(db, task.id, 'execute', { completion });
+    await task.reload();
+    expect(task.state).toBe('completed');
+    expect(task.results[0].status).toBe('passed');
+    expect(JSON.stringify(task.toJSON())).not.toContain('demo-token');
+  });
+  it('rechecks secret authorization at execution and never reads another project grant', async () => {
+    vi.stubEnv('TEST_AGENT_SECRET_GRANTS', JSON.stringify({ 2: ['TOKEN'] }));
+    vi.stubEnv('TEST_AGENT_SECRET_TOKEN', 'demo-token');
+    const source = [{ ...snapshots[1], executionInfo: { ...snapshots[1].executionInfo, dependsOn: [] } }];
+    const plan = buildPlan(source, { ...environment, secretVariables: ['TOKEN'] });
+    const task = await db.models.AgentTask.create({ runId: 1, state: 'running', plan: { ...plan, projectId: 2 } });
+    const completion = vi.fn();
+    await runAgent(db, task.id, 'execute', { completion });
+    await task.reload();
+    expect(task.state).toBe('failed');
+    expect(task.error).toContain('未授权');
+    expect(completion).not.toHaveBeenCalled();
+    expect(task.results.every((item) => item.request === null)).toBe(true);
+    expect(JSON.stringify(task.toJSON())).not.toContain('demo-token');
+  });
   it.each([{ extract: [] }, { extract: [{ name: 'PUBLIC_VALUE', path: '/token', secret: false }] }])(
     'never persists or sends assertion credentials to the model even without secret extraction: $extract',
     async ({ extract }) => {

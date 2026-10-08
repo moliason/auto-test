@@ -1,11 +1,22 @@
 import { environmentIssues, executionIssues } from './execution.js';
 
-export function environmentVariables(environment = {}) {
+export function environmentVariables(environment = {}, projectId) {
   const variables = { ...(environment.variables || {}) };
   const secrets = [];
   const issues = [];
+  let grants = {};
+  try {
+    grants = JSON.parse(process.env.TEST_AGENT_SECRET_GRANTS || '{}');
+  } catch {
+    /* Invalid or absent grants never authorize a secret. */
+  }
   for (const name of Array.isArray(environment.secretVariables) ? environment.secretVariables : []) {
     if (typeof name !== 'string' || !/^[A-Za-z_][A-Za-z0-9_]*$/.test(name)) continue;
+    if (!Number.isSafeInteger(projectId) || !Array.isArray(grants?.[projectId]) || !grants[projectId].includes(name)) {
+      delete variables[name];
+      issues.push(`当前项目未授权使用认证变量 ${name}，请由管理员配置 TEST_AGENT_SECRET_GRANTS`);
+      continue;
+    }
     const value = process.env[`TEST_AGENT_SECRET_${name}`];
     if (!value) issues.push(`请在后端配置认证变量 TEST_AGENT_SECRET_${name}`);
     else {
@@ -16,7 +27,7 @@ export function environmentVariables(environment = {}) {
   return { variables, secrets, issues };
 }
 
-export function buildPlan(snapshots, environment = {}, proposals = null, notes = '') {
+export function buildPlan(snapshots, environment = {}, proposals = null, notes = '', projectId) {
   if (!Array.isArray(snapshots) || !snapshots.length || snapshots.length > 20)
     throw new Error('请选择 1 至 20 条运行内用例');
   if (
@@ -28,7 +39,7 @@ export function buildPlan(snapshots, environment = {}, proposals = null, notes =
   )
     throw new Error('计划必须且只能包含本次选中的全部用例');
   if (typeof notes !== 'string' || notes.length > 2000) throw new Error('计划说明最多 2000 字符');
-  const resolved = environmentVariables(environment);
+  const resolved = environmentVariables(environment, projectId);
   const plan = {
     environment,
     notes,

@@ -111,7 +111,7 @@ node demo/server.mjs
 
 `dependsOn` 使用实际用例编号；前置登录用例通过 `extract: [{"name":"TOKEN","path":"/token","secret":true}]` 提取变量。所有前置用例都应加入本次选择。ID 等非敏感值可显式设置 `secret:false`。
 
-环境支持 `baseUrl`、`timeoutMs`、`headers`、`variables`、`secretVariables`。固定认证值在后端设置，例如 `TEST_AGENT_SECRET_API_TOKEN`；环境配置 `secretVariables: ["API_TOKEN"]`，请求头写 `Bearer {{API_TOKEN}}`。`TEST_AGENT_ALLOWED_ORIGINS` 是允许的测试目标来源列表，以逗号分隔；添加新测试环境时同时更新后端配置并重启。
+环境支持 `baseUrl`、`timeoutMs`、`headers`、`variables`、`secretVariables`。固定认证值在后端设置，例如 `TEST_AGENT_SECRET_API_TOKEN`；管理员还须配置项目授权，例如 `TEST_AGENT_SECRET_GRANTS={"10":["API_TOKEN"]}` 只允许项目 #10 使用该名称。环境配置 `secretVariables: ["API_TOKEN"]`，请求头写 `Bearer {{API_TOKEN}}`。没有授权的名称会被拒绝，旧配置也须补授权；修改后重启后端。`TEST_AGENT_ALLOWED_ORIGINS` 是允许的测试目标来源列表，以逗号分隔；添加新测试环境时同时更新后端配置并重启。
 
 权限沿用原平台：报告者及以上准备和执行本项目测试；开发者及以上保存原用例执行配置；项目管理者修改测试环境。服务端验证项目、运行与用例归属，不能通过替换编号访问其他项目的证据。
 

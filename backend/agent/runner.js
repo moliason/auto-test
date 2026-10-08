@@ -76,7 +76,12 @@ export async function runAgent(
   const signal = AbortSignal.timeout(timeoutMs);
   const tools = mode === 'prepare' ? prepareTools : executionTools;
   const allowedNames = new Set(tools.map((tool) => tool.function.name));
-  const { variables: initialVariables, secrets, issues: secretIssues } = environmentVariables(task.plan.environment);
+  const run = await defineRun(sequelize, DataTypes).findByPk(task.runId);
+  const {
+    variables: initialVariables,
+    secrets,
+    issues: secretIssues,
+  } = environmentVariables(task.plan.environment, run?.projectId);
   const extracted = new Map();
   const results = [...task.results];
   let read = false;
@@ -207,7 +212,10 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
                 }
               }
             }
-            const plan = { ...task.plan, ...buildPlan(task.plan.cases, task.plan.environment, args.cases, args.notes) };
+            const plan = {
+              ...task.plan,
+              ...buildPlan(task.plan.cases, task.plan.environment, args.cases, args.notes, run?.projectId),
+            };
             await task.update({
               plan,
               state: plan.issues.length ? 'needs_input' : 'awaiting_confirmation',

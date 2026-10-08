@@ -1,6 +1,7 @@
 import express from 'express';
 import { DataTypes } from 'sequelize';
 import { environmentIssues, executionIssues } from '../../agent/execution.js';
+import { environmentVariables } from '../../agent/plan.js';
 import authMiddleware from '../../middleware/auth.js';
 import editableMiddleware from '../../middleware/verifyEditable.js';
 import defineCase from '../../models/cases.js';
@@ -54,7 +55,13 @@ export default function (sequelize) {
     async (req, res) => {
       try {
         const run = await Run.findByPk(req.params.runId);
-        return res.json({ environment: run.agentEnvironment || {}, issues: environmentIssues(run.agentEnvironment) });
+        return res.json({
+          environment: run.agentEnvironment || {},
+          issues: [
+            ...environmentIssues(run.agentEnvironment),
+            ...environmentVariables(run.agentEnvironment || {}, run.projectId).issues,
+          ],
+        });
       } catch {
         return res.status(500).json({ error: '读取测试环境失败' });
       }
@@ -88,6 +95,9 @@ export default function (sequelize) {
           .json({ error: '认证值请使用 {{变量名}}，并在后端 TEST_AGENT_SECRET_变量名 中配置真实值' });
       }
       try {
+        const run = await Run.findByPk(req.params.runId);
+        const secretIssues = environmentVariables(environment, run.projectId).issues;
+        if (secretIssues.length) return res.status(400).json({ error: secretIssues.join('；') });
         const agentEnvironment = Object.fromEntries(
           ['baseUrl', 'headers', 'variables', 'secretVariables', 'timeoutMs']
             .filter((key) => Object.hasOwn(environment, key))
