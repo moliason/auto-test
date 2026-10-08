@@ -92,7 +92,7 @@ if (!state.configured) {
   writeFileSync(statePath, JSON.stringify(state, null, 2));
 }
 for (const mode of ['agent', 'baseline']) {
-  for (let round = 1; round <= 3; round++) {
+  for (let round = 1; round <= (mode === 'agent' && process.argv.includes('--reuse-check') ? 4 : 3); round++) {
     const ids = state[`${mode}RunIds`];
     if (ids[round - 1]) continue;
     const run = await api(`/runs?projectId=${state.projectId}`, 'POST', {

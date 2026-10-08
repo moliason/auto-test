@@ -21,7 +21,7 @@ const token = await loginResponse.json();
 const headers = { Authorization: `Bearer ${token.access_token}` };
 const browser = await chromium.launch({ executablePath: chromium.executablePath(), headless: true });
 try {
-  for (let round = 1; round <= 3; round++) {
+  for (let round = 1; round <= state.agentRunIds.length; round++) {
     const output = new URL(`agent-${round}.json`, outputDir);
     if (existsSync(output)) {
       console.log(`Agent round ${round}: existing evidence retained`);
@@ -89,6 +89,11 @@ try {
       throw new Error('Preparation observation timed out; task handle retained');
     });
     assert.ok(['needs_input', 'awaiting_confirmation'].includes(task.state), task.error || task.state);
+    if (round > 3) {
+      assert.equal(task.state, 'awaiting_confirmation');
+      assert.ok(task.events.some((event) => event.type === 'configuration_reused'));
+      assert.ok(!task.events.some((event) => event.type === 'model'));
+    }
     const readyPlan = task.plan;
     const resolutions = [];
     if (round === 1) {

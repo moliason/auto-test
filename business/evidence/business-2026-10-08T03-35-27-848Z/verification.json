@@ -1,0 +1,66 @@
+{
+  "at": "2026-10-08T04:02:12.437Z",
+  "checked": [
+    {
+      "mode": "agent",
+      "round": 1,
+      "runId": 10,
+      "taskId": 8,
+      "createdCaseId": 78,
+      "verified": true
+    },
+    {
+      "mode": "agent",
+      "round": 2,
+      "runId": 11,
+      "taskId": 9,
+      "createdCaseId": 80,
+      "verified": true
+    },
+    {
+      "mode": "agent",
+      "round": 3,
+      "runId": 12,
+      "taskId": 10,
+      "createdCaseId": 81,
+      "verified": true
+    },
+    {
+      "mode": "agent",
+      "round": 4,
+      "runId": 16,
+      "taskId": 11,
+      "createdCaseId": 82,
+      "verified": true
+    },
+    {
+      "mode": "baseline",
+      "round": 1,
+      "runId": 13,
+      "taskId": null,
+      "createdCaseId": 79,
+      "verified": true
+    },
+    {
+      "mode": "baseline",
+      "round": 2,
+      "runId": 14,
+      "taskId": null,
+      "createdCaseId": 83,
+      "verified": true
+    },
+    {
+      "mode": "baseline",
+      "round": 3,
+      "runId": 15,
+      "taskId": null,
+      "createdCaseId": 84,
+      "verified": true
+    }
+  ],
+  "historyUnchanged": true,
+  "liveBusinessReadback": true,
+  "excelEvidenceAndMetrics": true,
+  "secretsRedacted": true,
+  "reportUi": true
+}

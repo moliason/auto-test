@@ -1,0 +1,1502 @@
+{
+  "mode": "baseline",
+  "measurementType": "script-client-plus-browser-manual-status-simulation-not-human",
+  "round": 1,
+  "runId": 13,
+  "fixtureSha256": "86e0fd59e9de78da05d9e2eb031801f3162aa3188ccc48c2e8c1d3c3f584667c",
+  "scriptWallMs": 15905,
+  "resumedUiOnly": true,
+  "attemptStartIndex": 107,
+  "wallTimeScope": "本次恢复的 UI 阶段；中断前请求耗时见 results，不是完整端到端耗时",
+  "backfillScriptMs": 12823,
+  "reportScriptMs": 1189,
+  "actions": [
+    {
+      "label": "#1 解析首次请求配置",
+      "category": "script_client_prepare",
+      "at": "2026-10-08T03:51:44.415Z",
+      "ok": true,
+      "durationMs": 1
+    },
+    {
+      "label": "#1 发送业务请求",
+      "category": "script_http",
+      "at": "2026-10-08T03:51:44.417Z",
+      "ok": true,
+      "durationMs": 69
+    },
+    {
+      "label": "#1 逐条核对预期",
+      "category": "script_assertions",
+      "at": "2026-10-08T03:51:44.486Z",
+      "ok": true,
+      "durationMs": 1
+    },
+    {
+      "label": "#2 解析首次请求配置",
+      "category": "script_client_prepare",
+      "at": "2026-10-08T03:51:44.488Z",
+      "ok": true,
+      "durationMs": 0
+    },
+    {
+      "label": "#2 发送业务请求",
+      "category": "script_http",
+      "at": "2026-10-08T03:51:44.488Z",
+      "ok": true,
+      "durationMs": 10
+    },
+    {
+      "label": "#2 逐条核对预期",
+      "category": "script_assertions",
+      "at": "2026-10-08T03:51:44.498Z",
+      "ok": true,
+      "durationMs": 0
+    },
+    {
+      "label": "#3 解析首次请求配置",
+      "category": "script_client_prepare",
+      "at": "2026-10-08T03:51:44.498Z",
+      "ok": true,
+      "durationMs": 0
+    },
+    {
+      "label": "#3 发送业务请求",
+      "category": "script_http",
+      "at": "2026-10-08T03:51:44.499Z",
+      "ok": true,
+      "durationMs": 10
+    },
+    {
+      "label": "#3 逐条核对预期",
+      "category": "script_assertions",
+      "at": "2026-10-08T03:51:44.508Z",
+      "ok": true,
+      "durationMs": 0
+    },
+    {
+      "label": "#4 解析首次请求配置",
+      "category": "script_client_prepare",
+      "at": "2026-10-08T03:51:44.509Z",
+      "ok": true,
+      "durationMs": 0
+    },
+    {
+      "label": "#4 发送业务请求",
+      "category": "script_http",
+      "at": "2026-10-08T03:51:44.509Z",
+      "ok": true,
+      "durationMs": 20
+    },
+    {
+      "label": "#4 逐条核对预期",
+      "category": "script_assertions",
+      "at": "2026-10-08T03:51:44.529Z",
+      "ok": true,
+      "durationMs": 0
+    },
+    {
+      "label": "#5 解析首次请求配置",
+      "category": "script_client_prepare",
+      "at": "2026-10-08T03:51:44.530Z",
+      "ok": true,
+      "durationMs": 0
+    },
+    {
+      "label": "#5 发送业务请求",
+      "category": "script_http",
+      "at": "2026-10-08T03:51:44.530Z",
+      "ok": true,
+      "durationMs": 17
+    },
+    {
+      "label": "#5 逐条核对预期",
+      "category": "script_assertions",
+      "at": "2026-10-08T03:51:44.547Z",
+      "ok": true,
+      "durationMs": 0
+    },
+    {
+      "label": "#6 解析首次请求配置",
+      "category": "script_client_prepare",
+      "at": "2026-10-08T03:51:44.548Z",
+      "ok": true,
+      "durationMs": 0
+    },
+    {
+      "label": "#6 发送业务请求",
+      "category": "script_http",
+      "at": "2026-10-08T03:51:44.548Z",
+      "ok": true,
+      "durationMs": 64
+    },
+    {
+      "label": "#6 逐条核对预期",
+      "category": "script_assertions",
+      "at": "2026-10-08T03:51:44.612Z",
+      "ok": true,
+      "durationMs": 0
+    },
+    {
+      "label": "#7 解析首次请求配置",
+      "category": "script_client_prepare",
+      "at": "2026-10-08T03:51:44.613Z",
+      "ok": true,
+      "durationMs": 0
+    },
+    {
+      "label": "#7 发送业务请求",
+      "category": "script_http",
+      "at": "2026-10-08T03:51:44.613Z",
+      "ok": true,
+      "durationMs": 8
+    },
+    {
+      "label": "#7 逐条核对预期",
+      "category": "script_assertions",
+      "at": "2026-10-08T03:51:44.621Z",
+      "ok": true,
+      "durationMs": 0
+    },
+    {
+      "label": "#8 解析首次请求配置",
+      "category": "script_client_prepare",
+      "at": "2026-10-08T03:51:44.622Z",
+      "ok": true,
+      "durationMs": 0
+    },
+    {
+      "label": "#8 发送业务请求",
+      "category": "script_http",
+      "at": "2026-10-08T03:51:44.622Z",
+      "ok": true,
+      "durationMs": 64
+    },
+    {
+      "label": "#8 逐条核对预期",
+      "category": "script_assertions",
+      "at": "2026-10-08T03:51:44.686Z",
+      "ok": true,
+      "durationMs": 0
+    },
+    {
+      "label": "检查 #9 前置失败并跳过",
+      "category": "script_dependency_check",
+      "at": "2026-10-08T03:51:44.688Z",
+      "ok": true,
+      "durationMs": 0
+    },
+    {
+      "label": "#10 解析首次请求配置",
+      "category": "script_client_prepare",
+      "at": "2026-10-08T03:51:44.688Z",
+      "ok": true,
+      "durationMs": 0
+    },
+    {
+      "label": "#10 发送业务请求",
+      "category": "script_http",
+      "at": "2026-10-08T03:51:44.688Z",
+      "ok": true,
+      "durationMs": 24
+    },
+    {
+      "label": "#10 逐条核对预期",
+      "category": "script_assertions",
+      "at": "2026-10-08T03:51:44.713Z",
+      "ok": true,
+      "durationMs": 0
+    },
+    {
+      "label": "从请求客户端切换至测试运行",
+      "category": "browser_navigation",
+      "at": "2026-10-08T03:54:09.923Z",
+      "ok": true,
+      "durationMs": 243
+    },
+    {
+      "label": "#1 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:11.130Z",
+      "ok": true,
+      "durationMs": 158
+    },
+    {
+      "label": "#1 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:11.290Z",
+      "ok": true,
+      "durationMs": 127
+    },
+    {
+      "label": "#2 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:11.418Z",
+      "ok": true,
+      "durationMs": 137
+    },
+    {
+      "label": "#2 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:11.555Z",
+      "ok": true,
+      "durationMs": 56
+    },
+    {
+      "label": "#3 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:11.612Z",
+      "ok": true,
+      "durationMs": 79
+    },
+    {
+      "label": "#3 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:11.692Z",
+      "ok": true,
+      "durationMs": 79
+    },
+    {
+      "label": "#4 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:11.772Z",
+      "ok": true,
+      "durationMs": 91
+    },
+    {
+      "label": "#4 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:11.864Z",
+      "ok": true,
+      "durationMs": 44
+    },
+    {
+      "label": "#5 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:11.908Z",
+      "ok": true,
+      "durationMs": 65
+    },
+    {
+      "label": "#5 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:11.974Z",
+      "ok": true,
+      "durationMs": 79
+    },
+    {
+      "label": "#6 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:12.054Z",
+      "ok": true,
+      "durationMs": 52
+    },
+    {
+      "label": "#6 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:12.107Z",
+      "ok": true,
+      "durationMs": 51
+    },
+    {
+      "label": "#7 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:12.159Z",
+      "ok": true,
+      "durationMs": 89
+    },
+    {
+      "label": "#7 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:12.249Z",
+      "ok": true,
+      "durationMs": 66
+    },
+    {
+      "label": "#8 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:12.316Z",
+      "ok": true,
+      "durationMs": 81
+    },
+    {
+      "label": "#8 选择失败",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:12.398Z",
+      "ok": true,
+      "durationMs": 75
+    },
+    {
+      "label": "#9 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:12.474Z",
+      "ok": true,
+      "durationMs": 66
+    },
+    {
+      "label": "#9 选择跳过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:12.542Z",
+      "ok": true,
+      "durationMs": 69
+    },
+    {
+      "label": "#10 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:12.612Z",
+      "ok": true,
+      "durationMs": 55
+    },
+    {
+      "label": "#10 选择失败",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:12.668Z",
+      "ok": true,
+      "durationMs": 56
+    },
+    {
+      "label": "打开运行状态",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:12.725Z",
+      "ok": true,
+      "durationMs": 84
+    },
+    {
+      "label": "标记运行审核中",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:12.810Z",
+      "ok": true,
+      "durationMs": 376
+    },
+    {
+      "label": "保存人工状态",
+      "category": "browser_save",
+      "at": "2026-10-08T03:54:13.188Z",
+      "ok": true,
+      "durationMs": 315
+    },
+    {
+      "label": "从请求客户端切换至测试运行",
+      "category": "browser_navigation",
+      "at": "2026-10-08T03:54:34.192Z",
+      "ok": true,
+      "durationMs": 183
+    },
+    {
+      "label": "#1 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:35.165Z",
+      "ok": true,
+      "durationMs": 122
+    },
+    {
+      "label": "#1 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:35.289Z",
+      "ok": true,
+      "durationMs": 93
+    },
+    {
+      "label": "#2 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:35.399Z",
+      "ok": true,
+      "durationMs": 117
+    },
+    {
+      "label": "#2 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:54:35.517Z",
+      "ok": true,
+      "durationMs": 62
+    },
+    {
+      "label": "从请求客户端切换至测试运行",
+      "category": "browser_navigation",
+      "at": "2026-10-08T03:55:51.919Z",
+      "ok": true,
+      "durationMs": 244
+    },
+    {
+      "label": "#1 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:55:53.014Z",
+      "ok": true,
+      "durationMs": 201
+    },
+    {
+      "label": "#1 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:55:53.215Z",
+      "ok": true,
+      "durationMs": 451
+    },
+    {
+      "label": "#2 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:55:53.685Z",
+      "ok": true,
+      "durationMs": 120
+    },
+    {
+      "label": "#2 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:55:53.805Z",
+      "ok": false,
+      "durationMs": 30004
+    },
+    {
+      "label": "从请求客户端切换至测试运行",
+      "category": "browser_navigation",
+      "at": "2026-10-08T03:58:01.938Z",
+      "ok": true,
+      "durationMs": 369
+    },
+    {
+      "label": "#1 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:58:03.287Z",
+      "ok": true,
+      "durationMs": 192
+    },
+    {
+      "label": "#1 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:58:03.480Z",
+      "ok": true,
+      "durationMs": 497
+    },
+    {
+      "label": "#2 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:58:04.363Z",
+      "ok": true,
+      "durationMs": 74
+    },
+    {
+      "label": "#2 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:58:04.438Z",
+      "ok": true,
+      "durationMs": 378
+    },
+    {
+      "label": "#3 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:58:05.196Z",
+      "ok": true,
+      "durationMs": 81
+    },
+    {
+      "label": "#3 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:58:05.277Z",
+      "ok": true,
+      "durationMs": 430
+    },
+    {
+      "label": "#4 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:58:06.092Z",
+      "ok": true,
+      "durationMs": 88
+    },
+    {
+      "label": "#4 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:58:06.182Z",
+      "ok": true,
+      "durationMs": 427
+    },
+    {
+      "label": "#5 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:58:06.986Z",
+      "ok": true,
+      "durationMs": 65
+    },
+    {
+      "label": "#5 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:58:07.053Z",
+      "ok": true,
+      "durationMs": 410
+    },
+    {
+      "label": "#6 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:58:07.837Z",
+      "ok": true,
+      "durationMs": 61
+    },
+    {
+      "label": "#6 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:58:07.899Z",
+      "ok": true,
+      "durationMs": 426
+    },
+    {
+      "label": "#7 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:58:08.690Z",
+      "ok": true,
+      "durationMs": 82
+    },
+    {
+      "label": "#7 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:58:08.773Z",
+      "ok": false,
+      "durationMs": 30019
+    },
+    {
+      "label": "从请求客户端切换至测试运行",
+      "category": "browser_navigation",
+      "at": "2026-10-08T03:58:58.644Z",
+      "ok": true,
+      "durationMs": 452
+    },
+    {
+      "label": "#1 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:00.183Z",
+      "ok": true,
+      "durationMs": 189
+    },
+    {
+      "label": "#1 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:00.492Z",
+      "ok": true,
+      "durationMs": 514
+    },
+    {
+      "label": "#2 滚动至可操作区域",
+      "category": "browser_scroll",
+      "at": "2026-10-08T03:59:01.412Z",
+      "ok": true,
+      "durationMs": 15
+    },
+    {
+      "label": "#2 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:01.791Z",
+      "ok": true,
+      "durationMs": 90
+    },
+    {
+      "label": "#2 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:01.882Z",
+      "ok": true,
+      "durationMs": 450
+    },
+    {
+      "label": "#3 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:02.732Z",
+      "ok": true,
+      "durationMs": 84
+    },
+    {
+      "label": "#3 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:02.817Z",
+      "ok": true,
+      "durationMs": 464
+    },
+    {
+      "label": "#4 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:03.696Z",
+      "ok": true,
+      "durationMs": 93
+    },
+    {
+      "label": "#4 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:03.790Z",
+      "ok": true,
+      "durationMs": 436
+    },
+    {
+      "label": "#5 滚动至可操作区域",
+      "category": "browser_scroll",
+      "at": "2026-10-08T03:59:04.624Z",
+      "ok": true,
+      "durationMs": 19
+    },
+    {
+      "label": "#5 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:04.995Z",
+      "ok": true,
+      "durationMs": 77
+    },
+    {
+      "label": "#5 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:05.074Z",
+      "ok": true,
+      "durationMs": 442
+    },
+    {
+      "label": "#6 滚动至可操作区域",
+      "category": "browser_scroll",
+      "at": "2026-10-08T03:59:05.913Z",
+      "ok": true,
+      "durationMs": 16
+    },
+    {
+      "label": "#6 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:06.295Z",
+      "ok": true,
+      "durationMs": 110
+    },
+    {
+      "label": "#6 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:06.406Z",
+      "ok": true,
+      "durationMs": 421
+    },
+    {
+      "label": "#7 滚动至可操作区域",
+      "category": "browser_scroll",
+      "at": "2026-10-08T03:59:07.215Z",
+      "ok": true,
+      "durationMs": 16
+    },
+    {
+      "label": "#7 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:07.588Z",
+      "ok": true,
+      "durationMs": 93
+    },
+    {
+      "label": "#7 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:07.682Z",
+      "ok": true,
+      "durationMs": 407
+    },
+    {
+      "label": "#8 滚动至可操作区域",
+      "category": "browser_scroll",
+      "at": "2026-10-08T03:59:08.481Z",
+      "ok": true,
+      "durationMs": 10
+    },
+    {
+      "label": "#8 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:08.854Z",
+      "ok": true,
+      "durationMs": 92
+    },
+    {
+      "label": "#8 选择失败",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:08.947Z",
+      "ok": true,
+      "durationMs": 424
+    },
+    {
+      "label": "#9 滚动至可操作区域",
+      "category": "browser_scroll",
+      "at": "2026-10-08T03:59:09.763Z",
+      "ok": true,
+      "durationMs": 12
+    },
+    {
+      "label": "#9 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:10.140Z",
+      "ok": true,
+      "durationMs": 61
+    },
+    {
+      "label": "#9 选择跳过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:10.203Z",
+      "ok": true,
+      "durationMs": 410
+    },
+    {
+      "label": "#10 滚动至可操作区域",
+      "category": "browser_scroll",
+      "at": "2026-10-08T03:59:11.000Z",
+      "ok": true,
+      "durationMs": 11
+    },
+    {
+      "label": "#10 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:11.365Z",
+      "ok": true,
+      "durationMs": 72
+    },
+    {
+      "label": "#10 选择失败",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:11.438Z",
+      "ok": true,
+      "durationMs": 388
+    },
+    {
+      "label": "打开运行状态",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:12.200Z",
+      "ok": true,
+      "durationMs": 89
+    },
+    {
+      "label": "标记运行审核中",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:12.290Z",
+      "ok": false,
+      "durationMs": 30007
+    },
+    {
+      "label": "从请求客户端切换至测试运行",
+      "category": "browser_navigation",
+      "at": "2026-10-08T03:59:53.661Z",
+      "ok": true,
+      "durationMs": 246
+    },
+    {
+      "label": "#1 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:54.762Z",
+      "ok": true,
+      "durationMs": 118
+    },
+    {
+      "label": "#1 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:54.881Z",
+      "ok": true,
+      "durationMs": 446
+    },
+    {
+      "label": "#2 滚动至可操作区域",
+      "category": "browser_scroll",
+      "at": "2026-10-08T03:59:55.714Z",
+      "ok": true,
+      "durationMs": 11
+    },
+    {
+      "label": "#2 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:56.078Z",
+      "ok": true,
+      "durationMs": 52
+    },
+    {
+      "label": "#2 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:56.131Z",
+      "ok": true,
+      "durationMs": 387
+    },
+    {
+      "label": "#3 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:56.897Z",
+      "ok": true,
+      "durationMs": 72
+    },
+    {
+      "label": "#3 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:56.970Z",
+      "ok": true,
+      "durationMs": 412
+    },
+    {
+      "label": "#4 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:57.776Z",
+      "ok": true,
+      "durationMs": 60
+    },
+    {
+      "label": "#4 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:57.837Z",
+      "ok": true,
+      "durationMs": 398
+    },
+    {
+      "label": "#5 滚动至可操作区域",
+      "category": "browser_scroll",
+      "at": "2026-10-08T03:59:58.621Z",
+      "ok": true,
+      "durationMs": 11
+    },
+    {
+      "label": "#5 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:58.995Z",
+      "ok": true,
+      "durationMs": 52
+    },
+    {
+      "label": "#5 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T03:59:59.049Z",
+      "ok": true,
+      "durationMs": 396
+    },
+    {
+      "label": "#6 滚动至可操作区域",
+      "category": "browser_scroll",
+      "at": "2026-10-08T03:59:59.854Z",
+      "ok": true,
+      "durationMs": 13
+    },
+    {
+      "label": "#6 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T04:00:00.339Z",
+      "ok": true,
+      "durationMs": 116
+    },
+    {
+      "label": "#6 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T04:00:00.456Z",
+      "ok": true,
+      "durationMs": 455
+    },
+    {
+      "label": "#7 滚动至可操作区域",
+      "category": "browser_scroll",
+      "at": "2026-10-08T04:00:01.294Z",
+      "ok": true,
+      "durationMs": 14
+    },
+    {
+      "label": "#7 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T04:00:01.671Z",
+      "ok": true,
+      "durationMs": 103
+    },
+    {
+      "label": "#7 选择通过",
+      "category": "browser_status",
+      "at": "2026-10-08T04:00:01.775Z",
+      "ok": true,
+      "durationMs": 413
+    },
+    {
+      "label": "#8 滚动至可操作区域",
+      "category": "browser_scroll",
+      "at": "2026-10-08T04:00:02.579Z",
+      "ok": true,
+      "durationMs": 11
+    },
+    {
+      "label": "#8 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T04:00:02.954Z",
+      "ok": true,
+      "durationMs": 83
+    },
+    {
+      "label": "#8 选择失败",
+      "category": "browser_status",
+      "at": "2026-10-08T04:00:03.039Z",
+      "ok": true,
+      "durationMs": 419
+    },
+    {
+      "label": "#9 滚动至可操作区域",
+      "category": "browser_scroll",
+      "at": "2026-10-08T04:00:03.845Z",
+      "ok": true,
+      "durationMs": 14
+    },
+    {
+      "label": "#9 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T04:00:04.222Z",
+      "ok": true,
+      "durationMs": 77
+    },
+    {
+      "label": "#9 选择跳过",
+      "category": "browser_status",
+      "at": "2026-10-08T04:00:04.301Z",
+      "ok": true,
+      "durationMs": 410
+    },
+    {
+      "label": "#10 滚动至可操作区域",
+      "category": "browser_scroll",
+      "at": "2026-10-08T04:00:05.103Z",
+      "ok": true,
+      "durationMs": 13
+    },
+    {
+      "label": "#10 打开状态菜单",
+      "category": "browser_status",
+      "at": "2026-10-08T04:00:05.476Z",
+      "ok": true,
+      "durationMs": 66
+    },
+    {
+      "label": "#10 选择失败",
+      "category": "browser_status",
+      "at": "2026-10-08T04:00:05.543Z",
+      "ok": true,
+      "durationMs": 394
+    },
+    {
+      "label": "滚动至运行状态",
+      "category": "browser_scroll",
+      "at": "2026-10-08T04:00:06.311Z",
+      "ok": true,
+      "durationMs": 18
+    },
+    {
+      "label": "打开运行状态",
+      "category": "browser_status",
+      "at": "2026-10-08T04:00:06.683Z",
+      "ok": true,
+      "durationMs": 70
+    },
+    {
+      "label": "标记运行审核中",
+      "category": "browser_status",
+      "at": "2026-10-08T04:00:06.755Z",
+      "ok": true,
+      "durationMs": 382
+    },
+    {
+      "label": "保存人工状态",
+      "category": "browser_save",
+      "at": "2026-10-08T04:00:07.139Z",
+      "ok": true,
+      "durationMs": 322
+    },
+    {
+      "label": "打开报告导出菜单",
+      "category": "browser_export",
+      "at": "2026-10-08T04:00:07.578Z",
+      "ok": true,
+      "durationMs": 180
+    },
+    {
+      "label": "选择 Excel 导出",
+      "category": "browser_export",
+      "at": "2026-10-08T04:00:07.761Z",
+      "ok": true,
+      "durationMs": 394
+    },
+    {
+      "label": "刷新并核对人工来源",
+      "category": "browser_review",
+      "at": "2026-10-08T04:00:08.767Z",
+      "ok": true,
+      "durationMs": 220
+    }
+  ],
+  "results": [
+    {
+      "fixtureId": 1,
+      "caseId": 68,
+      "title": "使用独立业务账号登录",
+      "status": "passed",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8011/users/signin",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "email": "business-1791430527849@local",
+          "password": "[REDACTED]"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "access_token": "[REDACTED]",
+          "expires_at": 1791517904484,
+          "user": {
+            "id": 2,
+            "email": "business-1791430527849@local",
+            "username": "business-2026-10-08T03-35-27-848Z",
+            "role": 1,
+            "avatarPath": null,
+            "locale": "zh-CN",
+            "createdAt": "2026-10-08T03:35:28.254Z",
+            "updatedAt": "2026-10-08T03:35:28.254Z"
+          }
+        }
+      },
+      "assertions": [
+        {
+          "type": "status",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "type": "jsonExists",
+          "path": "/access_token",
+          "actual": "[REDACTED]",
+          "passed": true
+        }
+      ],
+      "durationMs": 70
+    },
+    {
+      "fixtureId": 2,
+      "caseId": 69,
+      "title": "创建私有业务项目",
+      "status": "passed",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8011/projects",
+        "headers": {
+          "Authorization": "[REDACTED]",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "business-2026-10-08T03-35-27-848Z-baseline-1",
+          "detail": "第二阶段独立业务测试数据",
+          "isPublic": false
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": 12,
+          "name": "business-2026-10-08T03-35-27-848Z-baseline-1",
+          "detail": "第二阶段独立业务测试数据",
+          "isPublic": false,
+          "userId": 2,
+          "updatedAt": "2026-10-08T03:51:44.493Z",
+          "createdAt": "2026-10-08T03:51:44.493Z"
+        }
+      },
+      "assertions": [
+        {
+          "type": "status",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "type": "jsonExists",
+          "path": "/id",
+          "actual": 12,
+          "passed": true
+        },
+        {
+          "type": "jsonEquals",
+          "path": "/isPublic",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        }
+      ],
+      "durationMs": 10
+    },
+    {
+      "fixtureId": 3,
+      "caseId": 70,
+      "title": "在项目中创建用例目录",
+      "status": "passed",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8011/folders?projectId=12",
+        "headers": {
+          "Authorization": "[REDACTED]",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "业务验收目录",
+          "detail": "独立数据",
+          "parentFolderId": null
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": 12,
+          "name": "业务验收目录",
+          "detail": "独立数据",
+          "projectId": 12,
+          "parentFolderId": null,
+          "updatedAt": "2026-10-08T03:51:44.504Z",
+          "createdAt": "2026-10-08T03:51:44.504Z"
+        }
+      },
+      "assertions": [
+        {
+          "type": "status",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "type": "jsonEquals",
+          "path": "/name",
+          "expected": "业务验收目录",
+          "actual": "业务验收目录",
+          "passed": true
+        },
+        {
+          "type": "jsonExists",
+          "path": "/id",
+          "actual": 12,
+          "passed": true
+        }
+      ],
+      "durationMs": 10
+    },
+    {
+      "fixtureId": 4,
+      "caseId": 71,
+      "title": "创建业务测试用例",
+      "status": "passed",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8011/cases?folderId=12",
+        "headers": {
+          "Authorization": "[REDACTED]",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "title": "业务验收用例",
+          "state": 0,
+          "priority": 1,
+          "type": 0,
+          "automationStatus": 0,
+          "template": 0,
+          "preConditions": "独立目录已创建",
+          "expectedResults": "业务验收用例可查询"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": 79,
+          "title": "业务验收用例",
+          "state": 0,
+          "caseNo": 1,
+          "priority": 1,
+          "type": 0,
+          "automationStatus": 0,
+          "description": null,
+          "template": 0,
+          "preConditions": "独立目录已创建",
+          "expectedResults": "业务验收用例可查询",
+          "folderId": 12,
+          "updatedAt": "2026-10-08T03:51:44.525Z",
+          "createdAt": "2026-10-08T03:51:44.525Z",
+          "executionInfo": null
+        }
+      },
+      "assertions": [
+        {
+          "type": "status",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "type": "jsonExists",
+          "path": "/id",
+          "actual": 79,
+          "passed": true
+        },
+        {
+          "type": "jsonEquals",
+          "path": "/title",
+          "expected": "业务验收用例",
+          "actual": "业务验收用例",
+          "passed": true
+        },
+        {
+          "type": "jsonEquals",
+          "path": "/priority",
+          "expected": 1,
+          "actual": 1,
+          "passed": true
+        }
+      ],
+      "durationMs": 20
+    },
+    {
+      "fixtureId": 5,
+      "caseId": 72,
+      "title": "查询新建业务用例",
+      "status": "passed",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8011/cases/79",
+        "headers": {
+          "Authorization": "[REDACTED]"
+        },
+        "body": null
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": 79,
+          "title": "业务验收用例",
+          "state": 0,
+          "caseNo": 1,
+          "priority": 1,
+          "type": 0,
+          "automationStatus": 0,
+          "description": null,
+          "template": 0,
+          "preConditions": "独立目录已创建",
+          "expectedResults": "业务验收用例可查询",
+          "executionInfo": null,
+          "folderId": 12,
+          "createdAt": "2026-10-08T03:51:44.525Z",
+          "updatedAt": "2026-10-08T03:51:44.525Z",
+          "Steps": [],
+          "Attachments": [],
+          "Tags": [],
+          "RunCases": []
+        }
+      },
+      "assertions": [
+        {
+          "type": "status",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "type": "jsonEquals",
+          "path": "/title",
+          "expected": "业务验收用例",
+          "actual": "业务验收用例",
+          "passed": true
+        },
+        {
+          "type": "jsonEquals",
+          "path": "/priority",
+          "expected": 1,
+          "actual": 1,
+          "passed": true
+        }
+      ],
+      "durationMs": 17
+    },
+    {
+      "fixtureId": 6,
+      "caseId": 73,
+      "title": "错误密码应被拒绝",
+      "status": "passed",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8011/users/signin",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "email": "business-1791430527849@local",
+          "password": "[REDACTED]"
+        }
+      },
+      "response": {
+        "status": 401,
+        "body": {
+          "error": "Authentication failed"
+        }
+      },
+      "assertions": [
+        {
+          "type": "status",
+          "expected": 401,
+          "actual": 401,
+          "passed": true
+        },
+        {
+          "type": "jsonEquals",
+          "path": "/error",
+          "expected": "Authentication failed",
+          "actual": "Authentication failed",
+          "passed": true
+        }
+      ],
+      "durationMs": 64
+    },
+    {
+      "fixtureId": 7,
+      "caseId": 74,
+      "title": "缺少标题时拒绝创建用例",
+      "status": "passed",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8011/cases?folderId=12",
+        "headers": {
+          "Authorization": "[REDACTED]",
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "state": 0,
+          "priority": 1,
+          "type": 0,
+          "automationStatus": 0,
+          "template": 0
+        }
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": "Title, state, priority, type, automationStatus, and template are required"
+        }
+      },
+      "assertions": [
+        {
+          "type": "status",
+          "expected": 400,
+          "actual": 400,
+          "passed": true
+        },
+        {
+          "type": "jsonExists",
+          "path": "/error",
+          "actual": "Title, state, priority, type, automationStatus, and template are required",
+          "passed": true
+        }
+      ],
+      "durationMs": 8
+    },
+    {
+      "fixtureId": 8,
+      "caseId": 75,
+      "title": "故障注入：登录前置使用错误密码",
+      "status": "failed",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8011/users/signin",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "email": "business-1791430527849@local",
+          "password": "[REDACTED]"
+        }
+      },
+      "response": {
+        "status": 401,
+        "body": {
+          "error": "Authentication failed"
+        }
+      },
+      "assertions": [
+        {
+          "type": "status",
+          "expected": 200,
+          "actual": 401,
+          "passed": false
+        },
+        {
+          "type": "jsonExists",
+          "path": "/access_token",
+          "actual": null,
+          "passed": false
+        }
+      ],
+      "durationMs": 64
+    },
+    {
+      "fixtureId": 9,
+      "caseId": 76,
+      "title": "前置登录失败后不发送业务查询",
+      "status": "skipped",
+      "request": null,
+      "response": null,
+      "assertions": [],
+      "durationMs": 0,
+      "reason": "前置用例未通过，不发送请求"
+    },
+    {
+      "fixtureId": 10,
+      "caseId": 77,
+      "title": "校准：错误预期应被断言发现",
+      "status": "failed",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8011/cases/79",
+        "headers": {
+          "Authorization": "[REDACTED]"
+        },
+        "body": null
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": 79,
+          "title": "业务验收用例",
+          "state": 0,
+          "caseNo": 1,
+          "priority": 1,
+          "type": 0,
+          "automationStatus": 0,
+          "description": null,
+          "template": 0,
+          "preConditions": "独立目录已创建",
+          "expectedResults": "业务验收用例可查询",
+          "executionInfo": null,
+          "folderId": 12,
+          "createdAt": "2026-10-08T03:51:44.525Z",
+          "updatedAt": "2026-10-08T03:51:44.525Z",
+          "Steps": [],
+          "Attachments": [],
+          "Tags": [],
+          "RunCases": []
+        }
+      },
+      "assertions": [
+        {
+          "type": "status",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "type": "jsonEquals",
+          "path": "/title",
+          "expected": "故意设置的不一致标题",
+          "actual": "业务验收用例",
+          "passed": false
+        }
+      ],
+      "durationMs": 24
+    }
+  ],
+  "summary": {
+    "total": 10,
+    "passed": 7,
+    "failed": 2,
+    "unexecuted": 1
+  },
+  "verification": {
+    "frozenOracle": true,
+    "actualHttp": true,
+    "manualSource": true,
+    "backfill": true,
+    "excel": true
+  },
+  "limitations": [
+    "请求参数与断言由脚本解析和核对，不计作真实人员填写和判断",
+    "浏览器逐条回填是真实 UI 操作，耗时为自动化脚本耗时",
+    "原人工 Excel 不包含 Agent 的完整证据，原始请求响应另存 JSON；报告能力不同，耗时不能直接代表相同报告质量"
+  ]
+}
