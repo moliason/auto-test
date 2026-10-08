@@ -1,0 +1,182 @@
+[
+  {
+    "id": 1,
+    "title": "使用独立业务账号登录",
+    "expectedResults": "HTTP 200，返回 access_token；随后请求使用该 Token。",
+    "expectedStatus": "passed",
+    "executionInfo": {
+      "method": "POST",
+      "path": "/users/signin",
+      "body": { "email": "{{BIZ_EMAIL}}", "password": "{{BIZ_PASSWORD}}" },
+      "assertions": [
+        { "type": "status", "expected": 200 },
+        { "type": "jsonExists", "path": "/access_token" }
+      ],
+      "extract": [{ "name": "BIZ_TOKEN", "path": "/access_token", "secret": true }]
+    }
+  },
+  {
+    "id": 2,
+    "title": "创建私有业务项目",
+    "expectedResults": "HTTP 200，返回新项目 id，isPublic 为 false。",
+    "expectedStatus": "passed",
+    "executionInfo": {
+      "method": "POST",
+      "path": "/projects",
+      "headers": { "Authorization": "Bearer {{BIZ_TOKEN}}" },
+      "body": { "name": "{{BIZ_PROJECT_NAME}}", "detail": "第二阶段独立业务测试数据", "isPublic": false },
+      "dependsOn": [1],
+      "assertions": [
+        { "type": "status", "expected": 200 },
+        { "type": "jsonExists", "path": "/id" },
+        { "type": "jsonEquals", "path": "/isPublic", "expected": false }
+      ],
+      "extract": [{ "name": "BIZ_PROJECT_ID", "path": "/id", "secret": false }]
+    }
+  },
+  {
+    "id": 3,
+    "title": "在项目中创建用例目录",
+    "expectedResults": "HTTP 200，目录名称为业务验收目录，并返回 id。",
+    "expectedStatus": "passed",
+    "executionInfo": {
+      "method": "POST",
+      "path": "/folders",
+      "query": { "projectId": "{{BIZ_PROJECT_ID}}" },
+      "headers": { "Authorization": "Bearer {{BIZ_TOKEN}}" },
+      "body": { "name": "业务验收目录", "detail": "独立数据", "parentFolderId": null },
+      "dependsOn": [2],
+      "assertions": [
+        { "type": "status", "expected": 200 },
+        { "type": "jsonEquals", "path": "/name", "expected": "业务验收目录" },
+        { "type": "jsonExists", "path": "/id" }
+      ],
+      "extract": [{ "name": "BIZ_FOLDER_ID", "path": "/id", "secret": false }]
+    }
+  },
+  {
+    "id": 4,
+    "title": "创建业务测试用例",
+    "expectedResults": "HTTP 200，标题为业务验收用例，priority 为 1，并返回 id。",
+    "expectedStatus": "passed",
+    "executionInfo": {
+      "method": "POST",
+      "path": "/cases",
+      "query": { "folderId": "{{BIZ_FOLDER_ID}}" },
+      "headers": { "Authorization": "Bearer {{BIZ_TOKEN}}" },
+      "body": {
+        "title": "业务验收用例",
+        "state": 0,
+        "priority": 1,
+        "type": 0,
+        "automationStatus": 0,
+        "template": 0,
+        "preConditions": "独立目录已创建",
+        "expectedResults": "业务验收用例可查询"
+      },
+      "dependsOn": [3],
+      "assertions": [
+        { "type": "status", "expected": 200 },
+        { "type": "jsonExists", "path": "/id" },
+        { "type": "jsonEquals", "path": "/title", "expected": "业务验收用例" },
+        { "type": "jsonEquals", "path": "/priority", "expected": 1 }
+      ],
+      "extract": [{ "name": "BIZ_CASE_ID", "path": "/id", "secret": false }]
+    }
+  },
+  {
+    "id": 5,
+    "title": "查询新建业务用例",
+    "expectedResults": "HTTP 200，title 为业务验收用例、priority 为 1，证明创建数据可读回。",
+    "expectedStatus": "passed",
+    "executionInfo": {
+      "method": "GET",
+      "path": "/cases/{{BIZ_CASE_ID}}",
+      "headers": { "Authorization": "Bearer {{BIZ_TOKEN}}" },
+      "dependsOn": [4],
+      "assertions": [
+        { "type": "status", "expected": 200 },
+        { "type": "jsonEquals", "path": "/title", "expected": "业务验收用例" },
+        { "type": "jsonEquals", "path": "/priority", "expected": 1 }
+      ]
+    }
+  },
+  {
+    "id": 6,
+    "title": "错误密码应被拒绝",
+    "expectedResults": "按登录规则，错误密码返回 HTTP 401 和 Authentication failed；拒绝登录是本条测试的通过条件。",
+    "expectedStatus": "passed",
+    "executionInfo": {
+      "method": "POST",
+      "path": "/users/signin",
+      "body": { "email": "{{BIZ_EMAIL}}", "password": "deliberately-wrong-password" },
+      "assertions": [
+        { "type": "status", "expected": 401 },
+        { "type": "jsonEquals", "path": "/error", "expected": "Authentication failed" }
+      ]
+    }
+  },
+  {
+    "id": 7,
+    "title": "缺少标题时拒绝创建用例",
+    "expectedResults": "合法目录下缺少必填 title，返回 HTTP 400，error 字段存在。",
+    "expectedStatus": "passed",
+    "executionInfo": {
+      "method": "POST",
+      "path": "/cases",
+      "query": { "folderId": "{{BIZ_FOLDER_ID}}" },
+      "headers": { "Authorization": "Bearer {{BIZ_TOKEN}}" },
+      "body": { "state": 0, "priority": 1, "type": 0, "automationStatus": 0, "template": 0 },
+      "dependsOn": [3],
+      "assertions": [
+        { "type": "status", "expected": 400 },
+        { "type": "jsonExists", "path": "/error" }
+      ]
+    }
+  },
+  {
+    "id": 8,
+    "title": "故障注入：登录前置使用错误密码",
+    "expectedResults": "控制实验：故意给登录前置错误密码，仍以正常登录所需 200/Token 为门槛，必须判失败；这是输入故障，不是平台缺陷。",
+    "expectedStatus": "failed",
+    "executionInfo": {
+      "method": "POST",
+      "path": "/users/signin",
+      "body": { "email": "{{BIZ_EMAIL}}", "password": "deliberately-wrong-password" },
+      "assertions": [
+        { "type": "status", "expected": 200 },
+        { "type": "jsonExists", "path": "/access_token" }
+      ],
+      "extract": [{ "name": "BROKEN_BIZ_TOKEN", "path": "/access_token", "secret": true }]
+    }
+  },
+  {
+    "id": 9,
+    "title": "前置登录失败后不发送业务查询",
+    "expectedResults": "依赖故障登录前置；必须记录未执行原因，request 和 response 均为空。",
+    "expectedStatus": "skipped",
+    "executionInfo": {
+      "method": "GET",
+      "path": "/cases/{{BIZ_CASE_ID}}",
+      "headers": { "Authorization": "Bearer {{BROKEN_BIZ_TOKEN}}" },
+      "dependsOn": [4, 8],
+      "assertions": [{ "type": "status", "expected": 200 }]
+    }
+  },
+  {
+    "id": 10,
+    "title": "校准：错误预期应被断言发现",
+    "expectedResults": "控制实验：故意预期不同标题，以验证检测能力；真实标题是业务验收用例。必须判失败，不计为发现真实业务缺陷。",
+    "expectedStatus": "failed",
+    "executionInfo": {
+      "method": "GET",
+      "path": "/cases/{{BIZ_CASE_ID}}",
+      "headers": { "Authorization": "Bearer {{BIZ_TOKEN}}" },
+      "dependsOn": [4],
+      "assertions": [
+        { "type": "status", "expected": 200 },
+        { "type": "jsonEquals", "path": "/title", "expected": "故意设置的不一致标题" }
+      ]
+    }
+  }
+]
