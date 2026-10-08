@@ -94,25 +94,32 @@ if (!state.configured) {
 for (const mode of ['agent', 'baseline']) {
   for (let round = 1; round <= (mode === 'agent' && process.argv.includes('--reuse-check') ? 4 : 3); round++) {
     const ids = state[`${mode}RunIds`];
-    if (ids[round - 1]) continue;
-    const run = await api(`/runs?projectId=${state.projectId}`, 'POST', {
-      name: `${mode === 'agent' ? 'Agent' : '脚本模拟逐条流程'} 第${round}轮`,
-      state: 0,
-      caseIds: state.caseIds,
-      configurations: '本地真实平台业务接口',
-      description: '首次与回归分组，非真实人员效率数据',
-    });
-    ids[round - 1] = run.id;
-    writeFileSync(statePath, JSON.stringify(state, null, 2));
-    if (mode === 'agent')
-      await api(`/agent/runs/${run.id}/environment`, 'PUT', {
-        environment: {
-          baseUrl,
-          timeoutMs: 5000,
-          variables: { BIZ_EMAIL: state.email, BIZ_PROJECT_NAME: `${state.studyId}-${mode}-${round}` },
-          secretVariables: ['BIZ_PASSWORD'],
-        },
+    if (!ids[round - 1]) {
+      const run = await api(`/runs?projectId=${state.projectId}`, 'POST', {
+        name: `${mode === 'agent' ? 'Agent' : '脚本模拟逐条流程'} 第${round}轮`,
+        state: 0,
+        caseIds: state.caseIds,
+        configurations: '本地真实平台业务接口',
+        description: '首次与回归分组，非真实人员效率数据',
       });
+      ids[round - 1] = run.id;
+      writeFileSync(statePath, JSON.stringify(state, null, 2));
+    }
+    state.configuredRunIds ||= [];
+    if (mode === 'agent' && !state.configuredRunIds.includes(ids[round - 1])) {
+      const current = await api(`/agent/runs/${ids[round - 1]}/environment`);
+      if (!Object.keys(current.environment || {}).length)
+        await api(`/agent/runs/${ids[round - 1]}/environment`, 'PUT', {
+          environment: {
+            baseUrl,
+            timeoutMs: 5000,
+            variables: { BIZ_EMAIL: state.email, BIZ_PROJECT_NAME: `${state.studyId}-${mode}-${round}` },
+            secretVariables: ['BIZ_PASSWORD'],
+          },
+        });
+      state.configuredRunIds.push(ids[round - 1]);
+      writeFileSync(statePath, JSON.stringify(state, null, 2));
+    }
   }
 }
 let envText = readFileSync(envPath, 'utf8');
