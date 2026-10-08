@@ -107,7 +107,7 @@ try {
           headers: { ...config.headers, ...(config.body ? { 'Content-Type': 'application/json' } : {}) },
           body: config.body ?? null,
         };
-        const started = performance.now();
+        const requestActionIndex = actions.length;
         const response = await step(`#${fixture.id} 发送业务请求`, 'script_http', async () => {
           const received = await fetch(url, {
             method: request.method,
@@ -126,7 +126,12 @@ try {
               actual = response.body;
               for (const part of rule.path.slice(1).split('/')) {
                 const key = part.replace(/~1/g, '/').replace(/~0/g, '~');
-                if (actual === null || typeof actual !== 'object' || !Object.hasOwn(actual, key)) {
+                if (
+                  actual === null ||
+                  typeof actual !== 'object' ||
+                  !Object.hasOwn(actual, key) ||
+                  (Array.isArray(actual) && (!/^(0|[1-9]\d*)$/.test(key) || Number(key) >= actual.length))
+                ) {
                   exists = false;
                   actual = null;
                   break;
@@ -147,7 +152,8 @@ try {
           request,
           response,
           assertions,
-          durationMs: Math.round(performance.now() - started),
+          // Each step records duration before its checkpoint write in finally.
+          durationMs: actions[requestActionIndex].durationMs + actions[requestActionIndex + 1].durationMs,
         };
         if (result.status === 'passed')
           for (const extraction of fixture.executionInfo.extract || []) {
@@ -254,6 +260,7 @@ try {
     const artifact = {
       mode: 'baseline',
       measurementType: 'script-client-plus-browser-manual-status-simulation-not-human',
+      timingVersion: 2,
       round,
       runId,
       fixtureSha256: createHash('sha256').update(fixtureText).digest('hex'),
