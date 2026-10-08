@@ -86,10 +86,19 @@ export default function (sequelize, { launch = runAgent } = {}) {
           ? 'DeepSeek'
           : 'configured-proxy',
       };
-      const task = await Task.create({ runId: run.id, createdBy: req.userId, state: 'preparing', plan });
-      void launch(sequelize, task.id, 'prepare').catch(() =>
-        console.error('Agent background task could not persist state:', task.id)
-      );
+      const reuse = plan.issues.length === 0 && !interfaceDescription.trim();
+      if (reuse) plan.notes = '已复用原用例执行配置并完成校验，请核对请求、预期和前置条件后确认执行。';
+      const task = await Task.create({
+        runId: run.id,
+        createdBy: req.userId,
+        state: reuse ? 'awaiting_confirmation' : 'preparing',
+        plan,
+        events: reuse ? [{ type: 'configuration_reused', at: new Date().toISOString() }] : [],
+      });
+      if (!reuse)
+        void launch(sequelize, task.id, 'prepare').catch(() =>
+          console.error('Agent background task could not persist state:', task.id)
+        );
       return res.status(202).json({
         ...task.toJSON(),
         summary: reportSummary(task),

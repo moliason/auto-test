@@ -47,6 +47,48 @@ afterEach(async () => {
 });
 
 describe('Agent task lifecycle and permissions', () => {
+  it('reuses complete saved configuration but still requires explicit execution confirmation', async () => {
+    const response = await request(app)
+      .post('/agent/runs/1/tasks')
+      .set('Authorization', auth())
+      .send({ caseIds: [1] });
+    expect(response.status).toBe(202);
+    expect(response.body.state).toBe('awaiting_confirmation');
+    expect(response.body.plan.cases[0].executionInfo).toEqual(executionInfo);
+    expect(response.body.events[0].type).toBe('configuration_reused');
+    expect(response.body.results).toEqual([]);
+    expect(launch).not.toHaveBeenCalled();
+    const url = `/agent/runs/1/tasks/${response.body.id}/confirm`;
+    expect((await request(app).post(url).set('Authorization', auth()).send({ version: 1 })).status).toBe(400);
+    expect((await db.models.RunCase.findOne({ where: { runId: 1, caseId: 1 } })).status).toBe(0);
+    expect(
+      (
+        await request(app).post(url).set('Authorization', auth()).send({
+          version: 1,
+          confirmed: true,
+          preconditionsConfirmed: true,
+        })
+      ).status
+    ).toBe(202);
+    expect(launch).toHaveBeenCalledWith(db, response.body.id, 'execute');
+  });
+
+  it('keeps model preparation for supplied documentation or unresolved business expectations', async () => {
+    const documented = await request(app)
+      .post('/agent/runs/1/tasks')
+      .set('Authorization', auth())
+      .send({ caseIds: [1], interfaceDescription: '核对健康检查接口文档' });
+    expect(documented.body.state).toBe('preparing');
+    await db.models.Case.update({ expectedResults: '业务结果待确认' }, { where: { id: 1 } });
+    const uncertain = await request(app)
+      .post('/agent/runs/1/tasks')
+      .set('Authorization', auth())
+      .send({ caseIds: [1] });
+    expect(uncertain.body.state).toBe('preparing');
+    expect(uncertain.body.plan.issues.join(' ')).toContain('待确认');
+    expect(launch).toHaveBeenCalledTimes(2);
+  });
+
   it('captures original text and ordered steps without executing before confirmation', async () => {
     const response = await request(app)
       .post('/agent/runs/1/tasks')
