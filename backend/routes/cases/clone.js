@@ -56,9 +56,11 @@ export default function (sequelize) {
       });
 
       await sequelize.transaction(async (t) => {
+        const copied = new Map();
         let nextCaseNo = await getNextProjectCaseNo(sequelize, Folder, targetFolderId, t);
-        for (const c of clonedCases) {
+        for (const [index, c] of clonedCases.entries()) {
           const newCase = await Case.create({ ...c, caseNo: nextCaseNo }, { transaction: t });
+          copied.set(cases[index].id, newCase);
           nextCaseNo += 1;
 
           if (c.Steps) {
@@ -77,6 +79,18 @@ export default function (sequelize) {
 
             await CaseStep.bulkCreate(newCaseSteps, { transaction: t });
           }
+        }
+        for (const item of copied.values()) {
+          if (Array.isArray(item.executionInfo?.dependsOn))
+            await item.update(
+              {
+                executionInfo: {
+                  ...item.executionInfo,
+                  dependsOn: item.executionInfo.dependsOn.map((id) => copied.get(id)?.id ?? id),
+                },
+              },
+              { transaction: t }
+            );
         }
       });
 

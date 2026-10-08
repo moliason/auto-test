@@ -7,6 +7,7 @@ import moveRoute from './move.js';
 import cloneRoute from './clone.js';
 import editRoute from './edit.js';
 import folderCloneRoute from '../folders/clone.js';
+import { buildPlan } from '../../agent/plan.js';
 
 let db, app;
 const auth = (userId = 1) => `Bearer ${jwt.sign({ userId }, 'transfer-test')}`;
@@ -38,6 +39,61 @@ afterEach(async () => {
 });
 
 describe('project-scoped case transfers', () => {
+  it.each(['cases', 'folders'])(
+    'remaps copied dependencies across a %s copy without changing originals',
+    async (mode) => {
+      await db.models.Case.update(
+        {
+          executionInfo: {
+            method: 'POST',
+            path: '/login',
+            assertions: [{ type: 'status', expected: 200 }],
+            extract: [{ name: 'TOKEN', path: '/token' }],
+          },
+        },
+        { where: { id: 1 } }
+      );
+      await db.models.Case.create({
+        id: 3,
+        folderId: 1,
+        caseNo: 2,
+        title: 'Query',
+        state: 0,
+        priority: 1,
+        type: 0,
+        automationStatus: 0,
+        template: 0,
+        executionInfo: {
+          method: 'GET',
+          path: '/profile',
+          headers: { Authorization: 'Bearer {{TOKEN}}' },
+          dependsOn: [1],
+          assertions: [{ type: 'status', expected: 200 }],
+        },
+      });
+      const response =
+        mode === 'cases'
+          ? await request(app)
+              .post('/cases/clone?projectId=1')
+              .set('Authorization', auth())
+              .send({ caseIds: [3, 1], targetFolderId: 3 })
+          : await request(app).post('/folders/1/clone').set('Authorization', auth()).send({ targetFolderId: 3 });
+      expect(response.status).toBe(mode === 'cases' ? 200 : 201);
+      const copied = (await db.models.Case.findAll()).filter((item) => item.id > 3);
+      expect(copied).toHaveLength(2);
+      const login = copied.find((item) => item.title === 'Private 1');
+      const query = copied.find((item) => item.title === 'Query');
+      expect(query.executionInfo.dependsOn).toEqual([login.id]);
+      expect((await db.models.Case.findByPk(3)).executionInfo.dependsOn).toEqual([1]);
+      vi.stubEnv('TEST_AGENT_ALLOWED_ORIGINS', 'http://127.0.0.1:4010');
+      expect(
+        buildPlan(
+          copied.map((item) => ({ ...item.toJSON(), caseId: item.id })),
+          { baseUrl: 'http://127.0.0.1:4010' }
+        ).issues
+      ).toEqual([]);
+    }
+  );
   for (const [method, action] of [
     ['put', 'move'],
     ['post', 'clone'],

@@ -21,7 +21,7 @@ export default function (sequelize) {
   Case.belongsToMany(Step, { through: 'caseSteps', foreignKey: 'caseId', otherKey: 'stepId' });
   Step.belongsToMany(Case, { through: 'caseSteps', foreignKey: 'stepId', otherKey: 'caseId' });
 
-  async function _cloneFolderRecursive(sourceFolder, targetParent, transaction) {
+  async function _cloneFolderRecursive(sourceFolder, targetParent, transaction, copied) {
     const folderToCreate = {
       name: sourceFolder.name,
       detail: sourceFolder.detail,
@@ -31,20 +31,20 @@ export default function (sequelize) {
 
     const clonedFolder = await Folder.create(folderToCreate, { transaction });
 
-    await _cloneCasesAndSteps(sourceFolder.id, clonedFolder.id, transaction);
+    await _cloneCasesAndSteps(sourceFolder.id, clonedFolder.id, transaction, copied);
 
     const childFolders = await Folder.findAll({
       where: { parentFolderId: sourceFolder.id },
     });
 
     for (const child of childFolders) {
-      await _cloneFolderRecursive(child, clonedFolder, transaction);
+      await _cloneFolderRecursive(child, clonedFolder, transaction, copied);
     }
 
     return clonedFolder;
   }
 
-  async function _cloneCasesAndSteps(folderId, targetFolderId, transaction) {
+  async function _cloneCasesAndSteps(folderId, targetFolderId, transaction, copied) {
     const folderCases = await Case.findAll({
       where: { folderId },
       include: [{ model: Step, through: { attributes: ['stepNo'] } }],
@@ -61,8 +61,9 @@ export default function (sequelize) {
     });
 
     let nextCaseNo = await getNextProjectCaseNo(sequelize, Folder, targetFolderId, transaction);
-    for (const c of clonedCases) {
+    for (const [index, c] of clonedCases.entries()) {
       const newCase = await Case.create({ ...c, caseNo: nextCaseNo }, { transaction });
+      copied.set(cases[index].id, newCase);
       nextCaseNo += 1;
 
       if (c.Steps && c.Steps.length > 0) {
@@ -99,7 +100,20 @@ export default function (sequelize) {
         return res.status(403).json({ error: 'Target folder must belong to the authorized project' });
 
       await sequelize.transaction(async (t) => {
-        await _cloneFolderRecursive(sourceFolder, targetFolder, t);
+        const copied = new Map();
+        await _cloneFolderRecursive(sourceFolder, targetFolder, t, copied);
+        for (const item of copied.values()) {
+          if (Array.isArray(item.executionInfo?.dependsOn))
+            await item.update(
+              {
+                executionInfo: {
+                  ...item.executionInfo,
+                  dependsOn: item.executionInfo.dependsOn.map((id) => copied.get(id)?.id ?? id),
+                },
+              },
+              { transaction: t }
+            );
+        }
       });
 
       res.status(201).send({ message: 'Folder cloned successfully' });
