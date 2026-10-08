@@ -1,5 +1,4 @@
 import express from 'express';
-const router = express.Router();
 import { DataTypes } from 'sequelize';
 import defineCase from '../../models/cases.js';
 import defineFolder from '../../models/folders.js';
@@ -10,6 +9,7 @@ import editableMiddleware from '../../middleware/verifyEditable.js';
 import { getNextProjectCaseNo } from '../../utils/caseNumber.js';
 
 export default function (sequelize) {
+  const router = express.Router();
   const { verifySignedIn } = authMiddleware(sequelize);
   const { verifyProjectDeveloperFromProjectId } = editableMiddleware(sequelize);
   const Case = defineCase(sequelize, DataTypes);
@@ -19,7 +19,6 @@ export default function (sequelize) {
   Case.belongsToMany(Step, { through: 'caseSteps', foreignKey: 'caseId', otherKey: 'stepId' });
   Step.belongsToMany(Case, { through: 'caseSteps', foreignKey: 'stepId', otherKey: 'caseId' });
 
-  // TODO:  Implement a safer middleware to check permissions based on the actual caseId (in this case, multiples case ids)
   router.post('/clone', verifySignedIn, verifyProjectDeveloperFromProjectId, async (req, res) => {
     const { caseIds, targetFolderId } = req.body;
 
@@ -36,6 +35,17 @@ export default function (sequelize) {
       if (caseRecords.length !== caseIds.length) {
         return res.status(404).json({ error: 'Some cases not found' });
       }
+
+      const folders = await Folder.findAll({
+        where: { id: [...caseRecords.map((item) => item.folderId), targetFolderId] },
+      });
+      if (!folders.some((item) => item.id === Number(targetFolderId)))
+        return res.status(404).json({ error: 'Target folder not found' });
+      if (
+        folders.some((item) => item.projectId !== Number(req.query.projectId)) ||
+        caseRecords.some((item) => !folders.some((folder) => folder.id === item.folderId))
+      )
+        return res.status(403).json({ error: 'Source cases and target folder must belong to the authorized project' });
 
       const cases = caseRecords.map((c) => c.get({ plain: true }));
 

@@ -1,5 +1,4 @@
 import express from 'express';
-const router = express.Router();
 import { DataTypes } from 'sequelize';
 import defineFolder from '../../models/folders.js';
 import defineCase from '../../models/cases.js';
@@ -10,6 +9,7 @@ import editableMiddleware from '../../middleware/verifyEditable.js';
 import { getNextProjectCaseNo } from '../../utils/caseNumber.js';
 
 export default function (sequelize) {
+  const router = express.Router();
   const { verifySignedIn } = authMiddleware(sequelize);
   const { verifyProjectDeveloperFromFolderId } = editableMiddleware(sequelize);
 
@@ -95,6 +95,8 @@ export default function (sequelize) {
       if (!sourceFolder || !targetFolder) {
         return res.status(404).send('Folder or target folder not found');
       }
+      if (sourceFolder.projectId !== targetFolder.projectId)
+        return res.status(403).json({ error: 'Target folder must belong to the authorized project' });
 
       await sequelize.transaction(async (t) => {
         await _cloneFolderRecursive(sourceFolder, targetFolder, t);
