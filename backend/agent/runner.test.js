@@ -48,6 +48,33 @@ const tool = (name, args = {}) => ({
 });
 
 describe('Agent plans and controlled HTTP tools', () => {
+  it.each([{ extract: [] }, { extract: [{ name: 'PUBLIC_VALUE', path: '/token', secret: false }] }])(
+    'never persists or sends assertion credentials to the model even without secret extraction: $extract',
+    async ({ extract }) => {
+      const source = [{ ...snapshots[0], executionInfo: { ...snapshots[0].executionInfo, extract } }];
+      const task = await db.models.AgentTask.create({
+        runId: 1,
+        state: 'running',
+        plan: buildPlan(source, environment),
+      });
+      const completion = vi
+        .fn()
+        .mockResolvedValueOnce(tool('read_cases'))
+        .mockResolvedValueOnce(tool('execute_case', { caseId: 1 }))
+        .mockResolvedValueOnce(tool('get_results'))
+        .mockResolvedValueOnce(tool('submit_report', { analysis: '登录结果已核对' }));
+      await runAgent(db, task.id, 'execute', { completion });
+      await task.reload();
+      expect(task.state).toBe('completed');
+      expect(task.results[0].status).toBe('passed');
+      expect(task.results[0].assertions.find((item) => item.path === '/token')).toMatchObject({
+        passed: true,
+        actual: '[REDACTED]',
+      });
+      expect(JSON.stringify(task.toJSON())).not.toContain('demo-token');
+      expect(JSON.stringify(completion.mock.calls)).not.toContain('demo-token');
+    }
+  );
   it('persists phase, timings and provider usage including failures without changing old evidence', async () => {
     const task = await db.models.AgentTask.create({
       runId: 1,

@@ -148,7 +148,15 @@ export function renderVariables(value, variables, encode = false) {
   });
 }
 
-export function redact(value, secrets = []) {
+export function collectSensitiveValues(value, sensitive = false) {
+  if (value && typeof value === 'object')
+    return Object.entries(value).flatMap(([key, entry]) =>
+      collectSensitiveValues(entry, sensitive || sensitiveName.test(key))
+    );
+  return sensitive && typeof value === 'string' && value.length ? [value] : [];
+}
+
+export function redact(value, secrets = collectSensitiveValues(value)) {
   if (Array.isArray(value)) return value.map((entry) => redact(entry, secrets));
   if (value && typeof value === 'object')
     return Object.fromEntries(
@@ -210,6 +218,7 @@ export async function executeHttpCase({ execution, environment, variables = {}, 
     for (const name of evidenceUrl.searchParams.keys())
       if (sensitiveName.test(name)) evidenceUrl.searchParams.set(name, '[REDACTED]');
     evidence.request = { method: execution.method, url: evidenceUrl.href, headers, body: body ?? null };
+    sensitiveValues.push(...collectSensitiveValues(evidence.request));
     const requestSignal = AbortSignal.any([
       AbortSignal.timeout(environment.timeoutMs || 5000),
       ...(signal ? [signal] : []),
@@ -256,6 +265,8 @@ export async function executeHttpCase({ execution, environment, variables = {}, 
       truncated: !isJson && text.length > 32768,
       bytes,
     };
+    // Assertion evaluation uses original values; every evidence copy is redacted with the same discovered secrets.
+    sensitiveValues.push(...collectSensitiveValues(evidence.response));
     for (const assertion of execution.assertions) {
       const actual =
         assertion.type === 'status'
