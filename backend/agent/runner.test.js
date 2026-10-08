@@ -180,6 +180,39 @@ describe('Agent plans and controlled HTTP tools', () => {
     expect(task.events.some((event) => event.name === 'submit_plan')).toBe(true);
   });
 
+  it('masks model-proposed literal credentials before storing plans or tool arguments', async () => {
+    const task = await db.models.AgentTask.create({
+      runId: 1,
+      plan: { ...buildPlan([snapshots[7]], environment), interfaceDescription: 'POST /login 接受 JSON 登录信息' },
+    });
+    const completion = vi
+      .fn()
+      .mockResolvedValueOnce(tool('read_cases'))
+      .mockResolvedValueOnce(
+        tool('submit_plan', {
+          cases: [
+            {
+              caseId: 8,
+              questions: [],
+              executionInfo: {
+                method: 'POST',
+                path: '/login',
+                headers: { Authorization: 'Bearer model-literal-token' },
+                body: JSON.stringify({ password: 'model-literal-password' }),
+                assertions: [{ type: 'status', expected: 200 }],
+              },
+            },
+          ],
+        })
+      );
+    await runAgent(db, task.id, 'prepare', { completion });
+    await task.reload();
+    expect(task.state).toBe('needs_input');
+    expect(task.plan.issues.join(' ')).toContain('脱敏凭据');
+    expect(JSON.stringify(task.toJSON())).not.toContain('model-literal-token');
+    expect(JSON.stringify(task.toJSON())).not.toContain('model-literal-password');
+  });
+
   it('executes real requests, skips failed dependencies, persists evidence and retains history across runs', async () => {
     const plan = buildPlan(snapshots.slice(0, 7), environment);
     const task = await db.models.AgentTask.create({ runId: 1, state: 'running', startedAt: new Date(), plan });

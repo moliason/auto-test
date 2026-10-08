@@ -6,6 +6,7 @@ import { chatCompletion } from './deepseek.js';
 import { executeHttpCase, redact } from './execution.js';
 import { buildPlan, environmentVariables, reportSummary } from './plan.js';
 import { executionTools, prepareTools } from './tools.js';
+import { protectConfiguration } from './credentials.js';
 
 export async function persistEvidence(sequelize, taskId, item, evidence, secrets = []) {
   const Task = defineAgentTask(sequelize, DataTypes);
@@ -183,7 +184,7 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
                 at: new Date().toISOString(),
                 type: 'tool_started',
                 name: call.function.name,
-                args: redact(args, secrets),
+                args: protectConfiguration(redact(args, secrets)),
               },
             ],
           });
@@ -211,6 +212,7 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
                     proposal.executionInfo[key] = value;
                 }
               }
+              proposal.executionInfo = protectConfiguration(proposal.executionInfo);
             }
             const plan = {
               ...task.plan,
