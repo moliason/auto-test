@@ -1,5 +1,7 @@
 # Auto-test：接口测试 Agent
 
+2026-10-08 安全与判定修复：见[本轮修复、回归测试及旧配置迁移](docs/review-fixes.md)。
+
 基于 [Test-platfrom](https://github.com/moliason/Test-platfrom) 的毕业设计。复用项目、用例目录、测试运行、成员权限、进度统计与报告，在原运行页面加入单个接口测试 Agent，减少用例准备、重复请求、结果回填与报告整理的工作。
 
 使用流程：**选中运行内用例 → Agent 整理计划 → 补充缺失信息并确认 → 执行真实 HTTP 请求 → 回填原运行 → 查看历史与导出 Excel**。

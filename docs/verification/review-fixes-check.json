@@ -1,0 +1,79 @@
+{
+  "verifiedAt": "2026-10-08T12:03:15.479Z",
+  "projectId": 19,
+  "runId": 18,
+  "taskId": 45,
+  "state": "completed",
+  "summary": {
+    "total": 8,
+    "passed": 3,
+    "failed": 4,
+    "unexecuted": 1,
+    "requestErrors": 2
+  },
+  "verification": {
+    "realPostgreSQL": true,
+    "rawTaskHasNoDemoCredential": true,
+    "realBrowserFlow": true,
+    "excelDownloaded": true
+  },
+  "modelMeasurements": [
+    {
+      "phase": "prepare",
+      "calls": 2,
+      "completedCalls": 2,
+      "failedCalls": 0,
+      "durationMs": 5373,
+      "timedCalls": 2,
+      "tokens": {
+        "prompt_tokens": {
+          "value": 2712,
+          "recordedCalls": 2
+        },
+        "completion_tokens": {
+          "value": 1093,
+          "recordedCalls": 2
+        },
+        "total_tokens": {
+          "value": 3805,
+          "recordedCalls": 2
+        }
+      }
+    },
+    {
+      "phase": "execute",
+      "calls": 6,
+      "completedCalls": 6,
+      "failedCalls": 0,
+      "durationMs": 8877,
+      "timedCalls": 6,
+      "tokens": {
+        "prompt_tokens": {
+          "value": 13119,
+          "recordedCalls": 6
+        },
+        "completion_tokens": {
+          "value": 1371,
+          "recordedCalls": 6
+        },
+        "total_tokens": {
+          "value": 14490,
+          "recordedCalls": 6
+        }
+      }
+    }
+  ],
+  "executionMeasurements": {
+    "requests": {
+      "durationMs": 535,
+      "recorded": 7,
+      "total": 7
+    },
+    "persistence": {
+      "durationMs": 109,
+      "recorded": 8,
+      "total": 8
+    },
+    "reportDurationMs": 4463
+  }
+}
