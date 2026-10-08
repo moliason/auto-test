@@ -3,6 +3,7 @@ import { DataTypes } from 'sequelize';
 import defineCase from '../../models/cases.js';
 import authMiddleware from '../../middleware/auth.js';
 import editableMiddleware from '../../middleware/verifyEditable.js';
+import { configurationIssues } from '../../agent/credentials.js';
 
 export default function (sequelize) {
   const router = express.Router();
@@ -13,6 +14,8 @@ export default function (sequelize) {
   router.put('/:caseId', verifySignedIn, verifyProjectDeveloperFromCaseId, async (req, res) => {
     const caseId = req.params.caseId;
     const updateCase = req.body;
+    if (Object.hasOwn(updateCase, 'executionInfo') && configurationIssues(updateCase.executionInfo).length)
+      return res.status(400).json({ error: '认证信息请使用变量引用，不能保存明文或脱敏占位值' });
     try {
       const testcase = await Case.findByPk(caseId);
       if (!testcase) {

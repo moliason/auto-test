@@ -47,6 +47,29 @@ afterEach(async () => {
 });
 
 describe('Agent task lifecycle and permissions', () => {
+  it('does not persist a literal credential submitted through plan editing', async () => {
+    const created = await request(app)
+      .post('/agent/runs/1/tasks')
+      .set('Authorization', auth())
+      .send({ caseIds: [1] });
+    const response = await request(app)
+      .put(`/agent/runs/1/tasks/${created.body.id}/plan`)
+      .set('Authorization', auth())
+      .send({
+        version: 1,
+        cases: [
+          {
+            caseId: 1,
+            executionInfo: { ...executionInfo, headers: { Authorization: 'Bearer plan-private-key' } },
+            questions: [],
+          },
+        ],
+      });
+    expect(response.status).toBe(400);
+    expect(JSON.stringify((await db.models.AgentTask.findByPk(created.body.id)).toJSON())).not.toContain(
+      'plan-private-key'
+    );
+  });
   it('reuses complete saved configuration but still requires explicit execution confirmation', async () => {
     const response = await request(app)
       .post('/agent/runs/1/tasks')

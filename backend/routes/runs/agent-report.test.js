@@ -87,6 +87,26 @@ afterEach(async () => {
 });
 
 describe('Agent historical Excel reports', () => {
+  it('protects legacy execution credentials in ordinary public JSON reports', async () => {
+    await db.sync();
+    await db.models.Project.update({ isPublic: true }, { where: { id: 1 } });
+    await db.models.Case.update(
+      {
+        executionInfo: {
+          method: 'GET',
+          path: '/profile',
+          headers: { Authorization: 'Bearer fixture-public-leak' },
+          body: { password: 'fixture-password' },
+        },
+      },
+      { where: { id: 1 } }
+    );
+    const response = await request(app).get('/runs/download/1?type=json').set('Authorization', auth(2));
+    expect(response.status).toBe(200);
+    expect(response.text).not.toContain('fixture-public-leak');
+    expect(response.text).not.toContain('fixture-password');
+    expect(response.text).toContain('[REDACTED]');
+  });
   it('exports persisted facts, complete long responses, historical expectations and distinct AI analysis', async () => {
     const response = await request(app)
       .get(`/runs/download/1?type=xlsx&agentTaskId=${task.id}`)

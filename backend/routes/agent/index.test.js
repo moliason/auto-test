@@ -11,6 +11,7 @@ import defineRun from '../../models/runs.js';
 import defineMember from '../../models/members.js';
 import agentRoute from './index.js';
 import editRunRoute from '../runs/edit.js';
+import editCaseRoute from '../cases/edit.js';
 
 let app;
 let db;
@@ -67,6 +68,7 @@ beforeEach(async () => {
   app.use(express.json());
   app.use('/agent', agentRoute(db));
   app.use('/runs', editRunRoute(db));
+  app.use('/cases', editCaseRoute(db));
 });
 afterEach(async () => {
   await db.close();
@@ -75,6 +77,29 @@ afterEach(async () => {
 const auth = (userId = 1) => `Bearer ${jwt.sign({ userId }, 'agent-test-only')}`;
 
 describe('Agent execution configuration permissions', () => {
+  it('refuses literal credentials in both execution configuration write routes', async () => {
+    for (const executionInfo of [
+      { headers: { authorization: 'Bearer fixture-private-key' } },
+      { headers: { Authorization: ['fixture-private-key'] } },
+      { body: { password: 'fixture-private-key' } },
+      { body: '{"nested":{"api_key":"fixture-private-key"}}' },
+      { body: 'username=test&password=fixture-private-key' },
+      { path: '/login?api_key=fixture-private-key' },
+    ]) {
+      for (const path of ['/agent/cases/1/execution', '/cases/1']) {
+        const response = await request(app).put(path).set('Authorization', auth()).send({ executionInfo });
+        expect(response.status).toBe(400);
+        expect(response.text).not.toContain('fixture-private-key');
+        expect((await db.models.Case.findByPk(1)).executionInfo).toBeNull();
+      }
+    }
+    const safe = { headers: { Authorization: 'Bearer {{API_TOKEN}}' }, body: { password: '{{PASSWORD}}' } };
+    expect(
+      (await request(app).put('/agent/cases/1/execution').set('Authorization', auth()).send({ executionInfo: safe }))
+        .status
+    ).toBe(200);
+    expect((await db.models.Case.findByPk(1)).executionInfo).toEqual(safe);
+  });
   it('cannot change a run project or set an environment through ordinary editing', async () => {
     for (const body of [{ projectId: 2 }, { agentEnvironment: { secretVariables: ['TOKEN'] } }]) {
       const response = await request(app).put('/runs/1').set('Authorization', auth(3)).send(body);

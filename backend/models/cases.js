@@ -1,3 +1,5 @@
+import { protectConfiguration } from '../agent/credentials.js';
+
 function defineCase(sequelize, DataTypes) {
   const Case = sequelize.define(
     'Case',
@@ -45,6 +47,9 @@ function defineCase(sequelize, DataTypes) {
       executionInfo: {
         type: DataTypes.JSONB,
         allowNull: true,
+        get() {
+          return protectConfiguration(this.getDataValue('executionInfo'));
+        },
       },
       folderId: {
         type: DataTypes.INTEGER,

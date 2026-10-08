@@ -2,6 +2,7 @@ import express from 'express';
 import { DataTypes } from 'sequelize';
 import { environmentIssues, executionIssues } from '../../agent/execution.js';
 import { environmentVariables } from '../../agent/plan.js';
+import { configurationIssues } from '../../agent/credentials.js';
 import authMiddleware from '../../middleware/auth.js';
 import editableMiddleware from '../../middleware/verifyEditable.js';
 import defineCase from '../../models/cases.js';
@@ -41,6 +42,8 @@ export default function (sequelize) {
           .json({ error: '执行信息必须是 JSON 对象（最多 64000 字符），或 null 以取消接口执行配置' });
       }
       try {
+        const credentialIssues = configurationIssues(executionInfo);
+        if (credentialIssues.length) return res.status(400).json({ error: credentialIssues.join('；') });
         await Case.update({ executionInfo }, { where: { id: req.params.caseId } });
         return res.json({ executionInfo, issues: executionIssues(executionInfo) });
       } catch {
@@ -82,14 +85,7 @@ export default function (sequelize) {
         return res.status(400).json({ error: '测试环境必须是 JSON 对象（最多 16000 字符）' });
       }
       // Authentication uses backend secret references, so credentials never need to be returned to the client.
-      const fields = { ...(environment.headers || {}), ...(environment.variables || {}) };
-      if (
-        Object.entries(fields).some(
-          ([key, value]) =>
-            /authorization|cookie|password|secret|token|api[-_]?key/i.test(key) &&
-            (typeof value !== 'string' || !/^(Bearer |Basic )?\{\{[A-Za-z_][A-Za-z0-9_]*\}\}$/.test(value))
-        )
-      ) {
+      if (configurationIssues(environment).length) {
         return res
           .status(400)
           .json({ error: '认证值请使用 {{变量名}}，并在后端 TEST_AGENT_SECRET_变量名 中配置真实值' });

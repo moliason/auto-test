@@ -12,6 +12,7 @@ import defineCaseStep from '../../models/caseSteps.js';
 import { buildPlan, reportSummary } from '../../agent/plan.js';
 import { runAgent } from '../../agent/runner.js';
 import { modelMeasurements, executionMeasurements } from '../../agent/measurements.js';
+import { configurationIssues, protectConfiguration } from '../../agent/credentials.js';
 
 export default function (sequelize, { launch = runAgent } = {}) {
   const router = express.Router();
@@ -100,7 +101,7 @@ export default function (sequelize, { launch = runAgent } = {}) {
           console.error('Agent background task could not persist state:', task.id)
         );
       return res.status(202).json({
-        ...task.toJSON(),
+        ...protectConfiguration(task.toJSON()),
         summary: reportSummary(task),
         measurements: modelMeasurements(task.events),
         executionMeasurements: executionMeasurements(task),
@@ -145,7 +146,7 @@ export default function (sequelize, { launch = runAgent } = {}) {
       const task = await Task.findOne({ where: { id: req.params.taskId, runId: req.params.runId } });
       if (!task) return res.status(404).json({ error: '任务不属于此测试运行或已删除' });
       return res.json({
-        ...task.toJSON(),
+        ...protectConfiguration(task.toJSON()),
         summary: reportSummary(task),
         measurements: modelMeasurements(task.events),
         executionMeasurements: executionMeasurements(task),
@@ -157,6 +158,8 @@ export default function (sequelize, { launch = runAgent } = {}) {
 
   router.put('/runs/:runId/tasks/:taskId/plan', async (req, res) => {
     if (!Number.isSafeInteger(req.body?.version)) return res.status(400).json({ error: '缺少计划版本，请重新加载' });
+    if (configurationIssues(req.body?.cases).length)
+      return res.status(400).json({ error: '认证信息请使用变量引用，不能保存明文或脱敏占位值' });
     try {
       const updated = await sequelize.transaction(async (transaction) => {
         const task = await Task.findOne({
@@ -201,7 +204,7 @@ export default function (sequelize, { launch = runAgent } = {}) {
         return task;
       });
       return res.json({
-        ...updated.toJSON(),
+        ...protectConfiguration(updated.toJSON()),
         summary: reportSummary(updated),
         measurements: modelMeasurements(updated.events),
         executionMeasurements: executionMeasurements(updated),
@@ -264,7 +267,7 @@ export default function (sequelize, { launch = runAgent } = {}) {
         console.error('Agent background task could not persist state:', task.id)
       );
       return res.status(202).json({
-        ...task.toJSON(),
+        ...protectConfiguration(task.toJSON()),
         summary: reportSummary(task),
         measurements: modelMeasurements(task.events),
         executionMeasurements: executionMeasurements(task),

@@ -1,3 +1,5 @@
+import { protectConfiguration } from '../agent/credentials.js';
+
 function defineRun(sequelize, DataTypes) {
   const Run = sequelize.define(
     'Run',
@@ -21,6 +23,9 @@ function defineRun(sequelize, DataTypes) {
       agentEnvironment: {
         type: DataTypes.JSONB,
         allowNull: true,
+        get() {
+          return protectConfiguration(this.getDataValue('agentEnvironment'));
+        },
       },
       projectId: {
         type: DataTypes.INTEGER,

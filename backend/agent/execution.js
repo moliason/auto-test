@@ -1,12 +1,13 @@
 import { isDeepStrictEqual } from 'node:util';
+import { sensitiveName } from './credentials.js';
 
 const variablePattern = /\{\{([A-Za-z_][A-Za-z0-9_]*)\}\}/g;
-const sensitiveName = /authorization|cookie|password|passwd|secret|token|api[-_]?key/i;
 const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
 
 export function executionIssues(spec) {
   const issues = [];
   if (!spec || typeof spec !== 'object' || Array.isArray(spec)) return ['缺少接口执行信息'];
+  if (JSON.stringify(spec).includes('"[REDACTED]"')) issues.push('执行配置包含旧的脱敏凭据，请重新配置变量引用');
   if (!methods.includes(spec.method)) issues.push('请选择 HTTP 方法');
   if (typeof spec.path !== 'string' || !/^\/(?!\/)/.test(spec.path) || /[\\\s#]/.test(spec.path)) {
     issues.push('接口路径须以单个 / 开头，不能包含域名、空格、反斜杠或片段');
@@ -78,6 +79,8 @@ export function executionIssues(spec) {
 
 export function environmentIssues(environment) {
   const issues = [];
+  if (JSON.stringify(environment)?.includes('"[REDACTED]"'))
+    issues.push('测试环境包含旧的脱敏凭据，请重新配置变量引用');
   try {
     const url = new URL(environment?.baseUrl);
     if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password || url.search || url.hash)
