@@ -210,6 +210,18 @@ describe('Execution contract and evidence safety', () => {
     expect(readJsonPointer(json, '/a~1b/0/~0value')).toEqual({ exists: true, value: null });
     expect(readJsonPointer(json, '/toString')).toEqual({ exists: false });
     expect(readJsonPointer({}, '/missing')).toEqual({ exists: false });
+    for (const part of ['length', 'map', '__proto__', 'constructor', '00', '01', '-1', '+0', '1.0', '1e0', '-', '2'])
+      expect(readJsonPointer({ items: ['first', 'second'] }, `/items/${part}`)).toEqual({ exists: false });
+    expect(readJsonPointer({ items: [] }, '/items/length')).toEqual({ exists: false });
+    expect(readJsonPointer({ items: ['first'] }, '/items/0')).toEqual({ exists: true, value: 'first' });
+    expect(readJsonPointer({ items: { length: 0, '01': 'object field' } }, '/items/length')).toEqual({
+      exists: true,
+      value: 0,
+    });
+    expect(readJsonPointer({ items: { '01': 'object field' } }, '/items/01')).toEqual({
+      exists: true,
+      value: 'object field',
+    });
   });
 
   it('redacts nested credentials and known secrets in free text', () => {

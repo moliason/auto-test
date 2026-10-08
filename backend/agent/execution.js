@@ -122,6 +122,7 @@ export function readJsonPointer(value, pointer) {
   if (pointer === '') return { exists: true, value };
   for (const part of pointer.slice(1).split('/')) {
     const key = part.replace(/~1/g, '/').replace(/~0/g, '~');
+    if (Array.isArray(value) && (!/^(0|[1-9]\d*)$/.test(key) || Number(key) >= value.length)) return { exists: false };
     if (value === null || typeof value !== 'object' || !Object.hasOwn(value, key)) return { exists: false };
     value = value[key];
   }
