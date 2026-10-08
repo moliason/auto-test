@@ -1,0 +1,2797 @@
+{
+  "mode": "agent",
+  "measurementType": "browser-script-not-human",
+  "round": 3,
+  "runId": 12,
+  "taskId": 10,
+  "fixtureSha256": "86e0fd59e9de78da05d9e2eb031801f3162aa3188ccc48c2e8c1d3c3f584667c",
+  "scriptWallMs": 27201,
+  "actions": [
+    {
+      "label": "打开测试运行",
+      "category": "navigation",
+      "at": "2026-10-08T03:51:56.213Z",
+      "ok": true,
+      "durationMs": 179
+    },
+    {
+      "label": "选择全部运行用例",
+      "category": "selection",
+      "at": "2026-10-08T03:51:56.391Z",
+      "ok": true,
+      "durationMs": 398
+    },
+    {
+      "label": "打开 Agent 面板",
+      "category": "navigation",
+      "at": "2026-10-08T03:51:56.789Z",
+      "ok": true,
+      "durationMs": 123
+    },
+    {
+      "label": "整理计划",
+      "category": "request",
+      "at": "2026-10-08T03:51:56.913Z",
+      "ok": true,
+      "durationMs": 907
+    },
+    {
+      "label": "等待准备完成",
+      "category": "system_wait",
+      "at": "2026-10-08T03:51:57.863Z",
+      "ok": true,
+      "durationMs": 10179
+    },
+    {
+      "label": "展开 #71",
+      "category": "navigation",
+      "at": "2026-10-08T03:52:08.051Z",
+      "ok": true,
+      "durationMs": 57
+    },
+    {
+      "label": "按冻结规则确认 #71 的问题",
+      "category": "supplement",
+      "at": "2026-10-08T03:52:08.108Z",
+      "ok": true,
+      "durationMs": 1457
+    },
+    {
+      "label": "按冻结规则确认 #72 的问题",
+      "category": "supplement",
+      "at": "2026-10-08T03:52:09.581Z",
+      "ok": true,
+      "durationMs": 72
+    },
+    {
+      "label": "按冻结规则确认 #77 的问题",
+      "category": "supplement",
+      "at": "2026-10-08T03:52:09.661Z",
+      "ok": true,
+      "durationMs": 62
+    },
+    {
+      "label": "按冻结规则确认 #73 的问题",
+      "category": "supplement",
+      "at": "2026-10-08T03:52:09.737Z",
+      "ok": true,
+      "durationMs": 91
+    },
+    {
+      "label": "按冻结规则确认 #68 的问题",
+      "category": "supplement",
+      "at": "2026-10-08T03:52:09.852Z",
+      "ok": true,
+      "durationMs": 78
+    },
+    {
+      "label": "按冻结规则确认 #76 的问题",
+      "category": "supplement",
+      "at": "2026-10-08T03:52:09.943Z",
+      "ok": true,
+      "durationMs": 64
+    },
+    {
+      "label": "按冻结规则确认 #69 的问题",
+      "category": "supplement",
+      "at": "2026-10-08T03:52:10.026Z",
+      "ok": true,
+      "durationMs": 48
+    },
+    {
+      "label": "按冻结规则确认 #74 的问题",
+      "category": "supplement",
+      "at": "2026-10-08T03:52:10.086Z",
+      "ok": true,
+      "durationMs": 49
+    },
+    {
+      "label": "按冻结规则确认 #70 的问题",
+      "category": "supplement",
+      "at": "2026-10-08T03:52:10.153Z",
+      "ok": true,
+      "durationMs": 60
+    },
+    {
+      "label": "按冻结规则确认 #75 的问题",
+      "category": "supplement",
+      "at": "2026-10-08T03:52:10.228Z",
+      "ok": true,
+      "durationMs": 62
+    },
+    {
+      "label": "复用已确认配置",
+      "category": "confirmation",
+      "at": "2026-10-08T03:52:10.290Z",
+      "ok": true,
+      "durationMs": 109
+    },
+    {
+      "label": "保存并校验计划",
+      "category": "save",
+      "at": "2026-10-08T03:52:10.399Z",
+      "ok": true,
+      "durationMs": 113
+    },
+    {
+      "label": "确认请求与预期",
+      "category": "confirmation",
+      "at": "2026-10-08T03:52:10.840Z",
+      "ok": true,
+      "durationMs": 96
+    },
+    {
+      "label": "确认前置准备",
+      "category": "confirmation",
+      "at": "2026-10-08T03:52:10.937Z",
+      "ok": true,
+      "durationMs": 81
+    },
+    {
+      "label": "启动执行",
+      "category": "request",
+      "at": "2026-10-08T03:52:11.018Z",
+      "ok": true,
+      "durationMs": 96
+    },
+    {
+      "label": "等待执行及报告",
+      "category": "system_wait",
+      "at": "2026-10-08T03:52:11.114Z",
+      "ok": true,
+      "durationMs": 11335
+    },
+    {
+      "label": "筛选失败及未执行",
+      "category": "review",
+      "at": "2026-10-08T03:52:22.488Z",
+      "ok": true,
+      "durationMs": 155
+    },
+    {
+      "label": "导出报告",
+      "category": "export",
+      "at": "2026-10-08T03:52:22.643Z",
+      "ok": true,
+      "durationMs": 76
+    },
+    {
+      "label": "关闭报告回看原运行",
+      "category": "navigation",
+      "at": "2026-10-08T03:52:22.990Z",
+      "ok": true,
+      "durationMs": 153
+    },
+    {
+      "label": "重开历史报告",
+      "category": "navigation",
+      "at": "2026-10-08T03:52:23.170Z",
+      "ok": true,
+      "durationMs": 139
+    },
+    {
+      "label": "选择已完成历史",
+      "category": "selection",
+      "at": "2026-10-08T03:52:23.309Z",
+      "ok": true,
+      "durationMs": 26
+    }
+  ],
+  "resolutions": [
+    {
+      "caseId": 71,
+      "questions": [
+        "body 中 type/state/template/automationStatus 的取值含义（0 分别代表什么）接口说明未提供，请确认是否按已保存配置直接发送。",
+        "folderId 作为查询参数传递是否符合接口约定（暂沿用已保存配置）？"
+      ],
+      "basis": "HTTP 200，标题为业务验收用例，priority 为 1，并返回 id。",
+      "source": "business/cases.json + business/README.md"
+    },
+    {
+      "caseId": 72,
+      "questions": [
+        "查询返回的 title/priority 是否位于响应顶层（已保存断言按 JSON Pointer /title、/priority 判断），若实际有 data 包裹层请确认路径。"
+      ],
+      "basis": "HTTP 200，title 为业务验收用例、priority 为 1，证明创建数据可读回。",
+      "source": "business/cases.json + business/README.md"
+    },
+    {
+      "caseId": 77,
+      "questions": [
+        "本条为校准实验：标题断言故意与真实值“业务验收用例”不一致，预期必须判失败，且不计为真实业务缺陷。请确认保留该故意错误预期。"
+      ],
+      "basis": "控制实验：故意预期不同标题，以验证检测能力；真实标题是业务验收用例。必须判失败，不计为发现真实业务缺陷。",
+      "source": "business/cases.json + business/README.md"
+    },
+    {
+      "caseId": 73,
+      "questions": [
+        "该用例使用的“错误密码”取值属于敏感信息，请确认由执行环境提供错误密码凭据（现有执行配置中密码字段已标记为敏感值），而无需回传明文。",
+        "响应中错误信息字段位于顶层 /error 是否有接口说明支持？暂沿用已保存配置。"
+      ],
+      "basis": "按登录规则，错误密码返回 HTTP 401 和 Authentication failed；拒绝登录是本条测试的通过条件。",
+      "source": "business/cases.json + business/README.md"
+    },
+    {
+      "caseId": 68,
+      "questions": [
+        "BIZ_PASSWORD 为已配置的敏感值，此处仅确认它在环境中可用即可，请勿回传明文；该独立业务账号（BIZ_EMAIL）由谁创建、是否已存在于测试环境？",
+        "登录接口不需要额外请求头（如 Content-Type）吗？已保存配置中未包含请求头，请确认是否原样沿用。"
+      ],
+      "basis": "HTTP 200，返回 access_token；随后请求使用该 Token。",
+      "source": "business/cases.json + business/README.md"
+    },
+    {
+      "caseId": 76,
+      "questions": [
+        "请确认：当依赖 75（故障登录）失败时，本条标记为“未执行”并记录原因，而非按接口失败上报。",
+        "本条是否应改用 BROKEN_BIZ_TOKEN 以验证失败链路？已保存配置未指定请求头取值，暂沿用原配置。"
+      ],
+      "basis": "依赖故障登录前置；必须记录未执行原因，request 和 response 均为空。",
+      "source": "business/cases.json + business/README.md"
+    },
+    {
+      "caseId": 69,
+      "questions": [
+        "Authorization 请求头在已保存配置中为敏感值，请确认其取值方式（例如固定前缀 Bearer 拼接 BIZ_TOKEN）由执行环境处理，而非由我猜测补全。",
+        "创建项目是否需要额外的请求头（如 Content-Type）？已保存配置中未包含，请确认是否原样沿用。",
+        "BIZ_PROJECT_NAME 是否有命名规范或唯一性约束（重复名称是否会被拒绝）？"
+      ],
+      "basis": "HTTP 200，返回新项目 id，isPublic 为 false。",
+      "source": "business/cases.json + business/README.md"
+    },
+    {
+      "caseId": 74,
+      "questions": [
+        "缺少 title 时返回 400 与 error 字段是否为已确认的接口行为？接口说明未提供，暂沿用已保存断言。"
+      ],
+      "basis": "合法目录下缺少必填 title，返回 HTTP 400，error 字段存在。",
+      "source": "business/cases.json + business/README.md"
+    },
+    {
+      "caseId": 70,
+      "questions": [
+        "目录名在同一项目内是否要求唯一？重复创建同名目录的预期响应是什么（已保存配置断言 200，若实际返回 400 需确认以哪个为准）。",
+        "projectId 作为查询参数传递是否符合接口约定（接口说明未提供，暂沿用已保存配置）？"
+      ],
+      "basis": "HTTP 200，目录名称为业务验收目录，并返回 id。",
+      "source": "business/cases.json + business/README.md"
+    },
+    {
+      "caseId": 75,
+      "questions": [
+        "本条为输入故障控制实验，预期结果记录为必须判失败且不计为平台缺陷；请确认执行时保留此判断口径，无需修改断言。",
+        "注入的错误密码由执行环境提供，请确认其敏感值配置来源即可，无需回传明文。"
+      ],
+      "basis": "控制实验：故意给登录前置错误密码，仍以正常登录所需 200/Token 为门槛，必须判失败；这是输入故障，不是平台缺陷。",
+      "source": "business/cases.json + business/README.md"
+    }
+  ],
+  "initialIssues": [
+    "#71 待确认：body 中 type/state/template/automationStatus 的取值含义（0 分别代表什么）接口说明未提供，请确认是否按已保存配置直接发送。",
+    "#71 待确认：folderId 作为查询参数传递是否符合接口约定（暂沿用已保存配置）？",
+    "#72 待确认：查询返回的 title/priority 是否位于响应顶层（已保存断言按 JSON Pointer /title、/priority 判断），若实际有 data 包裹层请确认路径。",
+    "#77 待确认：本条为校准实验：标题断言故意与真实值“业务验收用例”不一致，预期必须判失败，且不计为真实业务缺陷。请确认保留该故意错误预期。",
+    "#73 待确认：该用例使用的“错误密码”取值属于敏感信息，请确认由执行环境提供错误密码凭据（现有执行配置中密码字段已标记为敏感值），而无需回传明文。",
+    "#73 待确认：响应中错误信息字段位于顶层 /error 是否有接口说明支持？暂沿用已保存配置。",
+    "#68 待确认：BIZ_PASSWORD 为已配置的敏感值，此处仅确认它在环境中可用即可，请勿回传明文；该独立业务账号（BIZ_EMAIL）由谁创建、是否已存在于测试环境？",
+    "#68 待确认：登录接口不需要额外请求头（如 Content-Type）吗？已保存配置中未包含请求头，请确认是否原样沿用。",
+    "#76 待确认：请确认：当依赖 75（故障登录）失败时，本条标记为“未执行”并记录原因，而非按接口失败上报。",
+    "#76 待确认：本条是否应改用 BROKEN_BIZ_TOKEN 以验证失败链路？已保存配置未指定请求头取值，暂沿用原配置。",
+    "#69 待确认：Authorization 请求头在已保存配置中为敏感值，请确认其取值方式（例如固定前缀 Bearer 拼接 BIZ_TOKEN）由执行环境处理，而非由我猜测补全。",
+    "#69 待确认：创建项目是否需要额外的请求头（如 Content-Type）？已保存配置中未包含，请确认是否原样沿用。",
+    "#69 待确认：BIZ_PROJECT_NAME 是否有命名规范或唯一性约束（重复名称是否会被拒绝）？",
+    "#74 待确认：缺少 title 时返回 400 与 error 字段是否为已确认的接口行为？接口说明未提供，暂沿用已保存断言。",
+    "#70 待确认：目录名在同一项目内是否要求唯一？重复创建同名目录的预期响应是什么（已保存配置断言 200，若实际返回 400 需确认以哪个为准）。",
+    "#70 待确认：projectId 作为查询参数传递是否符合接口约定（接口说明未提供，暂沿用已保存配置）？",
+    "#75 待确认：本条为输入故障控制实验，预期结果记录为必须判失败且不计为平台缺陷；请确认执行时保留此判断口径，无需修改断言。",
+    "#75 待确认：注入的错误密码由执行环境提供，请确认其敏感值配置来源即可，无需回传明文。"
+  ],
+  "task": {
+    "id": 10,
+    "runId": 12,
+    "createdBy": 2,
+    "state": "completed",
+    "version": 2,
+    "plan": {
+      "cases": [
+        {
+          "steps": [],
+          "title": "创建业务测试用例",
+          "caseId": 71,
+          "issues": [],
+          "dependsOn": [
+            70
+          ],
+          "questions": [],
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "dependencyIds": [
+            68,
+            69,
+            70
+          ],
+          "executionInfo": {
+            "body": {
+              "type": 0,
+              "state": 0,
+              "title": "业务验收用例",
+              "priority": 1,
+              "template": 0,
+              "preConditions": "独立目录已创建",
+              "expectedResults": "业务验收用例可查询",
+              "automationStatus": 0
+            },
+            "path": "/cases",
+            "query": {
+              "folderId": "{{BIZ_FOLDER_ID}}"
+            },
+            "method": "POST",
+            "extract": [
+              {
+                "name": "BIZ_CASE_ID",
+                "path": "/id",
+                "secret": false
+              }
+            ],
+            "headers": {
+              "Authorization": "Bearer {{BIZ_TOKEN}}"
+            },
+            "dependsOn": [
+              70
+            ],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 200
+              },
+              {
+                "path": "/id",
+                "type": "jsonExists"
+              },
+              {
+                "path": "/title",
+                "type": "jsonEquals",
+                "expected": "业务验收用例"
+              },
+              {
+                "path": "/priority",
+                "type": "jsonEquals",
+                "expected": 1
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "HTTP 200，标题为业务验收用例，priority 为 1，并返回 id。"
+        },
+        {
+          "steps": [],
+          "title": "查询新建业务用例",
+          "caseId": 72,
+          "issues": [],
+          "dependsOn": [
+            71
+          ],
+          "questions": [],
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "dependencyIds": [
+            68,
+            69,
+            70,
+            71
+          ],
+          "executionInfo": {
+            "path": "/cases/{{BIZ_CASE_ID}}",
+            "method": "GET",
+            "headers": {
+              "Authorization": "Bearer {{BIZ_TOKEN}}"
+            },
+            "dependsOn": [
+              71
+            ],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 200
+              },
+              {
+                "path": "/title",
+                "type": "jsonEquals",
+                "expected": "业务验收用例"
+              },
+              {
+                "path": "/priority",
+                "type": "jsonEquals",
+                "expected": 1
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "HTTP 200，title 为业务验收用例、priority 为 1，证明创建数据可读回。"
+        },
+        {
+          "steps": [],
+          "title": "校准：错误预期应被断言发现",
+          "caseId": 77,
+          "issues": [],
+          "dependsOn": [
+            71
+          ],
+          "questions": [],
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "dependencyIds": [
+            68,
+            69,
+            70,
+            71
+          ],
+          "executionInfo": {
+            "path": "/cases/{{BIZ_CASE_ID}}",
+            "method": "GET",
+            "headers": {
+              "Authorization": "Bearer {{BIZ_TOKEN}}"
+            },
+            "dependsOn": [
+              71
+            ],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 200
+              },
+              {
+                "path": "/title",
+                "type": "jsonEquals",
+                "expected": "故意设置的不一致标题"
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "控制实验：故意预期不同标题，以验证检测能力；真实标题是业务验收用例。必须判失败，不计为发现真实业务缺陷。"
+        },
+        {
+          "steps": [],
+          "title": "错误密码应被拒绝",
+          "caseId": 73,
+          "issues": [],
+          "dependsOn": [],
+          "questions": [],
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "dependencyIds": [],
+          "executionInfo": {
+            "body": {
+              "email": "{{BIZ_EMAIL}}",
+              "password": "deliberately-wrong-password"
+            },
+            "path": "/users/signin",
+            "method": "POST",
+            "dependsOn": [],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 401
+              },
+              {
+                "path": "/error",
+                "type": "jsonEquals",
+                "expected": "Authentication failed"
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "按登录规则，错误密码返回 HTTP 401 和 Authentication failed；拒绝登录是本条测试的通过条件。"
+        },
+        {
+          "steps": [],
+          "title": "使用独立业务账号登录",
+          "caseId": 68,
+          "issues": [],
+          "dependsOn": [],
+          "questions": [],
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "dependencyIds": [],
+          "executionInfo": {
+            "body": {
+              "email": "{{BIZ_EMAIL}}",
+              "password": "{{BIZ_PASSWORD}}"
+            },
+            "path": "/users/signin",
+            "method": "POST",
+            "extract": [
+              {
+                "name": "BIZ_TOKEN",
+                "path": "/access_token",
+                "secret": true
+              }
+            ],
+            "dependsOn": [],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 200
+              },
+              {
+                "path": "/access_token",
+                "type": "jsonExists"
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "HTTP 200，返回 access_token；随后请求使用该 Token。"
+        },
+        {
+          "steps": [],
+          "title": "前置登录失败后不发送业务查询",
+          "caseId": 76,
+          "issues": [],
+          "dependsOn": [
+            71,
+            75
+          ],
+          "questions": [],
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "dependencyIds": [
+            68,
+            69,
+            70,
+            75,
+            71
+          ],
+          "executionInfo": {
+            "path": "/cases/{{BIZ_CASE_ID}}",
+            "method": "GET",
+            "headers": {
+              "Authorization": "Bearer {{BROKEN_BIZ_TOKEN}}"
+            },
+            "dependsOn": [
+              71,
+              75
+            ],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 200
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "依赖故障登录前置；必须记录未执行原因，request 和 response 均为空。"
+        },
+        {
+          "steps": [],
+          "title": "创建私有业务项目",
+          "caseId": 69,
+          "issues": [],
+          "dependsOn": [
+            68
+          ],
+          "questions": [],
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "dependencyIds": [
+            68
+          ],
+          "executionInfo": {
+            "body": {
+              "name": "{{BIZ_PROJECT_NAME}}",
+              "detail": "第二阶段独立业务测试数据",
+              "isPublic": false
+            },
+            "path": "/projects",
+            "method": "POST",
+            "extract": [
+              {
+                "name": "BIZ_PROJECT_ID",
+                "path": "/id",
+                "secret": false
+              }
+            ],
+            "headers": {
+              "Authorization": "Bearer {{BIZ_TOKEN}}"
+            },
+            "dependsOn": [
+              68
+            ],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 200
+              },
+              {
+                "path": "/id",
+                "type": "jsonExists"
+              },
+              {
+                "path": "/isPublic",
+                "type": "jsonEquals",
+                "expected": false
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "HTTP 200，返回新项目 id，isPublic 为 false。"
+        },
+        {
+          "steps": [],
+          "title": "缺少标题时拒绝创建用例",
+          "caseId": 74,
+          "issues": [],
+          "dependsOn": [
+            70
+          ],
+          "questions": [],
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "dependencyIds": [
+            68,
+            69,
+            70
+          ],
+          "executionInfo": {
+            "body": {
+              "type": 0,
+              "state": 0,
+              "priority": 1,
+              "template": 0,
+              "automationStatus": 0
+            },
+            "path": "/cases",
+            "query": {
+              "folderId": "{{BIZ_FOLDER_ID}}"
+            },
+            "method": "POST",
+            "headers": {
+              "Authorization": "Bearer {{BIZ_TOKEN}}"
+            },
+            "dependsOn": [
+              70
+            ],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 400
+              },
+              {
+                "path": "/error",
+                "type": "jsonExists"
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "合法目录下缺少必填 title，返回 HTTP 400，error 字段存在。"
+        },
+        {
+          "steps": [],
+          "title": "在项目中创建用例目录",
+          "caseId": 70,
+          "issues": [],
+          "dependsOn": [
+            69
+          ],
+          "questions": [],
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "dependencyIds": [
+            68,
+            69
+          ],
+          "executionInfo": {
+            "body": {
+              "name": "业务验收目录",
+              "detail": "独立数据",
+              "parentFolderId": null
+            },
+            "path": "/folders",
+            "query": {
+              "projectId": "{{BIZ_PROJECT_ID}}"
+            },
+            "method": "POST",
+            "extract": [
+              {
+                "name": "BIZ_FOLDER_ID",
+                "path": "/id",
+                "secret": false
+              }
+            ],
+            "headers": {
+              "Authorization": "Bearer {{BIZ_TOKEN}}"
+            },
+            "dependsOn": [
+              69
+            ],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 200
+              },
+              {
+                "path": "/name",
+                "type": "jsonEquals",
+                "expected": "业务验收目录"
+              },
+              {
+                "path": "/id",
+                "type": "jsonExists"
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "HTTP 200，目录名称为业务验收目录，并返回 id。"
+        },
+        {
+          "steps": [],
+          "title": "故障注入：登录前置使用错误密码",
+          "caseId": 75,
+          "issues": [],
+          "dependsOn": [],
+          "questions": [],
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "dependencyIds": [],
+          "executionInfo": {
+            "body": {
+              "email": "{{BIZ_EMAIL}}",
+              "password": "deliberately-wrong-password"
+            },
+            "path": "/users/signin",
+            "method": "POST",
+            "extract": [
+              {
+                "name": "BROKEN_BIZ_TOKEN",
+                "path": "/access_token",
+                "secret": true
+              }
+            ],
+            "dependsOn": [],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 200
+              },
+              {
+                "path": "/access_token",
+                "type": "jsonExists"
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "控制实验：故意给登录前置错误密码，仍以正常登录所需 200/Token 为门槛，必须判失败；这是输入故障，不是平台缺陷。"
+        }
+      ],
+      "model": "deepseek-flash",
+      "notes": "资料中未提供接口说明，因此所有用例的请求信息仅沿用已保存的执行配置，不做补充或推断。共 10 条用例：业务主链路 68→69→70→71→72，边界/拒绝类 73、74，控制实验类 77、75、76。已保存的断言与预期全部原样保留（包括 77 与 75 的故意失败预期），未执行任何请求。变量 BIZ_EMAIL、BIZ_PROJECT_NAME、BIZ_PASSWORD 已在环境中声明，但账号来源、目录/项目归属规则等仍需确认，见各用例问题。",
+      "order": [
+        73,
+        68,
+        69,
+        70,
+        75,
+        71,
+        72,
+        77,
+        76,
+        74
+      ],
+      "issues": [],
+      "provider": "DeepSeek",
+      "environment": {
+        "baseUrl": "http://localhost:8011",
+        "timeoutMs": 5000,
+        "variables": {
+          "BIZ_EMAIL": "business-1791430527849@local",
+          "BIZ_PROJECT_NAME": "business-2026-10-08T03-35-27-848Z-agent-3"
+        },
+        "secretVariables": [
+          "BIZ_PASSWORD"
+        ]
+      },
+      "interfaceDescription": ""
+    },
+    "results": [
+      {
+        "title": "使用独立业务账号登录",
+        "caseId": 68,
+        "reason": "",
+        "source": "agent",
+        "status": "passed",
+        "request": {
+          "url": "http://localhost:8011/users/signin",
+          "body": {
+            "email": "business-1791430527849@local",
+            "password": "[REDACTED]"
+          },
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          }
+        },
+        "response": {
+          "body": {
+            "user": {
+              "id": 2,
+              "role": 1,
+              "email": "business-1791430527849@local",
+              "locale": "zh-CN",
+              "username": "business-2026-10-08T03-35-27-848Z",
+              "createdAt": "2026-10-08T03:35:28.254Z",
+              "updatedAt": "2026-10-08T03:35:28.254Z",
+              "avatarPath": null
+            },
+            "expires_at": 1791517932630,
+            "access_token": "[REDACTED]"
+          },
+          "bytes": 413,
+          "status": 200,
+          "headers": {
+            "date": "Thu, 08 Oct 2026 03:52:12 GMT",
+            "etag": "W/\"19d-HcabZSUqwOktTvBGsFkrVfVbxcA\"",
+            "vary": "Origin",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5",
+            "content-type": "application/json; charset=utf-8",
+            "x-powered-by": "Express",
+            "content-length": "413",
+            "x-ratelimit-limit": "1000",
+            "x-ratelimit-reset": "1791434346",
+            "x-ratelimit-remaining": "795",
+            "access-control-allow-origin": "http://localhost:8010"
+          },
+          "truncated": false
+        },
+        "snapshot": {
+          "steps": [],
+          "title": "使用独立业务账号登录",
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "executionInfo": {
+            "body": {
+              "email": "{{BIZ_EMAIL}}",
+              "password": "[REDACTED]"
+            },
+            "path": "/users/signin",
+            "method": "POST",
+            "extract": [
+              {
+                "name": "BIZ_TOKEN",
+                "path": "/access_token",
+                "secret": "[REDACTED]"
+              }
+            ],
+            "dependsOn": [],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 200
+              },
+              {
+                "path": "/access_token",
+                "type": "jsonExists"
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "HTTP 200，返回 access_token；随后请求使用该 Token。"
+        },
+        "startedAt": "2026-10-08T03:52:12.569Z",
+        "assertions": [
+          {
+            "type": "status",
+            "actual": 200,
+            "exists": true,
+            "passed": true,
+            "expected": 200
+          },
+          {
+            "path": "/access_token",
+            "type": "jsonExists",
+            "actual": "[REDACTED]",
+            "exists": true,
+            "passed": true
+          }
+        ],
+        "durationMs": 62,
+        "finishedAt": "2026-10-08T03:52:12.631Z",
+        "mappedToRun": true
+      },
+      {
+        "title": "错误密码应被拒绝",
+        "caseId": 73,
+        "reason": "",
+        "source": "agent",
+        "status": "passed",
+        "request": {
+          "url": "http://localhost:8011/users/signin",
+          "body": {
+            "email": "business-1791430527849@local",
+            "password": "[REDACTED]"
+          },
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          }
+        },
+        "response": {
+          "body": {
+            "error": "Authentication failed"
+          },
+          "bytes": 33,
+          "status": 401,
+          "headers": {
+            "date": "Thu, 08 Oct 2026 03:52:12 GMT",
+            "etag": "W/\"21-4c+cq0f+0nYvCps40lzZMJn3sis\"",
+            "vary": "Origin",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5",
+            "content-type": "application/json; charset=utf-8",
+            "x-powered-by": "Express",
+            "content-length": "33",
+            "x-ratelimit-limit": "1000",
+            "x-ratelimit-reset": "1791434346",
+            "x-ratelimit-remaining": "794",
+            "access-control-allow-origin": "http://localhost:8010"
+          },
+          "truncated": false
+        },
+        "snapshot": {
+          "steps": [],
+          "title": "错误密码应被拒绝",
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "executionInfo": {
+            "body": {
+              "email": "{{BIZ_EMAIL}}",
+              "password": "[REDACTED]"
+            },
+            "path": "/users/signin",
+            "method": "POST",
+            "dependsOn": [],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 401
+              },
+              {
+                "path": "/error",
+                "type": "jsonEquals",
+                "expected": "Authentication failed"
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "按登录规则，错误密码返回 HTTP 401 和 Authentication failed；拒绝登录是本条测试的通过条件。"
+        },
+        "startedAt": "2026-10-08T03:52:12.654Z",
+        "assertions": [
+          {
+            "type": "status",
+            "actual": 401,
+            "exists": true,
+            "passed": true,
+            "expected": 401
+          },
+          {
+            "path": "/error",
+            "type": "jsonEquals",
+            "actual": "Authentication failed",
+            "exists": true,
+            "passed": true,
+            "expected": "Authentication failed"
+          }
+        ],
+        "durationMs": 59,
+        "finishedAt": "2026-10-08T03:52:12.713Z",
+        "mappedToRun": true
+      },
+      {
+        "title": "故障注入：登录前置使用错误密码",
+        "caseId": 75,
+        "reason": "无法提取变量 BROKEN_BIZ_TOKEN：字段不存在或不是标量",
+        "source": "agent",
+        "status": "failed",
+        "request": {
+          "url": "http://localhost:8011/users/signin",
+          "body": {
+            "email": "business-1791430527849@local",
+            "password": "[REDACTED]"
+          },
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          }
+        },
+        "response": {
+          "body": {
+            "error": "Authentication failed"
+          },
+          "bytes": 33,
+          "status": 401,
+          "headers": {
+            "date": "Thu, 08 Oct 2026 03:52:12 GMT",
+            "etag": "W/\"21-4c+cq0f+0nYvCps40lzZMJn3sis\"",
+            "vary": "Origin",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5",
+            "content-type": "application/json; charset=utf-8",
+            "x-powered-by": "Express",
+            "content-length": "33",
+            "x-ratelimit-limit": "1000",
+            "x-ratelimit-reset": "1791434346",
+            "x-ratelimit-remaining": "793",
+            "access-control-allow-origin": "http://localhost:8010"
+          },
+          "truncated": false
+        },
+        "snapshot": {
+          "steps": [],
+          "title": "故障注入：登录前置使用错误密码",
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "executionInfo": {
+            "body": {
+              "email": "{{BIZ_EMAIL}}",
+              "password": "[REDACTED]"
+            },
+            "path": "/users/signin",
+            "method": "POST",
+            "extract": [
+              {
+                "name": "BROKEN_BIZ_TOKEN",
+                "path": "/access_token",
+                "secret": "[REDACTED]"
+              }
+            ],
+            "dependsOn": [],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 200
+              },
+              {
+                "path": "/access_token",
+                "type": "jsonExists"
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "控制实验：故意给登录前置错误密码，仍以正常登录所需 200/Token 为门槛，必须判失败；这是输入故障，不是平台缺陷。"
+        },
+        "startedAt": "2026-10-08T03:52:12.734Z",
+        "assertions": [
+          {
+            "type": "status",
+            "actual": 401,
+            "exists": true,
+            "passed": false,
+            "expected": 200
+          },
+          {
+            "path": "/access_token",
+            "type": "jsonExists",
+            "actual": null,
+            "exists": false,
+            "passed": false
+          }
+        ],
+        "durationMs": 59,
+        "finishedAt": "2026-10-08T03:52:12.793Z",
+        "mappedToRun": true
+      },
+      {
+        "title": "创建私有业务项目",
+        "caseId": 69,
+        "reason": "",
+        "source": "agent",
+        "status": "passed",
+        "request": {
+          "url": "http://localhost:8011/projects",
+          "body": {
+            "name": "business-2026-10-08T03-35-27-848Z-agent-3",
+            "detail": "第二阶段独立业务测试数据",
+            "isPublic": false
+          },
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json",
+            "Authorization": "[REDACTED]"
+          }
+        },
+        "response": {
+          "body": {
+            "id": 14,
+            "name": "business-2026-10-08T03-35-27-848Z-agent-3",
+            "detail": "第二阶段独立业务测试数据",
+            "userId": 2,
+            "isPublic": false,
+            "createdAt": "2026-10-08T03:52:13.478Z",
+            "updatedAt": "2026-10-08T03:52:13.478Z"
+          },
+          "bytes": 214,
+          "status": 200,
+          "headers": {
+            "date": "Thu, 08 Oct 2026 03:52:13 GMT",
+            "etag": "W/\"d6-Dry8IFl1fHgFJ/hGToCOvYYrzkM\"",
+            "vary": "Origin",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5",
+            "content-type": "application/json; charset=utf-8",
+            "x-powered-by": "Express",
+            "content-length": "214",
+            "x-ratelimit-limit": "1000",
+            "x-ratelimit-reset": "1791434346",
+            "x-ratelimit-remaining": "792",
+            "access-control-allow-origin": "http://localhost:8010"
+          },
+          "truncated": false
+        },
+        "snapshot": {
+          "steps": [],
+          "title": "创建私有业务项目",
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "executionInfo": {
+            "body": {
+              "name": "{{BIZ_PROJECT_NAME}}",
+              "detail": "第二阶段独立业务测试数据",
+              "isPublic": false
+            },
+            "path": "/projects",
+            "method": "POST",
+            "extract": [
+              {
+                "name": "BIZ_PROJECT_ID",
+                "path": "/id",
+                "secret": "[REDACTED]"
+              }
+            ],
+            "headers": {
+              "Authorization": "[REDACTED]"
+            },
+            "dependsOn": [
+              68
+            ],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 200
+              },
+              {
+                "path": "/id",
+                "type": "jsonExists"
+              },
+              {
+                "path": "/isPublic",
+                "type": "jsonEquals",
+                "expected": false
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "HTTP 200，返回新项目 id，isPublic 为 false。"
+        },
+        "startedAt": "2026-10-08T03:52:13.477Z",
+        "assertions": [
+          {
+            "type": "status",
+            "actual": 200,
+            "exists": true,
+            "passed": true,
+            "expected": 200
+          },
+          {
+            "path": "/id",
+            "type": "jsonExists",
+            "actual": 14,
+            "exists": true,
+            "passed": true
+          },
+          {
+            "path": "/isPublic",
+            "type": "jsonEquals",
+            "actual": false,
+            "exists": true,
+            "passed": true,
+            "expected": false
+          }
+        ],
+        "durationMs": 5,
+        "finishedAt": "2026-10-08T03:52:13.482Z",
+        "mappedToRun": true
+      },
+      {
+        "title": "在项目中创建用例目录",
+        "caseId": 70,
+        "reason": "",
+        "source": "agent",
+        "status": "passed",
+        "request": {
+          "url": "http://localhost:8011/folders?projectId=14",
+          "body": {
+            "name": "业务验收目录",
+            "detail": "独立数据",
+            "parentFolderId": null
+          },
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json",
+            "Authorization": "[REDACTED]"
+          }
+        },
+        "response": {
+          "body": {
+            "id": 14,
+            "name": "业务验收目录",
+            "detail": "独立数据",
+            "createdAt": "2026-10-08T03:52:14.350Z",
+            "projectId": 14,
+            "updatedAt": "2026-10-08T03:52:14.350Z",
+            "parentFolderId": null
+          },
+          "bytes": 176,
+          "status": 200,
+          "headers": {
+            "date": "Thu, 08 Oct 2026 03:52:14 GMT",
+            "etag": "W/\"b0-v4qcEFBHfFm4RNq72VT84hgCmlo\"",
+            "vary": "Origin",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5",
+            "content-type": "application/json; charset=utf-8",
+            "x-powered-by": "Express",
+            "content-length": "176",
+            "x-ratelimit-limit": "1000",
+            "x-ratelimit-reset": "1791434346",
+            "x-ratelimit-remaining": "790",
+            "access-control-allow-origin": "http://localhost:8010"
+          },
+          "truncated": false
+        },
+        "snapshot": {
+          "steps": [],
+          "title": "在项目中创建用例目录",
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "executionInfo": {
+            "body": {
+              "name": "业务验收目录",
+              "detail": "独立数据",
+              "parentFolderId": null
+            },
+            "path": "/folders",
+            "query": {
+              "projectId": "{{BIZ_PROJECT_ID}}"
+            },
+            "method": "POST",
+            "extract": [
+              {
+                "name": "BIZ_FOLDER_ID",
+                "path": "/id",
+                "secret": "[REDACTED]"
+              }
+            ],
+            "headers": {
+              "Authorization": "[REDACTED]"
+            },
+            "dependsOn": [
+              69
+            ],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 200
+              },
+              {
+                "path": "/name",
+                "type": "jsonEquals",
+                "expected": "业务验收目录"
+              },
+              {
+                "path": "/id",
+                "type": "jsonExists"
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "HTTP 200，目录名称为业务验收目录，并返回 id。"
+        },
+        "startedAt": "2026-10-08T03:52:14.341Z",
+        "assertions": [
+          {
+            "type": "status",
+            "actual": 200,
+            "exists": true,
+            "passed": true,
+            "expected": 200
+          },
+          {
+            "path": "/name",
+            "type": "jsonEquals",
+            "actual": "业务验收目录",
+            "exists": true,
+            "passed": true,
+            "expected": "业务验收目录"
+          },
+          {
+            "path": "/id",
+            "type": "jsonExists",
+            "actual": 14,
+            "exists": true,
+            "passed": true
+          }
+        ],
+        "durationMs": 13,
+        "finishedAt": "2026-10-08T03:52:14.354Z",
+        "mappedToRun": true
+      },
+      {
+        "title": "创建业务测试用例",
+        "caseId": 71,
+        "reason": "",
+        "source": "agent",
+        "status": "passed",
+        "request": {
+          "url": "http://localhost:8011/cases?folderId=14",
+          "body": {
+            "type": 0,
+            "state": 0,
+            "title": "业务验收用例",
+            "priority": 1,
+            "template": 0,
+            "preConditions": "独立目录已创建",
+            "expectedResults": "业务验收用例可查询",
+            "automationStatus": 0
+          },
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json",
+            "Authorization": "[REDACTED]"
+          }
+        },
+        "response": {
+          "body": {
+            "id": 81,
+            "type": 0,
+            "state": 0,
+            "title": "业务验收用例",
+            "caseNo": 1,
+            "folderId": 14,
+            "priority": 1,
+            "template": 0,
+            "createdAt": "2026-10-08T03:52:15.400Z",
+            "updatedAt": "2026-10-08T03:52:15.400Z",
+            "description": null,
+            "executionInfo": null,
+            "preConditions": "独立目录已创建",
+            "expectedResults": "业务验收用例可查询",
+            "automationStatus": 0
+          },
+          "bytes": 335,
+          "status": 200,
+          "headers": {
+            "date": "Thu, 08 Oct 2026 03:52:15 GMT",
+            "etag": "W/\"14f-k0RJU4Rkn/x5TeJSSvIxmMEGgbg\"",
+            "vary": "Origin",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5",
+            "content-type": "application/json; charset=utf-8",
+            "x-powered-by": "Express",
+            "content-length": "335",
+            "x-ratelimit-limit": "1000",
+            "x-ratelimit-reset": "1791434346",
+            "x-ratelimit-remaining": "789",
+            "access-control-allow-origin": "http://localhost:8010"
+          },
+          "truncated": false
+        },
+        "snapshot": {
+          "steps": [],
+          "title": "创建业务测试用例",
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "executionInfo": {
+            "body": {
+              "type": 0,
+              "state": 0,
+              "title": "业务验收用例",
+              "priority": 1,
+              "template": 0,
+              "preConditions": "独立目录已创建",
+              "expectedResults": "业务验收用例可查询",
+              "automationStatus": 0
+            },
+            "path": "/cases",
+            "query": {
+              "folderId": "{{BIZ_FOLDER_ID}}"
+            },
+            "method": "POST",
+            "extract": [
+              {
+                "name": "BIZ_CASE_ID",
+                "path": "/id",
+                "secret": "[REDACTED]"
+              }
+            ],
+            "headers": {
+              "Authorization": "[REDACTED]"
+            },
+            "dependsOn": [
+              70
+            ],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 200
+              },
+              {
+                "path": "/id",
+                "type": "jsonExists"
+              },
+              {
+                "path": "/title",
+                "type": "jsonEquals",
+                "expected": "业务验收用例"
+              },
+              {
+                "path": "/priority",
+                "type": "jsonEquals",
+                "expected": 1
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "HTTP 200，标题为业务验收用例，priority 为 1，并返回 id。"
+        },
+        "startedAt": "2026-10-08T03:52:15.388Z",
+        "assertions": [
+          {
+            "type": "status",
+            "actual": 200,
+            "exists": true,
+            "passed": true,
+            "expected": 200
+          },
+          {
+            "path": "/id",
+            "type": "jsonExists",
+            "actual": 81,
+            "exists": true,
+            "passed": true
+          },
+          {
+            "path": "/title",
+            "type": "jsonEquals",
+            "actual": "业务验收用例",
+            "exists": true,
+            "passed": true,
+            "expected": "业务验收用例"
+          },
+          {
+            "path": "/priority",
+            "type": "jsonEquals",
+            "actual": 1,
+            "exists": true,
+            "passed": true,
+            "expected": 1
+          }
+        ],
+        "durationMs": 17,
+        "finishedAt": "2026-10-08T03:52:15.405Z",
+        "mappedToRun": true
+      },
+      {
+        "title": "缺少标题时拒绝创建用例",
+        "caseId": 74,
+        "reason": "",
+        "source": "agent",
+        "status": "passed",
+        "request": {
+          "url": "http://localhost:8011/cases?folderId=14",
+          "body": {
+            "type": 0,
+            "state": 0,
+            "priority": 1,
+            "template": 0,
+            "automationStatus": 0
+          },
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json",
+            "Authorization": "[REDACTED]"
+          }
+        },
+        "response": {
+          "body": {
+            "error": "Title, state, priority, type, automationStatus, and template are required"
+          },
+          "bytes": 85,
+          "status": 400,
+          "headers": {
+            "date": "Thu, 08 Oct 2026 03:52:15 GMT",
+            "etag": "W/\"55-dOao9BX3rlNWXBQsoVDetN7/FGc\"",
+            "vary": "Origin",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5",
+            "content-type": "application/json; charset=utf-8",
+            "x-powered-by": "Express",
+            "content-length": "85",
+            "x-ratelimit-limit": "1000",
+            "x-ratelimit-reset": "1791434346",
+            "x-ratelimit-remaining": "788",
+            "access-control-allow-origin": "http://localhost:8010"
+          },
+          "truncated": false
+        },
+        "snapshot": {
+          "steps": [],
+          "title": "缺少标题时拒绝创建用例",
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "executionInfo": {
+            "body": {
+              "type": 0,
+              "state": 0,
+              "priority": 1,
+              "template": 0,
+              "automationStatus": 0
+            },
+            "path": "/cases",
+            "query": {
+              "folderId": "{{BIZ_FOLDER_ID}}"
+            },
+            "method": "POST",
+            "headers": {
+              "Authorization": "[REDACTED]"
+            },
+            "dependsOn": [
+              70
+            ],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 400
+              },
+              {
+                "path": "/error",
+                "type": "jsonExists"
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "合法目录下缺少必填 title，返回 HTTP 400，error 字段存在。"
+        },
+        "startedAt": "2026-10-08T03:52:15.428Z",
+        "assertions": [
+          {
+            "type": "status",
+            "actual": 400,
+            "exists": true,
+            "passed": true,
+            "expected": 400
+          },
+          {
+            "path": "/error",
+            "type": "jsonExists",
+            "actual": "Title, state, priority, type, automationStatus, and template are required",
+            "exists": true,
+            "passed": true
+          }
+        ],
+        "durationMs": 11,
+        "finishedAt": "2026-10-08T03:52:15.439Z",
+        "mappedToRun": true
+      },
+      {
+        "title": "查询新建业务用例",
+        "caseId": 72,
+        "reason": "",
+        "source": "agent",
+        "status": "passed",
+        "request": {
+          "url": "http://localhost:8011/cases/81",
+          "body": null,
+          "method": "GET",
+          "headers": {
+            "Authorization": "[REDACTED]"
+          }
+        },
+        "response": {
+          "body": {
+            "id": 81,
+            "Tags": [],
+            "type": 0,
+            "Steps": [],
+            "state": 0,
+            "title": "业务验收用例",
+            "caseNo": 1,
+            "RunCases": [],
+            "folderId": 14,
+            "priority": 1,
+            "template": 0,
+            "createdAt": "2026-10-08T03:52:15.400Z",
+            "updatedAt": "2026-10-08T03:52:15.400Z",
+            "Attachments": [],
+            "description": null,
+            "executionInfo": null,
+            "preConditions": "独立目录已创建",
+            "expectedResults": "业务验收用例可查询",
+            "automationStatus": 0
+          },
+          "bytes": 387,
+          "status": 200,
+          "headers": {
+            "date": "Thu, 08 Oct 2026 03:52:16 GMT",
+            "etag": "W/\"183-6FmQlSm9+hBxPkARiz0exEEoHhA\"",
+            "vary": "Origin",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5",
+            "content-type": "application/json; charset=utf-8",
+            "x-powered-by": "Express",
+            "content-length": "387",
+            "x-ratelimit-limit": "1000",
+            "x-ratelimit-reset": "1791434346",
+            "x-ratelimit-remaining": "786",
+            "access-control-allow-origin": "http://localhost:8010"
+          },
+          "truncated": false
+        },
+        "snapshot": {
+          "steps": [],
+          "title": "查询新建业务用例",
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "executionInfo": {
+            "path": "/cases/{{BIZ_CASE_ID}}",
+            "method": "GET",
+            "headers": {
+              "Authorization": "[REDACTED]"
+            },
+            "dependsOn": [
+              71
+            ],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 200
+              },
+              {
+                "path": "/title",
+                "type": "jsonEquals",
+                "expected": "业务验收用例"
+              },
+              {
+                "path": "/priority",
+                "type": "jsonEquals",
+                "expected": 1
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "HTTP 200，title 为业务验收用例、priority 为 1，证明创建数据可读回。"
+        },
+        "startedAt": "2026-10-08T03:52:16.223Z",
+        "assertions": [
+          {
+            "type": "status",
+            "actual": 200,
+            "exists": true,
+            "passed": true,
+            "expected": 200
+          },
+          {
+            "path": "/title",
+            "type": "jsonEquals",
+            "actual": "业务验收用例",
+            "exists": true,
+            "passed": true,
+            "expected": "业务验收用例"
+          },
+          {
+            "path": "/priority",
+            "type": "jsonEquals",
+            "actual": 1,
+            "exists": true,
+            "passed": true,
+            "expected": 1
+          }
+        ],
+        "durationMs": 18,
+        "finishedAt": "2026-10-08T03:52:16.241Z",
+        "mappedToRun": true
+      },
+      {
+        "title": "校准：错误预期应被断言发现",
+        "caseId": 77,
+        "reason": "",
+        "source": "agent",
+        "status": "failed",
+        "request": {
+          "url": "http://localhost:8011/cases/81",
+          "body": null,
+          "method": "GET",
+          "headers": {
+            "Authorization": "[REDACTED]"
+          }
+        },
+        "response": {
+          "body": {
+            "id": 81,
+            "Tags": [],
+            "type": 0,
+            "Steps": [],
+            "state": 0,
+            "title": "业务验收用例",
+            "caseNo": 1,
+            "RunCases": [],
+            "folderId": 14,
+            "priority": 1,
+            "template": 0,
+            "createdAt": "2026-10-08T03:52:15.400Z",
+            "updatedAt": "2026-10-08T03:52:15.400Z",
+            "Attachments": [],
+            "description": null,
+            "executionInfo": null,
+            "preConditions": "独立目录已创建",
+            "expectedResults": "业务验收用例可查询",
+            "automationStatus": 0
+          },
+          "bytes": 387,
+          "status": 200,
+          "headers": {
+            "date": "Thu, 08 Oct 2026 03:52:16 GMT",
+            "etag": "W/\"183-6FmQlSm9+hBxPkARiz0exEEoHhA\"",
+            "vary": "Origin",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5",
+            "content-type": "application/json; charset=utf-8",
+            "x-powered-by": "Express",
+            "content-length": "387",
+            "x-ratelimit-limit": "1000",
+            "x-ratelimit-reset": "1791434346",
+            "x-ratelimit-remaining": "785",
+            "access-control-allow-origin": "http://localhost:8010"
+          },
+          "truncated": false
+        },
+        "snapshot": {
+          "steps": [],
+          "title": "校准：错误预期应被断言发现",
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "executionInfo": {
+            "path": "/cases/{{BIZ_CASE_ID}}",
+            "method": "GET",
+            "headers": {
+              "Authorization": "[REDACTED]"
+            },
+            "dependsOn": [
+              71
+            ],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 200
+              },
+              {
+                "path": "/title",
+                "type": "jsonEquals",
+                "expected": "故意设置的不一致标题"
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "控制实验：故意预期不同标题，以验证检测能力；真实标题是业务验收用例。必须判失败，不计为发现真实业务缺陷。"
+        },
+        "startedAt": "2026-10-08T03:52:16.269Z",
+        "assertions": [
+          {
+            "type": "status",
+            "actual": 200,
+            "exists": true,
+            "passed": true,
+            "expected": 200
+          },
+          {
+            "path": "/title",
+            "type": "jsonEquals",
+            "actual": "业务验收用例",
+            "exists": true,
+            "passed": false,
+            "expected": "故意设置的不一致标题"
+          }
+        ],
+        "durationMs": 20,
+        "finishedAt": "2026-10-08T03:52:16.289Z",
+        "mappedToRun": true
+      },
+      {
+        "title": "前置登录失败后不发送业务查询",
+        "caseId": 76,
+        "reason": "前置用例 #75 未通过",
+        "source": "agent",
+        "status": "skipped",
+        "request": null,
+        "response": null,
+        "snapshot": {
+          "steps": [],
+          "title": "前置登录失败后不发送业务查询",
+          "description": "规则来源：business/README.md 与 cases.json；独立业务数据",
+          "executionInfo": {
+            "path": "/cases/{{BIZ_CASE_ID}}",
+            "method": "GET",
+            "headers": {
+              "Authorization": "[REDACTED]"
+            },
+            "dependsOn": [
+              71,
+              75
+            ],
+            "assertions": [
+              {
+                "type": "status",
+                "expected": 200
+              }
+            ]
+          },
+          "preConditions": "独立账号可用，按 dependsOn 执行前置；故障注入用例用于控制实验。",
+          "expectedResults": "依赖故障登录前置；必须记录未执行原因，request 和 response 均为空。"
+        },
+        "startedAt": "2026-10-08T03:52:16.335Z",
+        "assertions": [],
+        "durationMs": 0,
+        "finishedAt": "2026-10-08T03:52:16.335Z",
+        "mappedToRun": true
+      }
+    ],
+    "events": [
+      {
+        "at": "2026-10-08T03:51:57.837Z",
+        "call": 1,
+        "type": "model",
+        "phase": "prepare",
+        "usage": {
+          "total_tokens": 779,
+          "prompt_tokens": 744,
+          "completion_tokens": 35,
+          "prompt_cache_hit_tokens": 512,
+          "prompt_cache_miss_tokens": 232
+        },
+        "outcome": "completed",
+        "durationMs": 662,
+        "finishedAt": "2026-10-08T03:51:58.502Z"
+      },
+      {
+        "at": "2026-10-08T03:51:58.505Z",
+        "args": {},
+        "name": "read_cases",
+        "type": "tool_started"
+      },
+      {
+        "at": "2026-10-08T03:51:58.509Z",
+        "ok": true,
+        "name": "read_cases",
+        "type": "tool_finished"
+      },
+      {
+        "at": "2026-10-08T03:51:58.513Z",
+        "call": 2,
+        "type": "model",
+        "phase": "prepare",
+        "usage": {
+          "total_tokens": 5464,
+          "prompt_tokens": 2880,
+          "completion_tokens": 2584,
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 2112
+        },
+        "outcome": "completed",
+        "durationMs": 9107,
+        "finishedAt": "2026-10-08T03:52:07.624Z"
+      },
+      {
+        "at": "2026-10-08T03:52:07.628Z",
+        "args": {
+          "cases": [
+            {
+              "caseId": 68,
+              "questions": [
+                "BIZ_PASSWORD 为已配置的敏感值，此处仅确认它在环境中可用即可，请勿回传明文；该独立业务账号（BIZ_EMAIL）由谁创建、是否已存在于测试环境？",
+                "登录接口不需要额外请求头（如 Content-Type）吗？已保存配置中未包含请求头，请确认是否原样沿用。"
+              ],
+              "executionInfo": {
+                "body": {
+                  "email": "{{BIZ_EMAIL}}",
+                  "password": "[REDACTED]"
+                },
+                "path": "/users/signin",
+                "query": null,
+                "method": "POST",
+                "extract": [
+                  {
+                    "name": "BIZ_TOKEN",
+                    "path": "/access_token",
+                    "secret": "[REDACTED]"
+                  }
+                ],
+                "headers": null,
+                "dependsOn": [],
+                "assertions": [
+                  {
+                    "type": "status",
+                    "expected": 200
+                  },
+                  {
+                    "path": "/access_token",
+                    "type": "jsonExists"
+                  }
+                ],
+                "preconditions": "独立账号可用；按依赖顺序执行前置。",
+                "requiredVariables": [
+                  "BIZ_EMAIL",
+                  "BIZ_PASSWORD"
+                ]
+              }
+            },
+            {
+              "caseId": 69,
+              "questions": [
+                "Authorization 请求头在已保存配置中为敏感值，请确认其取值方式（例如固定前缀 Bearer 拼接 BIZ_TOKEN）由执行环境处理，而非由我猜测补全。",
+                "创建项目是否需要额外的请求头（如 Content-Type）？已保存配置中未包含，请确认是否原样沿用。",
+                "BIZ_PROJECT_NAME 是否有命名规范或唯一性约束（重复名称是否会被拒绝）？"
+              ],
+              "executionInfo": {
+                "body": {
+                  "name": "{{BIZ_PROJECT_NAME}}",
+                  "detail": "第二阶段独立业务测试数据",
+                  "isPublic": false
+                },
+                "path": "/projects",
+                "query": null,
+                "method": "POST",
+                "extract": [
+                  {
+                    "name": "BIZ_PROJECT_ID",
+                    "path": "/id",
+                    "secret": "[REDACTED]"
+                  }
+                ],
+                "headers": {
+                  "Authorization": "[REDACTED]"
+                },
+                "dependsOn": [
+                  68
+                ],
+                "assertions": [
+                  {
+                    "type": "status",
+                    "expected": 200
+                  },
+                  {
+                    "path": "/id",
+                    "type": "jsonExists"
+                  },
+                  {
+                    "path": "/isPublic",
+                    "type": "jsonEquals",
+                    "expected": false
+                  }
+                ],
+                "preconditions": "用例 68 已成功登录并提取 BIZ_TOKEN；按依赖顺序执行前置。",
+                "requiredVariables": [
+                  "BIZ_PROJECT_NAME",
+                  "BIZ_TOKEN"
+                ]
+              }
+            },
+            {
+              "caseId": 70,
+              "questions": [
+                "目录名在同一项目内是否要求唯一？重复创建同名目录的预期响应是什么（已保存配置断言 200，若实际返回 400 需确认以哪个为准）。",
+                "projectId 作为查询参数传递是否符合接口约定（接口说明未提供，暂沿用已保存配置）？"
+              ],
+              "executionInfo": {
+                "body": {
+                  "name": "业务验收目录",
+                  "detail": "独立数据",
+                  "parentFolderId": null
+                },
+                "path": "/folders",
+                "query": {
+                  "projectId": "{{BIZ_PROJECT_ID}}"
+                },
+                "method": "POST",
+                "extract": [
+                  {
+                    "name": "BIZ_FOLDER_ID",
+                    "path": "/id",
+                    "secret": "[REDACTED]"
+                  }
+                ],
+                "headers": {
+                  "Authorization": "[REDACTED]"
+                },
+                "dependsOn": [
+                  69
+                ],
+                "assertions": [
+                  {
+                    "type": "status",
+                    "expected": 200
+                  },
+                  {
+                    "path": "/name",
+                    "type": "jsonEquals",
+                    "expected": "业务验收目录"
+                  },
+                  {
+                    "path": "/id",
+                    "type": "jsonExists"
+                  }
+                ],
+                "preconditions": "用例 69 已创建项目并提取 BIZ_PROJECT_ID；按依赖顺序执行前置。",
+                "requiredVariables": [
+                  "BIZ_PROJECT_ID",
+                  "BIZ_TOKEN"
+                ]
+              }
+            },
+            {
+              "caseId": 71,
+              "questions": [
+                "body 中 type/state/template/automationStatus 的取值含义（0 分别代表什么）接口说明未提供，请确认是否按已保存配置直接发送。",
+                "folderId 作为查询参数传递是否符合接口约定（暂沿用已保存配置）？"
+              ],
+              "executionInfo": {
+                "body": {
+                  "type": 0,
+                  "state": 0,
+                  "title": "业务验收用例",
+                  "priority": 1,
+                  "template": 0,
+                  "preConditions": "独立目录已创建",
+                  "expectedResults": "业务验收用例可查询",
+                  "automationStatus": 0
+                },
+                "path": "/cases",
+                "query": {
+                  "folderId": "{{BIZ_FOLDER_ID}}"
+                },
+                "method": "POST",
+                "extract": [
+                  {
+                    "name": "BIZ_CASE_ID",
+                    "path": "/id",
+                    "secret": "[REDACTED]"
+                  }
+                ],
+                "headers": {
+                  "Authorization": "[REDACTED]"
+                },
+                "dependsOn": [
+                  70
+                ],
+                "assertions": [
+                  {
+                    "type": "status",
+                    "expected": 200
+                  },
+                  {
+                    "path": "/id",
+                    "type": "jsonExists"
+                  },
+                  {
+                    "path": "/title",
+                    "type": "jsonEquals",
+                    "expected": "业务验收用例"
+                  },
+                  {
+                    "path": "/priority",
+                    "type": "jsonEquals",
+                    "expected": 1
+                  }
+                ],
+                "preconditions": "用例 70 已创建独立目录并提取 BIZ_FOLDER_ID；按依赖顺序执行前置。",
+                "requiredVariables": [
+                  "BIZ_FOLDER_ID",
+                  "BIZ_TOKEN"
+                ]
+              }
+            },
+            {
+              "caseId": 72,
+              "questions": [
+                "查询返回的 title/priority 是否位于响应顶层（已保存断言按 JSON Pointer /title、/priority 判断），若实际有 data 包裹层请确认路径。"
+              ],
+              "executionInfo": {
+                "body": null,
+                "path": "/cases/{{BIZ_CASE_ID}}",
+                "query": null,
+                "method": "GET",
+                "extract": null,
+                "headers": {
+                  "Authorization": "[REDACTED]"
+                },
+                "dependsOn": [
+                  71
+                ],
+                "assertions": [
+                  {
+                    "type": "status",
+                    "expected": 200
+                  },
+                  {
+                    "path": "/title",
+                    "type": "jsonEquals",
+                    "expected": "业务验收用例"
+                  },
+                  {
+                    "path": "/priority",
+                    "type": "jsonEquals",
+                    "expected": 1
+                  }
+                ],
+                "preconditions": "用例 71 已创建用例并提取 BIZ_CASE_ID；按依赖顺序执行前置。",
+                "requiredVariables": [
+                  "BIZ_CASE_ID",
+                  "BIZ_TOKEN"
+                ]
+              }
+            },
+            {
+              "caseId": 73,
+              "questions": [
+                "该用例使用的“错误密码”取值属于敏感信息，请确认由执行环境提供错误密码凭据（现有执行配置中密码字段已标记为敏感值），而无需回传明文。",
+                "响应中错误信息字段位于顶层 /error 是否有接口说明支持？暂沿用已保存配置。"
+              ],
+              "executionInfo": {
+                "body": {
+                  "email": "{{BIZ_EMAIL}}",
+                  "password": "[REDACTED]"
+                },
+                "path": "/users/signin",
+                "query": null,
+                "method": "POST",
+                "extract": null,
+                "headers": null,
+                "dependsOn": [],
+                "assertions": [
+                  {
+                    "type": "status",
+                    "expected": 401
+                  },
+                  {
+                    "path": "/error",
+                    "type": "jsonEquals",
+                    "expected": "Authentication failed"
+                  }
+                ],
+                "preconditions": "独立账号可用；无依赖，可独立执行。",
+                "requiredVariables": [
+                  "BIZ_EMAIL"
+                ]
+              }
+            },
+            {
+              "caseId": 74,
+              "questions": [
+                "缺少 title 时返回 400 与 error 字段是否为已确认的接口行为？接口说明未提供，暂沿用已保存断言。"
+              ],
+              "executionInfo": {
+                "body": {
+                  "type": 0,
+                  "state": 0,
+                  "priority": 1,
+                  "template": 0,
+                  "automationStatus": 0
+                },
+                "path": "/cases",
+                "query": {
+                  "folderId": "{{BIZ_FOLDER_ID}}"
+                },
+                "method": "POST",
+                "extract": null,
+                "headers": {
+                  "Authorization": "[REDACTED]"
+                },
+                "dependsOn": [
+                  70
+                ],
+                "assertions": [
+                  {
+                    "type": "status",
+                    "expected": 400
+                  },
+                  {
+                    "path": "/error",
+                    "type": "jsonExists"
+                  }
+                ],
+                "preconditions": "用例 70 已创建独立目录并提取 BIZ_FOLDER_ID；按依赖顺序执行前置。",
+                "requiredVariables": [
+                  "BIZ_FOLDER_ID",
+                  "BIZ_TOKEN"
+                ]
+              }
+            },
+            {
+              "caseId": 75,
+              "questions": [
+                "本条为输入故障控制实验，预期结果记录为必须判失败且不计为平台缺陷；请确认执行时保留此判断口径，无需修改断言。",
+                "注入的错误密码由执行环境提供，请确认其敏感值配置来源即可，无需回传明文。"
+              ],
+              "executionInfo": {
+                "body": {
+                  "email": "{{BIZ_EMAIL}}",
+                  "password": "[REDACTED]"
+                },
+                "path": "/users/signin",
+                "query": null,
+                "method": "POST",
+                "extract": [
+                  {
+                    "name": "BROKEN_BIZ_TOKEN",
+                    "path": "/access_token",
+                    "secret": "[REDACTED]"
+                  }
+                ],
+                "headers": null,
+                "dependsOn": [],
+                "assertions": [
+                  {
+                    "type": "status",
+                    "expected": 200
+                  },
+                  {
+                    "path": "/access_token",
+                    "type": "jsonExists"
+                  }
+                ],
+                "preconditions": "故障注入用例：故意使用错误密码作为登录前置，用于控制实验。",
+                "requiredVariables": [
+                  "BIZ_EMAIL"
+                ]
+              }
+            },
+            {
+              "caseId": 76,
+              "questions": [
+                "请确认：当依赖 75（故障登录）失败时，本条标记为“未执行”并记录原因，而非按接口失败上报。",
+                "本条是否应改用 BROKEN_BIZ_TOKEN 以验证失败链路？已保存配置未指定请求头取值，暂沿用原配置。"
+              ],
+              "executionInfo": {
+                "body": null,
+                "path": "/cases/{{BIZ_CASE_ID}}",
+                "query": null,
+                "method": "GET",
+                "extract": null,
+                "headers": {
+                  "Authorization": "[REDACTED]"
+                },
+                "dependsOn": [
+                  71,
+                  75
+                ],
+                "assertions": [
+                  {
+                    "type": "status",
+                    "expected": 200
+                  }
+                ],
+                "preconditions": "依赖故障登录前置用例 75；当 75 失败时本条应记录未执行原因，request 与 response 均为空。",
+                "requiredVariables": [
+                  "BIZ_CASE_ID",
+                  "BIZ_TOKEN"
+                ]
+              }
+            },
+            {
+              "caseId": 77,
+              "questions": [
+                "本条为校准实验：标题断言故意与真实值“业务验收用例”不一致，预期必须判失败，且不计为真实业务缺陷。请确认保留该故意错误预期。"
+              ],
+              "executionInfo": {
+                "body": null,
+                "path": "/cases/{{BIZ_CASE_ID}}",
+                "query": null,
+                "method": "GET",
+                "extract": null,
+                "headers": {
+                  "Authorization": "[REDACTED]"
+                },
+                "dependsOn": [
+                  71
+                ],
+                "assertions": [
+                  {
+                    "type": "status",
+                    "expected": 200
+                  },
+                  {
+                    "path": "/title",
+                    "type": "jsonEquals",
+                    "expected": "故意设置的不一致标题"
+                  }
+                ],
+                "preconditions": "用例 71 已创建用例并提取 BIZ_CASE_ID；校准控制实验。",
+                "requiredVariables": [
+                  "BIZ_CASE_ID",
+                  "BIZ_TOKEN"
+                ]
+              }
+            }
+          ],
+          "notes": "资料中未提供接口说明，因此所有用例的请求信息仅沿用已保存的执行配置，不做补充或推断。共 10 条用例：业务主链路 68→69→70→71→72，边界/拒绝类 73、74，控制实验类 77、75、76。已保存的断言与预期全部原样保留（包括 77 与 75 的故意失败预期），未执行任何请求。变量 BIZ_EMAIL、BIZ_PROJECT_NAME、BIZ_PASSWORD 已在环境中声明，但账号来源、目录/项目归属规则等仍需确认，见各用例问题。"
+        },
+        "name": "submit_plan",
+        "type": "tool_started"
+      },
+      {
+        "at": "2026-10-08T03:52:07.636Z",
+        "ok": true,
+        "name": "submit_plan",
+        "type": "tool_finished"
+      },
+      {
+        "at": "2026-10-08T03:52:10.468Z",
+        "type": "user_plan_edited",
+        "userId": 2
+      },
+      {
+        "at": "2026-10-08T03:52:11.080Z",
+        "type": "user_confirmed",
+        "userId": 2,
+        "version": 2
+      },
+      {
+        "at": "2026-10-08T03:52:11.092Z",
+        "call": 1,
+        "type": "model",
+        "phase": "execute",
+        "usage": {
+          "total_tokens": 714,
+          "prompt_tokens": 681,
+          "completion_tokens": 33,
+          "prompt_cache_hit_tokens": 512,
+          "prompt_cache_miss_tokens": 169
+        },
+        "outcome": "completed",
+        "durationMs": 591,
+        "finishedAt": "2026-10-08T03:52:11.688Z"
+      },
+      {
+        "at": "2026-10-08T03:52:11.692Z",
+        "args": {},
+        "name": "read_cases",
+        "type": "tool_started"
+      },
+      {
+        "at": "2026-10-08T03:52:11.697Z",
+        "ok": true,
+        "name": "read_cases",
+        "type": "tool_finished"
+      },
+      {
+        "at": "2026-10-08T03:52:11.700Z",
+        "call": 2,
+        "type": "model",
+        "phase": "execute",
+        "usage": {
+          "total_tokens": 2931,
+          "prompt_tokens": 2815,
+          "completion_tokens": 116,
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 2175
+        },
+        "outcome": "completed",
+        "durationMs": 856,
+        "finishedAt": "2026-10-08T03:52:12.560Z"
+      },
+      {
+        "at": "2026-10-08T03:52:12.564Z",
+        "args": {
+          "caseId": 68
+        },
+        "name": "execute_case",
+        "type": "tool_started"
+      },
+      {
+        "at": "2026-10-08T03:52:12.643Z",
+        "type": "evidence_saved",
+        "caseId": 68,
+        "durationMs": 12
+      },
+      {
+        "at": "2026-10-08T03:52:12.646Z",
+        "ok": true,
+        "name": "execute_case",
+        "type": "tool_finished"
+      },
+      {
+        "at": "2026-10-08T03:52:12.649Z",
+        "args": {
+          "caseId": 73
+        },
+        "name": "execute_case",
+        "type": "tool_started"
+      },
+      {
+        "at": "2026-10-08T03:52:12.723Z",
+        "type": "evidence_saved",
+        "caseId": 73,
+        "durationMs": 10
+      },
+      {
+        "at": "2026-10-08T03:52:12.727Z",
+        "ok": true,
+        "name": "execute_case",
+        "type": "tool_finished"
+      },
+      {
+        "at": "2026-10-08T03:52:12.730Z",
+        "args": {
+          "caseId": 75
+        },
+        "name": "execute_case",
+        "type": "tool_started"
+      },
+      {
+        "at": "2026-10-08T03:52:12.802Z",
+        "type": "evidence_saved",
+        "caseId": 75,
+        "durationMs": 9
+      },
+      {
+        "at": "2026-10-08T03:52:12.805Z",
+        "ok": true,
+        "name": "execute_case",
+        "type": "tool_finished"
+      },
+      {
+        "at": "2026-10-08T03:52:12.810Z",
+        "call": 3,
+        "type": "model",
+        "phase": "execute",
+        "usage": {
+          "total_tokens": 3246,
+          "prompt_tokens": 3164,
+          "completion_tokens": 82,
+          "prompt_cache_hit_tokens": 2816,
+          "prompt_cache_miss_tokens": 348
+        },
+        "outcome": "completed",
+        "durationMs": 653,
+        "finishedAt": "2026-10-08T03:52:13.466Z"
+      },
+      {
+        "at": "2026-10-08T03:52:13.469Z",
+        "args": {
+          "caseId": 69
+        },
+        "name": "execute_case",
+        "type": "tool_started"
+      },
+      {
+        "at": "2026-10-08T03:52:13.492Z",
+        "type": "evidence_saved",
+        "caseId": 69,
+        "durationMs": 10
+      },
+      {
+        "at": "2026-10-08T03:52:13.495Z",
+        "ok": true,
+        "name": "execute_case",
+        "type": "tool_finished"
+      },
+      {
+        "at": "2026-10-08T03:52:13.498Z",
+        "call": 4,
+        "type": "model",
+        "phase": "execute",
+        "usage": {
+          "total_tokens": 3382,
+          "prompt_tokens": 3344,
+          "completion_tokens": 38,
+          "prompt_cache_hit_tokens": 3200,
+          "prompt_cache_miss_tokens": 144
+        },
+        "outcome": "completed",
+        "durationMs": 829,
+        "finishedAt": "2026-10-08T03:52:14.332Z"
+      },
+      {
+        "at": "2026-10-08T03:52:14.336Z",
+        "args": {
+          "caseId": 70
+        },
+        "name": "execute_case",
+        "type": "tool_started"
+      },
+      {
+        "at": "2026-10-08T03:52:14.372Z",
+        "type": "evidence_saved",
+        "caseId": 70,
+        "durationMs": 17
+      },
+      {
+        "at": "2026-10-08T03:52:14.376Z",
+        "ok": true,
+        "name": "execute_case",
+        "type": "tool_finished"
+      },
+      {
+        "at": "2026-10-08T03:52:14.381Z",
+        "call": 5,
+        "type": "model",
+        "phase": "execute",
+        "usage": {
+          "total_tokens": 3561,
+          "prompt_tokens": 3483,
+          "completion_tokens": 78,
+          "prompt_cache_hit_tokens": 3328,
+          "prompt_cache_miss_tokens": 155
+        },
+        "outcome": "completed",
+        "durationMs": 992,
+        "finishedAt": "2026-10-08T03:52:15.378Z"
+      },
+      {
+        "at": "2026-10-08T03:52:15.382Z",
+        "args": {
+          "caseId": 71
+        },
+        "name": "execute_case",
+        "type": "tool_started"
+      },
+      {
+        "at": "2026-10-08T03:52:15.415Z",
+        "type": "evidence_saved",
+        "caseId": 71,
+        "durationMs": 11
+      },
+      {
+        "at": "2026-10-08T03:52:15.419Z",
+        "ok": true,
+        "name": "execute_case",
+        "type": "tool_finished"
+      },
+      {
+        "at": "2026-10-08T03:52:15.423Z",
+        "args": {
+          "caseId": 74
+        },
+        "name": "execute_case",
+        "type": "tool_started"
+      },
+      {
+        "at": "2026-10-08T03:52:15.453Z",
+        "type": "evidence_saved",
+        "caseId": 74,
+        "durationMs": 14
+      },
+      {
+        "at": "2026-10-08T03:52:15.458Z",
+        "ok": true,
+        "name": "execute_case",
+        "type": "tool_finished"
+      },
+      {
+        "at": "2026-10-08T03:52:15.462Z",
+        "call": 6,
+        "type": "model",
+        "phase": "execute",
+        "usage": {
+          "total_tokens": 3892,
+          "prompt_tokens": 3769,
+          "completion_tokens": 123,
+          "prompt_cache_hit_tokens": 3456,
+          "prompt_cache_miss_tokens": 313
+        },
+        "outcome": "completed",
+        "durationMs": 746,
+        "finishedAt": "2026-10-08T03:52:16.212Z"
+      },
+      {
+        "at": "2026-10-08T03:52:16.217Z",
+        "args": {
+          "caseId": 72
+        },
+        "name": "execute_case",
+        "type": "tool_started"
+      },
+      {
+        "at": "2026-10-08T03:52:16.253Z",
+        "type": "evidence_saved",
+        "caseId": 72,
+        "durationMs": 12
+      },
+      {
+        "at": "2026-10-08T03:52:16.257Z",
+        "ok": true,
+        "name": "execute_case",
+        "type": "tool_finished"
+      },
+      {
+        "at": "2026-10-08T03:52:16.261Z",
+        "args": {
+          "caseId": 77
+        },
+        "name": "execute_case",
+        "type": "tool_started"
+      },
+      {
+        "at": "2026-10-08T03:52:16.320Z",
+        "type": "evidence_saved",
+        "caseId": 77,
+        "durationMs": 31
+      },
+      {
+        "at": "2026-10-08T03:52:16.325Z",
+        "ok": true,
+        "name": "execute_case",
+        "type": "tool_finished"
+      },
+      {
+        "at": "2026-10-08T03:52:16.329Z",
+        "args": {
+          "caseId": 76
+        },
+        "name": "execute_case",
+        "type": "tool_started"
+      },
+      {
+        "at": "2026-10-08T03:52:16.349Z",
+        "type": "evidence_saved",
+        "caseId": 76,
+        "durationMs": 15
+      },
+      {
+        "at": "2026-10-08T03:52:16.355Z",
+        "ok": true,
+        "name": "execute_case",
+        "type": "tool_finished"
+      },
+      {
+        "at": "2026-10-08T03:52:16.358Z",
+        "call": 7,
+        "type": "model",
+        "phase": "execute",
+        "usage": {
+          "total_tokens": 4142,
+          "prompt_tokens": 4107,
+          "completion_tokens": 35,
+          "prompt_cache_hit_tokens": 3840,
+          "prompt_cache_miss_tokens": 267
+        },
+        "outcome": "completed",
+        "durationMs": 676,
+        "finishedAt": "2026-10-08T03:52:17.037Z"
+      },
+      {
+        "at": "2026-10-08T03:52:17.042Z",
+        "args": {},
+        "name": "get_results",
+        "type": "tool_started"
+      },
+      {
+        "at": "2026-10-08T03:52:17.045Z",
+        "ok": true,
+        "name": "get_results",
+        "type": "tool_finished"
+      },
+      {
+        "at": "2026-10-08T03:52:17.049Z",
+        "call": 8,
+        "type": "model",
+        "phase": "execute",
+        "usage": {
+          "total_tokens": 5333,
+          "prompt_tokens": 4599,
+          "completion_tokens": 734,
+          "prompt_cache_hit_tokens": 4096,
+          "prompt_cache_miss_tokens": 503
+        },
+        "outcome": "completed",
+        "durationMs": 3900,
+        "finishedAt": "2026-10-08T03:52:20.952Z"
+      },
+      {
+        "at": "2026-10-08T03:52:20.964Z",
+        "args": {
+          "analysis": "## 执行概况\n共 10 条已确认用例：通过 7、失败 2、未执行 1（跳过），请求错误 0。执行顺序按依赖（前置优先），未重复发送、未修改请求或断言。\n\n## 通过用例（7）\n- #68 使用独立业务账号登录：HTTP 200，返回 access_token。\n- #73 错误密码应被拒绝：HTTP 401，error = \"Authentication failed\"。\n- #69 创建私有业务项目：HTTP 200，返回 id，isPublic=false。\n- #70 创建用例目录：HTTP 200，name=业务验收目录，返回 id。\n- #71 创建业务测试用例：HTTP 200，返回 id，title=业务验收用例，priority=1。\n- #74 缺少标题时拒绝创建：HTTP 400，error 字段存在（\"Title, state, priority, type, automationStatus, and template are required\"）。\n- #72 查询新建业务用例：HTTP 200，title、priority 与创建值一致，证明数据写入后可读回。\n\n## 失败用例（2）——均为预期内的控制/故障注入，非平台缺陷\n- #77 校准：错误预期应被断言发现。状态断言 200 通过；title 预期\"故意设置的不一致标题\"，实际\"业务验收用例\"，断言判失败。该条为控制实验，本意就是校验断言检测能力，失败即证明检测有效。按用例定义，不属真实业务缺陷，不计入。\n- #75 故障注入：登录前置使用错误密码。运行期 HTTP 401，/access_token 不存在，导致变量 BROKEN_BIZ_TOKEN 提取失败（\"字段不存在或不是标量\"）。该条故意注入错误凭据，本就应失败，属输入故障，不是平台缺陷。\n\n## 跳过用例（1）\n- #76 前置登录失败后不发送业务查询：因前置 #75 未通过而被跳过，未发送请求，无请求/响应证据。符合\"前置失败则依赖用例跳过\"的规则。\n\n## 疑似原因（假设，非确认缺陷）\n- #68 与 #75 请求同一登录路径且使用同一 BIZ_EMAIL，但 #68 返回 200、#75 返回 401。结合用例定义（#75 故意使用错误密码），最可能解释是两用例注入的密码值不同（#75 使用了无效密码），即预期内的输入差异导致。此为对证据的推断，未经核实。\n- #76 未执行，因此无法评估其目标路径的读取行为；其跳过完全由 #75 失败级联引起。\n\n## 证据缺失说明\n- #76 无请求/响应数据（未执行）。\n- 密码等敏感值以 [REDACTED] 形式配置，未在报告中展开；登录成功/失败的具体输入差异无法从证据中直接观察，故仅作假设陈述。\n\n## 结论\n本轮所有已确认用例均已尝试执行。除两条按设计必须失败的故障注入/校准用例外，其余业务用例全部通过，无请求错误、无真实业务缺陷被发现。控制实验（#77、#75）按预期产生失败，证明断言与前置门槛有效。"
+        },
+        "name": "submit_report",
+        "type": "tool_started"
+      },
+      {
+        "at": "2026-10-08T03:52:21.000Z",
+        "ok": true,
+        "name": "submit_report",
+        "type": "tool_finished",
+        "reportDurationMs": 3955
+      }
+    ],
+    "analysis": "## 执行概况\n共 10 条已确认用例：通过 7、失败 2、未执行 1（跳过），请求错误 0。执行顺序按依赖（前置优先），未重复发送、未修改请求或断言。\n\n## 通过用例（7）\n- #68 使用独立业务账号登录：HTTP 200，返回 access_token。\n- #73 错误密码应被拒绝：HTTP 401，error = \"Authentication failed\"。\n- #69 创建私有业务项目：HTTP 200，返回 id，isPublic=false。\n- #70 创建用例目录：HTTP 200，name=业务验收目录，返回 id。\n- #71 创建业务测试用例：HTTP 200，返回 id，title=业务验收用例，priority=1。\n- #74 缺少标题时拒绝创建：HTTP 400，error 字段存在（\"Title, state, priority, type, automationStatus, and template are required\"）。\n- #72 查询新建业务用例：HTTP 200，title、priority 与创建值一致，证明数据写入后可读回。\n\n## 失败用例（2）——均为预期内的控制/故障注入，非平台缺陷\n- #77 校准：错误预期应被断言发现。状态断言 200 通过；title 预期\"故意设置的不一致标题\"，实际\"业务验收用例\"，断言判失败。该条为控制实验，本意就是校验断言检测能力，失败即证明检测有效。按用例定义，不属真实业务缺陷，不计入。\n- #75 故障注入：登录前置使用错误密码。运行期 HTTP 401，/access_token 不存在，导致变量 BROKEN_BIZ_TOKEN 提取失败（\"字段不存在或不是标量\"）。该条故意注入错误凭据，本就应失败，属输入故障，不是平台缺陷。\n\n## 跳过用例（1）\n- #76 前置登录失败后不发送业务查询：因前置 #75 未通过而被跳过，未发送请求，无请求/响应证据。符合\"前置失败则依赖用例跳过\"的规则。\n\n## 疑似原因（假设，非确认缺陷）\n- #68 与 #75 请求同一登录路径且使用同一 BIZ_EMAIL，但 #68 返回 200、#75 返回 401。结合用例定义（#75 故意使用错误密码），最可能解释是两用例注入的密码值不同（#75 使用了无效密码），即预期内的输入差异导致。此为对证据的推断，未经核实。\n- #76 未执行，因此无法评估其目标路径的读取行为；其跳过完全由 #75 失败级联引起。\n\n## 证据缺失说明\n- #76 无请求/响应数据（未执行）。\n- 密码等敏感值以 [REDACTED] 形式配置，未在报告中展开；登录成功/失败的具体输入差异无法从证据中直接观察，故仅作假设陈述。\n\n## 结论\n本轮所有已确认用例均已尝试执行。除两条按设计必须失败的故障注入/校准用例外，其余业务用例全部通过，无请求错误、无真实业务缺陷被发现。控制实验（#77、#75）按预期产生失败，证明断言与前置门槛有效。",
+    "error": null,
+    "startedAt": "2026-10-08T03:52:11.080Z",
+    "finishedAt": "2026-10-08T03:52:20.986Z",
+    "createdAt": "2026-10-08T03:51:57.824Z",
+    "updatedAt": "2026-10-08T03:52:21.000Z",
+    "summary": {
+      "total": 10,
+      "passed": 7,
+      "failed": 2,
+      "unexecuted": 1,
+      "requestErrors": 0
+    },
+    "measurements": [
+      {
+        "phase": "prepare",
+        "calls": 2,
+        "completedCalls": 2,
+        "failedCalls": 0,
+        "durationMs": 9769,
+        "timedCalls": 2,
+        "tokens": {
+          "prompt_tokens": {
+            "value": 3624,
+            "recordedCalls": 2
+          },
+          "completion_tokens": {
+            "value": 2619,
+            "recordedCalls": 2
+          },
+          "total_tokens": {
+            "value": 6243,
+            "recordedCalls": 2
+          }
+        }
+      },
+      {
+        "phase": "execute",
+        "calls": 8,
+        "completedCalls": 8,
+        "failedCalls": 0,
+        "durationMs": 9243,
+        "timedCalls": 8,
+        "tokens": {
+          "prompt_tokens": {
+            "value": 25962,
+            "recordedCalls": 8
+          },
+          "completion_tokens": {
+            "value": 1239,
+            "recordedCalls": 8
+          },
+          "total_tokens": {
+            "value": 27201,
+            "recordedCalls": 8
+          }
+        }
+      }
+    ],
+    "executionMeasurements": {
+      "requests": {
+        "durationMs": 264,
+        "recorded": 9,
+        "total": 9
+      },
+      "persistence": {
+        "durationMs": 141,
+        "recorded": 10,
+        "total": 10
+      },
+      "reportDurationMs": 3955
+    }
+  },
+  "verification": {
+    "frozenOracle": true,
+    "statuses": true,
+    "excel": true,
+    "backfill": true,
+    "history": true,
+    "pageErrors": []
+  }
+}
