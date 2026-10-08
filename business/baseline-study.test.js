@@ -61,6 +61,7 @@ it('excludes deliberately slow checkpoint writes from HTTP and assertion duratio
   );
   await expect(import('./baseline-study.mjs')).rejects.toThrow('HTTP phase collected');
   const checkpoint = JSON.parse([...fixture.saved.values()].at(-1));
+  expect(checkpoint.timingVersion).toBe(2);
   expect(checkpoint.results[0].durationMs).toBe(25);
   expect(
     checkpoint.actions

@@ -22,6 +22,15 @@ for (let round = 1; round <= state.agentRunIds.length; round++) {
         mode === 'baseline' ? event.category.startsWith('browser_') : event.category !== 'system_wait'
       );
     const measured = record.task?.executionMeasurements;
+    const requestActions = record.actions.filter((event) =>
+      ['script_http', 'script_assertions'].includes(event.category)
+    );
+    if (mode === 'baseline') {
+      assert.equal(requestActions.length, record.results.filter((item) => item.request).length * 2);
+      assert.ok(
+        requestActions.every((event) => event.ok && Number.isFinite(event.durationMs) && event.durationMs >= 0)
+      );
+    }
     rows.push({
       round,
       phase: round > 3 ? '修复后补充回归（不替换前三轮）' : round === 1 ? '首次（已有用例与共享请求基线）' : '重复回归',
@@ -40,8 +49,12 @@ for (let round = 1; round <= state.agentRunIds.length; round++) {
       resumedUiSegmentMs: record.resumedUiOnly ? record.scriptWallMs : null,
       httpAndAssertionsMs:
         mode === 'baseline'
-          ? record.results.reduce((sum, item) => sum + item.durationMs, 0)
+          ? requestActions.reduce((sum, item) => sum + item.durationMs, 0)
           : measured.requests.durationMs,
+      httpTimingSource:
+        mode === 'baseline' ? '写检查点之前记录的 HTTP 与断言 action.durationMs 之和' : '服务端请求执行计量',
+      originalResultDurationMs:
+        mode === 'baseline' ? record.results.reduce((sum, item) => sum + item.durationMs, 0) : null,
       backfillMs: mode === 'baseline' ? record.backfillScriptMs : measured.persistence.durationMs,
       reportMs: mode === 'baseline' ? record.reportScriptMs : measured.reportDurationMs,
       timingScope:
@@ -71,11 +84,13 @@ for (let round = 1; round <= state.agentRunIds.length; round++) {
   }
 }
 const report = {
+  timingVersion: 2,
   studyId: state.studyId,
   fixtureSha256: fixtureHash,
   measurementType: '脚本模拟，非真实测试人员测量',
   rows,
   limitations: [
+    '本表按原始 action 日志重新汇总 HTTP/断言耗时，排除检查点写盘；不是重新执行实验。旧 comparison 文件与逐用例 durationMs 保留用于追溯，旧基线耗时不再作为比较依据。各步骤以毫秒取整，首轮修正前后相同不表示写盘没有成本。',
     '被测系统为作者授权的本地测试管理平台；三轮均使用新建私有项目，非高负载生产环境。',
     '已有文字用例和请求基线由同一份文件提供；用例编写、阅读文档与首次编写请求 JSON 的人工时间未测量。',
     '基线的请求准备、发送与核对由脚本完成，浏览器日志仅对实际 UI 操作计数；不得将 API 操作伪装为人类点击。',
@@ -86,9 +101,9 @@ const report = {
     '第 4 轮是修复后的独立 Agent 复测，单独展示，不覆盖修复前三轮。模型耗时与报告计时可能重叠，不相加。',
   ],
 };
-writeFileSync(new URL('comparison.json', dir), JSON.stringify(report, null, 2) + '\n');
+writeFileSync(new URL('comparison-timing-v2.json', dir), JSON.stringify(report, null, 2) + '\n');
 const table = [
-  '# 三轮脚本模拟对比',
+  '# 三轮脚本模拟对比（计时口径修正）',
   '',
   `研究：${state.studyId}。同一用例与预期 SHA-256：\`${fixtureHash}\`。`,
   '',
@@ -108,5 +123,5 @@ const table = [
   '完整阶段范围、覆盖率、操作时间戳与业务证据见同目录 JSON 和 Excel。',
   '',
 ];
-writeFileSync(new URL('comparison.md', dir), table.join('\n'));
+writeFileSync(new URL('comparison-timing-v2.md', dir), table.join('\n'));
 console.log(JSON.stringify({ studyId: state.studyId, rows: rows.length, fixtureHash }));

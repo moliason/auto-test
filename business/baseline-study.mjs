@@ -35,6 +35,7 @@ try {
       throw new Error(`Baseline ${round} has retained progress; inspect before repeating business writes`);
     const runId = state.baselineRunIds[round - 1];
     const retained = existsSync(pendingPath) ? JSON.parse(readFileSync(pendingPath, 'utf8')) : null;
+    const timingVersion = retained?.timingVersion ?? (retained ? 1 : 2);
     if (retained) {
       assert.equal(retained.runId, runId);
       assert.equal(retained.results.length, fixtures.length, 'Only a completed HTTP phase can resume UI backfill');
@@ -57,7 +58,7 @@ try {
         throw error;
       } finally {
         event.durationMs = Math.round(performance.now() - start);
-        writeFileSync(pendingPath, JSON.stringify({ runId, results, actions }, null, 2));
+        writeFileSync(pendingPath, JSON.stringify({ runId, results, actions, timingVersion }, null, 2));
       }
     }
     const start = performance.now();
@@ -67,7 +68,7 @@ try {
       BIZ_PROJECT_NAME: `${state.studyId}-baseline-${round}`,
     };
     const secrets = [state.password, login.access_token];
-    writeFileSync(pendingPath, JSON.stringify({ runId, results, actions }, null, 2));
+    writeFileSync(pendingPath, JSON.stringify({ runId, results, actions, timingVersion }, null, 2));
     for (const fixture of fixtures) {
       if (retained) continue;
       const dependencyFailed = (fixture.executionInfo.dependsOn || []).some(
@@ -168,7 +169,7 @@ try {
       }
       assert.equal(result.status, fixture.expectedStatus);
       results.push(result);
-      writeFileSync(pendingPath, JSON.stringify({ runId, results, actions }, null, 2));
+      writeFileSync(pendingPath, JSON.stringify({ runId, results, actions, timingVersion }, null, 2));
     }
     const page = await browser.newPage({
       locale: 'zh-CN',
@@ -260,7 +261,7 @@ try {
     const artifact = {
       mode: 'baseline',
       measurementType: 'script-client-plus-browser-manual-status-simulation-not-human',
-      timingVersion: 2,
+      timingVersion,
       round,
       runId,
       fixtureSha256: createHash('sha256').update(fixtureText).digest('hex'),
