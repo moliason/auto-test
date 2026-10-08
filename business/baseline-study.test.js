@@ -41,6 +41,8 @@ vi.mock('@playwright/test', () => ({
     }),
   },
 }));
+// This test stops before browser backfill and Excel export; avoid loading that unrelated dependency.
+vi.mock('../backend/node_modules/exceljs/excel.js', () => ({ default: {} }));
 afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
