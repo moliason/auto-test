@@ -6,7 +6,7 @@
 
 Docker 启动曾因 `Docker/run/dockerInference` 运行时套接字无法访问而失败。停止故障进程后，将 Docker 的 run 与 docker-secrets-engine 运行目录重命名留存，再创建运行目录并启动。数据库卷未清除。复查引擎版本 29.5.2，PostgreSQL 容器 healthy；Docker 窗口已恢复。此记录不声称永久解决重启后的复发问题。
 
-本机 Edge 无法被 Playwright 正常启动，采集改用项目锁定依赖对应的 Chromium 134 / build 1161。Edge 失败发生在创建 Agent 任务前，没有产生重复业务写请求。
+本机 Edge 无法被 Playwright 正常启动，采集改用项目锁定依赖对应的 Chromium 134 / build 1161。Edge 失败发生在创建 Agent 任务前，没有产生重复业务写请求。完整 Chromium 已下载并用于全部验收；附加 headless shell 下载因连接中断未完成，脚本显式指定完整 Chromium 路径，无需该附加组件，复现命令使用 `--no-shell`。
 
 ## 基线首轮中断
 
