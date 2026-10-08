@@ -36,6 +36,21 @@ const login = {
 };
 
 describe('HTTP execution with real local requests', () => {
+  it('overrides environment authorization irrespective of header name casing', async () => {
+    const result = await executeHttpCase({
+      execution: {
+        method: 'GET',
+        path: '/profile',
+        headers: { authorization: 'Bearer demo-token' },
+        assertions: [{ type: 'status', expected: 200 }],
+      },
+      environment: { ...environment, headers: { Authorization: 'Bearer wrong-environment-token' } },
+    });
+    expect(result.evidence.status).toBe('passed');
+    expect(
+      Object.keys(result.evidence.request.headers).filter((key) => key.toLowerCase() === 'authorization')
+    ).toHaveLength(1);
+  });
   it('executes all three assertion types and reuses an extracted token', async () => {
     const result = await executeHttpCase({ execution: login, environment });
     expect(result.evidence.status).toBe('passed');

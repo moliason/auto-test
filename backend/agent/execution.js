@@ -202,10 +202,14 @@ export async function executeHttpCase({ execution, environment, variables = {}, 
     if (url.origin !== new URL(environment.baseUrl).origin) throw new Error('请求地址超出了已确认的测试环境');
     for (const [name, value] of Object.entries(renderVariables(execution.query || {}, variables)))
       url.searchParams.set(name, value);
-    const headers = {
-      ...renderVariables(environment.headers || {}, variables),
-      ...renderVariables(execution.headers || {}, variables),
-    };
+    const headers = {};
+    for (const source of [environment.headers || {}, execution.headers || {}]) {
+      for (const [name, value] of Object.entries(renderVariables(source, variables))) {
+        const existing = Object.keys(headers).find((key) => key.toLowerCase() === name.toLowerCase());
+        if (existing) delete headers[existing];
+        headers[name] = value;
+      }
+    }
     if (Object.keys(headers).some((key) => /^(host|connection|content-length|transfer-encoding)$/i.test(key)))
       throw new Error('不能覆盖连接管理请求头');
     for (const [name, value] of Object.entries(headers))
