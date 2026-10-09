@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import express from 'express';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
@@ -6,8 +6,20 @@ import { createAgentDatabase } from './database.fixture.js';
 import tasksRoute from '../routes/agent/tasks.js';
 import { runAgent } from './runner.js';
 import { saveDocumentCases } from './documentCases.js';
+import { createDemoServer } from '../../demo/server.mjs';
+import { documentAcceptance } from './documentPlan.js';
 
 let db, app, launch;
+let server, baseUrl;
+beforeAll(async () => {
+  server = createDemoServer();
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  baseUrl = `http://127.0.0.1:${server.address().port}`;
+});
+afterAll(async () => {
+  server.closeAllConnections();
+  await new Promise((resolve) => server.close(resolve));
+});
 const auth = (userId = 1) => `Bearer ${jwt.sign({ userId }, 'agent-test-only')}`;
 const input = { document: { name: 'api.md', content: 'GET /plain\n正常查询返回 200。响应包含 text 字段。' } };
 const proposal = {
@@ -46,13 +58,245 @@ const tool = (name, args = {}) => ({
 
 beforeEach(async () => {
   vi.stubEnv('SECRET_KEY', 'agent-test-only');
-  vi.stubEnv('TEST_AGENT_ALLOWED_ORIGINS', 'http://127.0.0.1:4010');
+  vi.stubEnv('TEST_AGENT_ALLOWED_ORIGINS', baseUrl);
   db = await createAgentDatabase();
-  await db.models.Run.update({ agentEnvironment: { baseUrl: 'http://127.0.0.1:4010' } }, { where: { id: 1 } });
+  await db.models.Run.update({ agentEnvironment: { baseUrl } }, { where: { id: 1 } });
   launch = vi.fn().mockResolvedValue(undefined);
   app = express();
   app.use(express.json());
   app.use('/agent', tasksRoute(db, { launch }));
+});
+
+async function confirmedDocument({ path = '/plain', expected = 200, limits = {} } = {}) {
+  const source = {
+    document: {
+      name: 'api.md',
+      content: `GET ${path}\n正常查询返回 ${expected}。支持可选 query 参数 probe（字符串）。`,
+    },
+    limits,
+  };
+  const created = await request(app).post('/agent/runs/1/tasks/document').set('Authorization', auth()).send(source);
+  expect(created.status).toBe(202);
+  const draft = structuredClone(proposal);
+  Object.assign(draft.operations[0], { path, evidence: `GET ${path}` });
+  Object.assign(draft.rules[0], { evidence: `正常查询返回 ${expected}`, assertion: { type: 'status', expected } });
+  Object.assign(draft.cases[0].executionInfo, { path, assertions: [{ type: 'status', expected }] });
+  await saveDocumentCases(db, created.body.id, draft);
+  const task = await db.models.AgentTask.findByPk(created.body.id);
+  const confirmed = await request(app)
+    .post(`/agent/runs/1/tasks/${task.id}/confirm`)
+    .set('Authorization', auth())
+    .send({ version: task.version, confirmed: true, preconditionsConfirmed: true });
+  expect(confirmed.status, JSON.stringify(confirmed.body)).toBe(202);
+  await task.reload();
+  return task;
+}
+
+describe('feedback loop against real HTTP', () => {
+  it('executes, discovers a new validation point, supplements and stops without replacing failures', async () => {
+    const task = await confirmedDocument({ expected: 201 });
+    const first = task.plan.cases[0];
+    const supplement = {
+      reason: '原始请求返回 200，与规则 201 不符；补测可选 probe 参数是否影响结果',
+      analysis: `#${first.caseId} 的状态断言失败。可能原因：服务与文档版本不同，尚未证实。`,
+      questions: [],
+      cases: [
+        {
+          ...structuredClone(proposal.cases[0]),
+          key: 'probe',
+          scenario: 'boundary',
+          purpose: '验证可选参数为空的边界',
+          evidenceCaseIds: [first.caseId],
+          executionInfo: { ...first.executionInfo, query: { probe: '' }, dependsOn: [] },
+        },
+      ],
+    };
+    let secondId;
+    const completion = vi
+      .fn()
+      .mockResolvedValueOnce(tool('read_cases'))
+      .mockResolvedValueOnce(tool('execute_case', { caseId: first.caseId }))
+      .mockResolvedValueOnce(tool('get_results'))
+      .mockResolvedValueOnce(tool('submit_document_cases', supplement))
+      .mockImplementationOnce(async (messages) => {
+        const output = JSON.parse(messages.at(-1).content);
+        secondId = output.cases.find((item) => item.key === 'probe').caseId;
+        return tool('execute_case', { caseId: secondId });
+      })
+      .mockResolvedValueOnce(tool('get_results'))
+      .mockResolvedValueOnce(
+        tool('submit_document_cases', {
+          cases: [],
+          questions: [],
+          reason: '已验证默认请求和可选参数边界，无新的文档内验证点',
+          analysis: '两次状态断言失败；文档版本差异仅是推测，应由业务负责人确认。',
+        })
+      );
+    await runAgent(db, task.id, 'execute', { completion });
+    await task.reload();
+    expect(task.state, task.error).toBe('completed');
+    expect(task.plan.workflow.stopReason).toBe('no_new_cases');
+    expect(task.plan.workflow.rounds.map((round) => round.caseIds)).toEqual([[first.caseId], [secondId]]);
+    expect(task.results.map((result) => [result.status, result.response.status])).toEqual([
+      ['failed', 200],
+      ['failed', 200],
+    ]);
+    expect(task.plan.cases[0].executionInfo.assertions[0].expected).toBe(201);
+    expect(task.results[0].snapshot.executionInfo.assertions[0].expected).toBe(201);
+    expect(documentAcceptance(task)).toMatchObject({ verdict: 'failed', failedCaseIds: [first.caseId, secondId] });
+    const read = await request(app).get(`/agent/runs/1/tasks/${task.id}`).set('Authorization', auth());
+    expect(read.body.acceptance).toEqual(documentAcceptance(task));
+    expect(read.body.summary).toMatchObject({ total: 2, passed: 0, failed: 2, unexecuted: 0 });
+  });
+  it('deduplicates a renamed case and stops when no effective new point remains', async () => {
+    const task = await confirmedDocument();
+    const caseId = task.plan.cases[0].caseId;
+    const completion = vi
+      .fn()
+      .mockResolvedValueOnce(tool('read_cases'))
+      .mockResolvedValueOnce(tool('execute_case', { caseId }))
+      .mockResolvedValueOnce(tool('get_results'))
+      .mockResolvedValueOnce(
+        tool('submit_document_cases', {
+          cases: [{ ...structuredClone(proposal.cases[0]), key: 'renamed' }],
+          questions: [],
+          reason: '重复验证',
+        })
+      );
+    await runAgent(db, task.id, 'execute', { completion });
+    await task.reload();
+    expect(task.plan.workflow.stopReason).toBe('no_new_cases');
+    expect(task.results).toHaveLength(1);
+    expect(await db.models.Case.count()).toBe(1);
+  });
+  it.each([
+    [{ maxRounds: 0 }, 'max_rounds'],
+    [{ maxCases: 1 }, 'max_cases'],
+    [{ maxModelCalls: 2 }, 'max_model_calls'],
+  ])('respects the confirmed budget %j', async (limits, reason) => {
+    const task = await confirmedDocument({ limits });
+    const completion = vi
+      .fn()
+      .mockResolvedValueOnce(tool('read_cases'))
+      .mockResolvedValueOnce(tool('execute_case', { caseId: task.plan.cases[0].caseId }))
+      .mockResolvedValueOnce(tool('get_results'));
+    await runAgent(db, task.id, 'execute', { completion });
+    await task.reload();
+    expect(task.plan.workflow.stopReason).toBe(reason);
+    expect(documentAcceptance(task).verdict).toBe('inconclusive');
+    expect(completion.mock.calls.length).toBeLessThanOrEqual(limits.maxModelCalls || 40);
+    expect(task.results[0].status).toBe('passed');
+  });
+  it('records time exhaustion without calling the next tool', async () => {
+    const task = await confirmedDocument();
+    const completion = vi.fn(
+      async (_messages, { signal }) =>
+        new Promise((_resolve, reject) => {
+          signal.addEventListener('abort', () => reject(signal.reason), { once: true });
+          if (signal.aborted) reject(signal.reason);
+        })
+    );
+    await runAgent(db, task.id, 'execute', { completion, timeoutMs: 35 });
+    await task.reload();
+    expect(task.plan.workflow.stopReason).toBe('max_time');
+    expect(task.results[0]).toMatchObject({ status: 'skipped', request: null });
+  });
+  it('preserves the request failure and stops before requesting supplements', async () => {
+    const task = await confirmedDocument({ path: '/disconnect' });
+    const completion = vi
+      .fn()
+      .mockResolvedValueOnce(tool('read_cases'))
+      .mockResolvedValueOnce(tool('execute_case', { caseId: task.plan.cases[0].caseId }));
+    await runAgent(db, task.id, 'execute', { completion });
+    await task.reload();
+    expect(task.plan.workflow.stopReason).toBe('execution_fault');
+    expect(task.results[0].status).toBe('error');
+    expect(task.results[0].request).not.toBeNull();
+    expect(completion).toHaveBeenCalledTimes(2);
+  });
+  it('pauses for out-of-scope supplements without inserting or executing them', async () => {
+    const task = await confirmedDocument();
+    const completion = vi
+      .fn()
+      .mockResolvedValueOnce(tool('read_cases'))
+      .mockResolvedValueOnce(tool('execute_case', { caseId: task.plan.cases[0].caseId }))
+      .mockResolvedValueOnce(tool('get_results'))
+      .mockResolvedValueOnce(
+        tool('submit_document_cases', {
+          cases: [
+            {
+              ...structuredClone(proposal.cases[0]),
+              key: 'outside',
+              executionInfo: { ...proposal.cases[0].executionInfo, path: '/admin' },
+            },
+          ],
+          questions: [],
+          reason: '尝试未确认的接口',
+        })
+      );
+    await runAgent(db, task.id, 'execute', { completion });
+    await task.reload();
+    expect(task.state).toBe('needs_input');
+    expect(task.plan.workflow.stopReason).toBe('needs_confirmation');
+    expect(task.plan.workflow.pending.questions.join('；')).toContain('范围');
+    expect(await db.models.Case.count()).toBe(1);
+    expect(task.results).toHaveLength(1);
+  });
+  it('stops a pending model call through the authenticated endpoint', async () => {
+    const task = await confirmedDocument();
+    let notifyStarted;
+    const started = new Promise((resolve) => {
+      notifyStarted = resolve;
+    });
+    const completion = vi.fn(
+      async (_messages, { signal }) =>
+        new Promise((_resolve, reject) => {
+          signal.addEventListener('abort', () => reject(signal.reason), { once: true });
+          notifyStarted();
+        })
+    );
+    const running = runAgent(db, task.id, 'execute', { completion });
+    await started;
+    expect((await request(app).post(`/agent/runs/1/tasks/${task.id}/stop`).set('Authorization', auth(2))).status).toBe(
+      403
+    );
+    expect((await request(app).post(`/agent/runs/1/tasks/${task.id}/stop`).set('Authorization', auth())).status).toBe(
+      202
+    );
+    await running;
+    await task.reload();
+    expect(task.state).toBe('stopped');
+    expect(task.plan.workflow.stopReason).toBe('user_stopped');
+    expect(task.results[0].request).toBeNull();
+    expect(completion).toHaveBeenCalledTimes(1);
+  });
+  it('retains in-flight HTTP evidence when the user stops', async () => {
+    const task = await confirmedDocument({ path: '/slow' });
+    let notifyRequest;
+    const received = new Promise((resolve) => {
+      notifyRequest = resolve;
+    });
+    const listener = (req) => {
+      if (req.url === '/slow') notifyRequest();
+    };
+    server.on('request', listener);
+    const completion = vi
+      .fn()
+      .mockResolvedValueOnce(tool('read_cases'))
+      .mockResolvedValueOnce(tool('execute_case', { caseId: task.plan.cases[0].caseId }));
+    const running = runAgent(db, task.id, 'execute', { completion });
+    await received;
+    const stopped = await request(app).post(`/agent/runs/1/tasks/${task.id}/stop`).set('Authorization', auth());
+    expect(stopped.status).toBe(202);
+    await running;
+    await task.reload();
+    server.off('request', listener);
+    expect(task.state).toBe('stopped');
+    expect(task.plan.workflow.stopReason).toBe('user_stopped');
+    expect(task.results[0].request.url).toContain('/slow');
+    expect(task.results[0].status).toBe('error');
+    expect(completion).toHaveBeenCalledTimes(2);
+  });
 });
 afterEach(async () => {
   await db.close();

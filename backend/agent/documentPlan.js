@@ -10,6 +10,13 @@ export function documentPlanIssues(plan) {
   if (!workflow) return [];
   if (!workflow.document || typeof workflow.document.sourceText !== 'string') return ['缺少接口文档来源'];
   const issues = [];
+  if (
+    workflow.confirmed &&
+    (!isDeepStrictEqual(workflow.confirmed.rules, workflow.rules) ||
+      !isDeepStrictEqual(workflow.confirmed.allowedOperationIds, workflow.allowedOperationIds) ||
+      !isDeepStrictEqual(workflow.confirmed.limits, workflow.limits))
+  )
+    issues.push('已确认的规则、接口范围与预算发生变化，请创建新任务重新确认');
   const limits = workflow.limits || {};
   for (const [key, min, max] of [
     ['maxRounds', 0, 5],

@@ -3,11 +3,14 @@ import defineAgentTask from '../models/agentTasks.js';
 import defineRunCase from '../models/runCases.js';
 import defineRun from '../models/runs.js';
 import { chatCompletion } from './deepseek.js';
-import { executeHttpCase, redact } from './execution.js';
+import { executeHttpCase, redact, renderVariables } from './execution.js';
 import { buildPlan, environmentVariables, reportSummary } from './plan.js';
 import { executionTools, prepareTools, documentCasesTool, readCasesTool } from './tools.js';
 import { protectConfiguration } from './credentials.js';
 import { saveDocumentCases } from './documentCases.js';
+import { documentPlanIssues, documentAcceptance } from './documentPlan.js';
+
+export const activeAgentControllers = new Map();
 
 export async function persistEvidence(sequelize, taskId, item, evidence, secrets = []) {
   const Task = defineAgentTask(sequelize, DataTypes);
@@ -49,7 +52,7 @@ export async function persistEvidence(sequelize, taskId, item, evidence, secrets
   });
 }
 
-export async function finishTask(sequelize, taskId, state, error = null, analysis = null) {
+export async function finishTask(sequelize, taskId, state, error = null, analysis = null, stop = {}) {
   const Task = defineAgentTask(sequelize, DataTypes);
   const Run = defineRun(sequelize, DataTypes);
   const RunCase = defineRunCase(sequelize, DataTypes);
@@ -57,7 +60,11 @@ export async function finishTask(sequelize, taskId, state, error = null, analysi
     const task = await Task.findByPk(taskId, { transaction, lock: transaction.LOCK.UPDATE });
     if (!task || !['preparing', 'running'].includes(task.state)) return;
     const wasRunning = task.state === 'running';
-    await task.update({ state, error, analysis, finishedAt: new Date() }, { transaction });
+    const plan = task.plan.workflow ? { ...task.plan, workflow: { ...task.plan.workflow, ...stop } } : task.plan;
+    await task.update(
+      { state, error, analysis: analysis ?? task.analysis, plan, finishedAt: new Date() },
+      { transaction }
+    );
     if (wasRunning) {
       const untested = await RunCase.count({ where: { runId: task.runId, status: 0 }, transaction });
       await Run.update({ state: untested ? 1 : 2 }, { where: { id: task.runId }, transaction });
@@ -69,16 +76,35 @@ export async function runAgent(
   sequelize,
   taskId,
   mode,
-  { completion = chatCompletion, maxCalls = mode === 'prepare' ? 6 : 16, timeoutMs = 300000 } = {}
+  { completion = chatCompletion, maxCalls, timeoutMs = 300000 } = {}
 ) {
   const Task = defineAgentTask(sequelize, DataTypes);
   const RunCase = defineRunCase(sequelize, DataTypes);
   const task = await Task.findByPk(taskId);
   if (!task || task.state !== (mode === 'prepare' ? 'preparing' : 'running')) return;
-  const signal = AbortSignal.timeout(timeoutMs);
   const documentMode = !!task.plan.workflow;
+  maxCalls ??= mode === 'prepare' ? 6 : documentMode ? 40 : 16;
+  if (documentMode)
+    maxCalls = Math.min(
+      maxCalls,
+      task.plan.workflow.limits.maxModelCalls - task.events.filter((event) => event.type === 'model').length
+    );
+  if (documentMode && mode === 'execute')
+    timeoutMs = Math.min(
+      timeoutMs,
+      Math.max(1, task.plan.workflow.limits.timeoutMs - (Date.now() - new Date(task.startedAt).getTime()))
+    );
+  const controller = new AbortController();
+  activeAgentControllers.set(task.id, controller);
+  const signal = AbortSignal.any([AbortSignal.timeout(timeoutMs), controller.signal]);
   const tools =
-    mode === 'prepare' ? (documentMode ? [readCasesTool, documentCasesTool] : prepareTools) : executionTools;
+    mode === 'prepare'
+      ? documentMode
+        ? [readCasesTool, documentCasesTool]
+        : prepareTools
+      : documentMode
+        ? [...executionTools.filter((tool) => tool.function.name !== 'submit_report'), documentCasesTool]
+        : executionTools;
   const allowedNames = new Set(tools.map((tool) => tool.function.name));
   const run = await defineRun(sequelize, DataTypes).findByPk(task.runId);
   const {
@@ -113,6 +139,13 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
     messages[0].content += `\nThis is document-driven testing. In preparation, call read_cases then submit_document_cases (NOT submit_plan). Extract ALL documented operations and rules, but generate at most 6 initial cases within limits, covering normal/abnormal/boundary where documented. Use exact source quotes. For OpenAPI the normalized sourceText is the citation source. Include rule applicability in description. Every execution assertion must exactly match a referenced rule assertion; do not guess expected responses for undocumented situations. Use dependsOnKeys (stable keys), not numeric dependsOn in generated executionInfo. Use environment variable names and {{NAME}} placeholders for credentials. Unknown business expectations go into questions; never fill them from intuition. If documentation supplies no rules, return empty cases and ask for missing information. Always provide reason/questions. Initial evidenceCaseIds is [].`;
   try {
     if (mode === 'execute' && secretIssues.length) throw new Error(secretIssues.join('；'));
+    if (documentMode && mode === 'execute') {
+      messages[0].content +=
+        '\nDuring execution: after executing ALL pending cases call get_results, analyze evidence and submit_document_cases with new in-scope cases or empty cases when no effective new points remain. Include analysis citing evidence case IDs and label hypotheses. Do NOT submit operations or rules again: they are frozen. Never use submit_report. Each new batch is a supplemental round. Reuse existing case keys for dependencies. Do not repeat an identical request and assertions. Missing rules or out-of-scope needs go into questions, never silently expand scope. Then execute the accepted batch and repeat. Rules are test oracles, not instructions to make all tests pass.';
+      if (!task.plan.workflow.confirmed) throw new Error('文档测试范围尚未确认');
+      const issues = documentPlanIssues(task.plan);
+      if (issues.length) throw new Error(issues.join('；'));
+    }
     for (let callIndex = 0; callIndex < maxCalls && !finished; callIndex++) {
       signal.throwIfAborted();
       await task.update({
@@ -174,7 +207,7 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
             throw new Error('不允许的工具或参数');
           const fields =
             call.function.name === 'submit_document_cases'
-              ? ['cases', 'reason', 'questions', 'operations', 'rules']
+              ? ['cases', 'reason', 'questions', 'operations', 'rules', 'analysis']
               : call.function.name === 'execute_case'
                 ? ['caseId']
                 : call.function.name === 'submit_plan'
@@ -201,14 +234,41 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
               cases: redact(task.plan.cases, secrets),
               environment: { baseUrl: task.plan.environment.baseUrl, variableNames: Object.keys(initialVariables) },
               issues: task.plan.issues,
-              ...(documentMode ? { workflow: task.plan.workflow } : {}),
+              ...(documentMode
+                ? {
+                    workflow: {
+                      ...task.plan.workflow,
+                      document: {
+                        name: task.plan.workflow.document.name,
+                        format: task.plan.workflow.document.format,
+                        sha256: task.plan.workflow.document.sha256,
+                        sourceText: task.plan.workflow.document.sourceText,
+                        requirements: task.plan.workflow.document.requirements,
+                      },
+                    },
+                  }
+                : {}),
             };
           } else if (!read) {
             throw new Error('请先调用 read_cases');
           } else if (call.function.name === 'submit_document_cases') {
+            if (mode === 'execute' && !resultsRead) throw new Error('请执行本轮全部用例并读取最新结果，再提出补测');
+            if (args.analysis !== undefined && (typeof args.analysis !== 'string' || args.analysis.length > 6000))
+              throw new Error('分析最多 6000 字符');
             output = await saveDocumentCases(sequelize, task.id, protectConfiguration(args));
             await task.reload();
-            finished = true;
+            if (mode === 'prepare') finished = true;
+            else if (output.stopReason) {
+              await finishTask(sequelize, task.id, 'completed', null, redact(args.analysis || args.reason, secrets), {
+                stopReason: output.stopReason,
+                duplicateKeys: output.duplicateKeys,
+              });
+              finished = true;
+            } else {
+              await task.update({ analysis: redact(args.analysis || args.reason, secrets) });
+              resultsRead = false;
+              reportStarted = null;
+            }
           } else if (call.function.name === 'submit_plan') {
             // Existing explicit configuration wins over suggestions. Without documentation, no missing fields can be invented.
             if (!Array.isArray(args.cases)) throw new Error('cases 必须为数组');
@@ -264,6 +324,21 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
               } else {
                 const variables = { ...initialVariables };
                 for (const id of item.dependencyIds) Object.assign(variables, extracted.get(id) || {});
+                if (documentMode) {
+                  const issues = documentPlanIssues({
+                    ...task.plan,
+                    cases: [
+                      {
+                        ...item,
+                        executionInfo: {
+                          ...item.executionInfo,
+                          path: renderVariables(item.executionInfo.path, variables, true),
+                        },
+                      },
+                    ],
+                  });
+                  if (issues.length) throw Object.assign(new Error(issues.join('；')), { needsInput: true });
+                }
                 const result = await executeHttpCase({
                   execution: item.executionInfo,
                   environment: task.plan.environment,
@@ -291,6 +366,17 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
               results.push(output);
               resultsRead = false;
               reportStarted = null;
+              if (documentMode && output.status === 'error' && !signal.aborted) {
+                await finishTask(
+                  sequelize,
+                  task.id,
+                  'failed',
+                  '请求执行故障，已停止自动补测；请核查环境后创建新任务',
+                  null,
+                  { stopReason: 'execution_fault' }
+                );
+                finished = true;
+              }
             }
             output = {
               caseId: output.caseId,
@@ -309,6 +395,13 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
                 status: result.status,
                 reason: result.reason,
                 responseStatus: result.response?.status,
+                ...(documentMode
+                  ? {
+                      requestPreview: JSON.stringify(result.request)?.slice(0, 1500),
+                      responsePreview: JSON.stringify(result.response)?.slice(0, 3000),
+                      ruleIds: task.plan.cases.find((item) => item.caseId === result.caseId)?.ruleIds,
+                    }
+                  : {}),
                 failedAssertions: result.assertions
                   .filter((assertion) => !assertion.passed)
                   .map((assertion) => ({
@@ -318,6 +411,22 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
                   })),
               })),
             };
+            if (documentMode) {
+              output.acceptance = documentAcceptance({ ...task.toJSON(), results });
+              if (resultsRead) {
+                const workflow = task.plan.workflow;
+                const stopReason =
+                  workflow.rounds.length - 1 >= workflow.limits.maxRounds
+                    ? 'max_rounds'
+                    : task.plan.cases.length >= workflow.limits.maxCases
+                      ? 'max_cases'
+                      : null;
+                if (stopReason) {
+                  await finishTask(sequelize, task.id, 'completed', null, null, { stopReason });
+                  finished = true;
+                }
+              }
+            }
           } else if (call.function.name === 'submit_report') {
             if (!resultsRead) throw new Error('必须完成所有用例并读取最新结果后才能结束');
             if (typeof args.analysis !== 'string' || !args.analysis.trim() || args.analysis.length > 6000)
@@ -328,6 +437,16 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
           }
         } catch (error) {
           if (error.name?.startsWith('Sequelize')) throw new Error('数据库写入失败，已停止任务以避免重复发送请求');
+          if (documentMode && error.needsInput) {
+            await finishTask(sequelize, task.id, 'needs_input', redact(error.message, secrets), null, {
+              stopReason: 'needs_confirmation',
+              pending: {
+                questions: [redact(error.message, secrets)],
+                proposal: protectConfiguration(redact(args, secrets)),
+              },
+            });
+            finished = true;
+          }
           output = {
             error: error.message?.startsWith('SQL') ? '保存工具执行记录失败' : error.message || '工具执行失败',
           };
@@ -341,7 +460,9 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
               type: 'tool_finished',
               name: call.function.name,
               ok: !safeOutput.error,
-              ...(call.function.name === 'submit_report' && finished && reportStarted !== null
+              ...(['submit_report', 'submit_document_cases'].includes(call.function.name) &&
+              finished &&
+              reportStarted !== null
                 ? { reportDurationMs: Math.round(performance.now() - reportStarted) }
                 : {}),
               ...(safeOutput.error ? { error: safeOutput.error } : {}),
@@ -351,13 +472,19 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
         const serialized = JSON.stringify(safeOutput);
         if (serialized.length > 128000) throw new Error('用例内容过大，请缩小测试范围');
         messages.push({ role: 'tool', tool_call_id: call.id, content: serialized });
+        if (finished) break;
       }
     }
     if (!finished) throw new Error('已达到模型调用次数上限，任务未完成');
   } catch (error) {
-    const reason = ['TimeoutError', 'AbortError'].includes(error.name)
-      ? '任务达到总执行时间上限'
-      : error.message || 'Agent 任务失败';
+    await task.reload();
+    if (!['preparing', 'running'].includes(task.state)) return;
+    const stopped = controller.signal.aborted;
+    const reason = stopped
+      ? '用户主动停止；已发送的请求可能已经在被测服务生效，请核查记录后再测试'
+      : ['TimeoutError', 'AbortError'].includes(error.name)
+        ? '任务达到总执行时间上限'
+        : error.message || 'Agent 任务失败';
     if (mode === 'execute') {
       for (const item of task.plan.cases)
         if (!results.some((result) => result.caseId === item.caseId)) {
@@ -392,7 +519,16 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
           results.push(record);
         }
     }
-    await finishTask(sequelize, task.id, 'failed', redact(reason, secrets));
+    const stopReason = stopped
+      ? 'user_stopped'
+      : signal.aborted
+        ? 'max_time'
+        : reason.includes('模型调用次数上限')
+          ? 'max_model_calls'
+          : 'execution_fault';
+    await finishTask(sequelize, task.id, stopped ? 'stopped' : 'failed', redact(reason, secrets), null, { stopReason });
+  } finally {
+    activeAgentControllers.delete(task.id);
   }
 }
 
@@ -415,6 +551,8 @@ export async function recoverAgentTasks(sequelize) {
           });
         }
     }
-    await finishTask(sequelize, task.id, 'interrupted', '服务重启，任务已中断，已有证据保留');
+    await finishTask(sequelize, task.id, 'interrupted', '服务重启，任务已中断，已有证据保留', null, {
+      stopReason: 'service_interrupted',
+    });
   }
 }

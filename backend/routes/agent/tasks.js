@@ -10,7 +10,7 @@ import defineFolder from '../../models/folders.js';
 import defineStep from '../../models/steps.js';
 import defineCaseStep from '../../models/caseSteps.js';
 import { buildPlan, reportSummary } from '../../agent/plan.js';
-import { runAgent } from '../../agent/runner.js';
+import { runAgent, finishTask, activeAgentControllers } from '../../agent/runner.js';
 import { modelMeasurements, executionMeasurements } from '../../agent/measurements.js';
 import { configurationIssues, protectConfiguration } from '../../agent/credentials.js';
 import { parseInterfaceDocument } from '../../agent/documents.js';
@@ -95,15 +95,13 @@ export default function (sequelize, { launch = runAgent } = {}) {
       void launch(sequelize, task.id, 'prepare').catch(() =>
         console.error('Agent document task could not persist state:', task.id)
       );
-      return res
-        .status(202)
-        .json({
-          ...protectConfiguration(task.toJSON()),
-          summary: reportSummary(task),
-          measurements: modelMeasurements(task.events),
-          executionMeasurements: executionMeasurements(task),
-          acceptance: documentAcceptance(task),
-        });
+      return res.status(202).json({
+        ...protectConfiguration(task.toJSON()),
+        summary: reportSummary(task),
+        measurements: modelMeasurements(task.events),
+        executionMeasurements: executionMeasurements(task),
+        acceptance: documentAcceptance(task),
+      });
     } catch {
       return res.status(500).json({ error: '创建文档测试任务失败' });
     }
@@ -378,6 +376,29 @@ export default function (sequelize, { launch = runAgent } = {}) {
       if (error.name === 'SequelizeUniqueConstraintError')
         return res.status(409).json({ error: '此测试运行已有 Agent 正在执行' });
       return res.status(error.status || 500).json({ error: error.status ? error.message : '启动执行失败' });
+    }
+  });
+  router.post('/runs/:runId/tasks/:taskId/stop', async (req, res) => {
+    try {
+      const task = await Task.findOne({ where: { id: req.params.taskId, runId: req.params.runId } });
+      if (!task) return res.status(404).json({ error: '任务不存在' });
+      if (!['preparing', 'running'].includes(task.state)) return res.status(409).json({ error: '任务已停止' });
+      const controller = activeAgentControllers.get(task.id);
+      if (controller) controller.abort(new Error('用户主动停止'));
+      else await finishTask(sequelize, task.id, 'stopped', '用户主动停止', null, { stopReason: 'user_stopped' });
+      await task.reload();
+      return res
+        .status(202)
+        .json({
+          ...protectConfiguration(task.toJSON()),
+          stopRequested: true,
+          summary: reportSummary(task),
+          measurements: modelMeasurements(task.events),
+          executionMeasurements: executionMeasurements(task),
+          acceptance: documentAcceptance(task),
+        });
+    } catch {
+      return res.status(500).json({ error: '停止任务失败' });
     }
   });
   return router;

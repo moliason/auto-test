@@ -34,6 +34,11 @@ export const documentCasesTool = {
           description:
             'Why these scenarios are needed, based on source rules or actual execution evidence. In Chinese.',
         },
+        analysis: {
+          type: 'string',
+          description:
+            'Execution only: evidence-backed analysis in Chinese, cite case IDs. Label possible causes as hypotheses, state missing evidence and uncovered scenarios. Never invent statistics.',
+        },
         questions: { type: 'array', items: { type: 'string' } },
         cases: {
           type: 'array',
