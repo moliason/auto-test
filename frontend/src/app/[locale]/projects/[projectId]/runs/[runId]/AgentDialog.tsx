@@ -85,6 +85,7 @@ export default function AgentDialog({ runId, token, caseIds, canManage, canEditC
       try {
         const fresh = await agentRequest<AgentTask>(token, `/runs/${runId}/tasks/${task.id}`);
         if (cancelled) return;
+        setHistory((current) => current.map((item) => (item.id === fresh.id ? fresh : item)));
         setTask(fresh);
         if (['preparing', 'running'].includes(fresh.state)) timer = setTimeout(poll, 2000);
         else {

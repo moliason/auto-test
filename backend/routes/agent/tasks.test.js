@@ -77,6 +77,8 @@ describe('Agent task lifecycle and permissions', () => {
       .send({ caseIds: [1] });
     expect(response.status).toBe(202);
     expect(response.body.state).toBe('awaiting_confirmation');
+    expect(typeof response.body.createdAt).toBe('string');
+    expect(Number.isFinite(Date.parse(response.body.createdAt))).toBe(true);
     expect(response.body.plan.cases[0].executionInfo).toEqual(executionInfo);
     expect(response.body.events[0].type).toBe('configuration_reused');
     expect(response.body.results).toEqual([]);

@@ -5,6 +5,7 @@ const reference = /^(?:Bearer |Basic )?\{\{[A-Za-z_][A-Za-z0-9_]*\}\}$/i;
 
 // Preserve variable references in editable configuration; never return legacy literal credentials.
 export function protectConfiguration(value, field = '') {
+  if (value instanceof Date) return value.toISOString();
   if (typeof value === 'string') {
     if (sensitiveName.test(field) && value && !reference.test(value)) return '[REDACTED]';
     if (field === 'body') {
