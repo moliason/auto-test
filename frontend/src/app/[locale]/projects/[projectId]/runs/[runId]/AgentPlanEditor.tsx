@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Button, Checkbox, Input, Textarea } from '@heroui/react';
 import type { AgentTask } from '@/types/agent';
+import { agentLimitFields, defaultAgentLimits } from '@/types/agent';
 import { agentRequest } from '@/utils/agentControl';
 
 type Props = {
@@ -27,10 +28,15 @@ export default function AgentPlanEditor({ task, token, runId, canEditCase, onSav
     })
   );
   const [notes, setNotes] = useState(task.plan.notes || '');
+  const [limits, setLimits] = useState(task.plan.workflow?.limits || defaultAgentLimits);
+  const [allowedOperationIds, setAllowedOperationIds] = useState(task.plan.workflow?.allowedOperationIds || []);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [saveToCases, setSaveToCases] = useState(false);
-  const editable = !task.startedAt && ['needs_input', 'awaiting_confirmation', 'failed'].includes(task.state);
+  const editable =
+    !task.startedAt &&
+    (!task.plan.workflow || canEditCase) &&
+    ['needs_input', 'awaiting_confirmation', 'failed'].includes(task.state);
 
   const updateDraft = (index: number, field: string, value: string) => {
     setDrafts((current) => current.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
@@ -53,6 +59,52 @@ export default function AgentPlanEditor({ task, token, runId, canEditCase, onSav
           </ul>
         </div>
       )}
+      {task.plan.workflow && (
+        <div className="space-y-3 rounded-medium border border-primary-200 p-3">
+          <h3 className="text-sm font-semibold">执行范围与自动补测预算</h3>
+          <div className="flex flex-col gap-2">
+            {task.plan.workflow.operations.map((operation) => (
+              <Checkbox
+                key={operation.id}
+                isDisabled={!editable || busy}
+                isSelected={allowedOperationIds.includes(operation.id)}
+                onValueChange={(checked) => {
+                  setAllowedOperationIds((current) =>
+                    checked ? [...current, operation.id] : current.filter((id) => id !== operation.id)
+                  );
+                  onDirty(true);
+                }}
+              >
+                {operation.method} {operation.path}
+              </Checkbox>
+            ))}
+          </div>
+          <p className="text-xs text-default-500">
+            取消接口后，其用例将从本次计划排除；若其他用例依赖它，需先调整依赖。原用例仍保留在管理平台。
+          </p>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {agentLimitFields.map((field) => (
+              <Input
+                key={field.key}
+                label={`确认${field.label}`}
+                type="number"
+                min={field.min}
+                max={field.max}
+                step="1"
+                value={String(limits[field.key] / field.scale)}
+                isDisabled={!editable || busy}
+                onValueChange={(value) => {
+                  setLimits((current) => ({ ...current, [field.key]: Number(value) * field.scale }));
+                  onDirty(true);
+                }}
+              />
+            ))}
+          </div>
+          <p className="text-xs text-default-500">
+            模型上限包含已发生的生成调用，执行时间从确认起计算。业务规则有误或缺失时，请补充文档要求后重新生成，保留来源记录。
+          </p>
+        </div>
+      )}
       {task.plan.cases.map((item, index) => (
         <details
           key={item.caseId}
@@ -64,6 +116,26 @@ export default function AgentPlanEditor({ task, token, runId, canEditCase, onSav
             {item.issues.length > 0 ? ' · 待补充' : ' · 信息已齐全'}
           </summary>
           <div className="mt-3 space-y-3">
+            {item.ruleIds && (
+              <div className="rounded-medium bg-default-100 p-3 text-sm space-y-2">
+                <p>测试目的：{item.purpose}</p>
+                <p>
+                  场景：{{ normal: '正常', abnormal: '异常', boundary: '边界' }[item.scenario || ''] || item.scenario}
+                </p>
+                {task.plan.workflow?.rules
+                  .filter((rule) => item.ruleIds?.includes(rule.id))
+                  .map((rule) => (
+                    <div key={rule.id}>
+                      <p className="font-medium">
+                        {rule.id} · {rule.description}
+                      </p>
+                      <blockquote className="whitespace-pre-wrap break-all border-l-2 border-default-300 pl-2 text-default-600">
+                        {rule.evidence}
+                      </blockquote>
+                    </div>
+                  ))}
+              </div>
+            )}
             <dl className="text-sm space-y-2">
               <div>
                 <dt className="font-medium">原前置条件</dt>
@@ -201,6 +273,7 @@ export default function AgentPlanEditor({ task, token, runId, canEditCase, onSav
                   version: task.version,
                   cases,
                   notes,
+                  ...(task.plan.workflow ? { limits, allowedOperationIds } : {}),
                 });
                 let warning;
                 try {

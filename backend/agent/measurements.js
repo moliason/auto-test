@@ -32,7 +32,7 @@ export function executionMeasurements(task) {
   const report = task.events.find(
     (event) =>
       event.type === 'tool_finished' &&
-      event.name === 'submit_report' &&
+      ['submit_report', 'submit_document_cases'].includes(event.name) &&
       event.ok &&
       Number.isFinite(event.reportDurationMs) &&
       event.reportDurationMs >= 0

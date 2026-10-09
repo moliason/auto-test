@@ -267,6 +267,17 @@ export default function (sequelize, { launch = runAgent } = {}) {
               limits: req.body.limits ?? plan.workflow.limits,
               allowedOperationIds: req.body.allowedOperationIds ?? plan.workflow.allowedOperationIds,
             };
+            if (!Array.isArray(plan.workflow.allowedOperationIds)) throw new Error('允许执行的接口须为数组');
+            const allCases = [...plan.cases, ...(task.plan.workflow.excludedCases || [])];
+            const selected = allCases.filter((item) =>
+              item.ruleIds?.some((id) =>
+                plan.workflow.rules.some(
+                  (rule) => rule.id === id && plan.workflow.allowedOperationIds.includes(rule.operationId)
+                )
+              )
+            );
+            plan.workflow.excludedCases = allCases.filter((item) => !selected.includes(item));
+            Object.assign(plan, buildPlan(selected, plan.environment, null, plan.notes, run.projectId));
             plan.issues.push(...documentPlanIssues(plan));
           }
         } catch (error) {
@@ -387,16 +398,14 @@ export default function (sequelize, { launch = runAgent } = {}) {
       if (controller) controller.abort(new Error('用户主动停止'));
       else await finishTask(sequelize, task.id, 'stopped', '用户主动停止', null, { stopReason: 'user_stopped' });
       await task.reload();
-      return res
-        .status(202)
-        .json({
-          ...protectConfiguration(task.toJSON()),
-          stopRequested: true,
-          summary: reportSummary(task),
-          measurements: modelMeasurements(task.events),
-          executionMeasurements: executionMeasurements(task),
-          acceptance: documentAcceptance(task),
-        });
+      return res.status(202).json({
+        ...protectConfiguration(task.toJSON()),
+        stopRequested: true,
+        summary: reportSummary(task),
+        measurements: modelMeasurements(task.events),
+        executionMeasurements: executionMeasurements(task),
+        acceptance: documentAcceptance(task),
+      });
     } catch {
       return res.status(500).json({ error: '停止任务失败' });
     }

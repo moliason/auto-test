@@ -18,6 +18,8 @@ import defineAgentTask from '../../models/agentTasks.js';
 import { reportSummary } from '../../agent/plan.js';
 import { redact } from '../../agent/execution.js';
 import { modelMeasurements, executionMeasurements } from '../../agent/measurements.js';
+import { documentAcceptance } from '../../agent/documentPlan.js';
+import { protectConfiguration } from '../../agent/credentials.js';
 
 export default function (sequelize) {
   const router = express.Router();
@@ -222,6 +224,48 @@ export default function (sequelize) {
             ]);
           }
           usage.columns = Array.from({ length: 12 }, (_, index) => ({ width: index === 0 ? 18 : 24 }));
+          if (task.plan.workflow) {
+            const acceptance = documentAcceptance(task);
+            const workflow = task.plan.workflow;
+            const document = workbook.addWorksheet('文档验收');
+            document.columns = [{ width: 26 }, { width: 12 }, { width: 115 }];
+            document.addRows([
+              ['内容', '分段', '记录（同一内容按分段顺序拼接）'],
+              ['验收判定', 1, acceptance.verdict],
+              ['停止原因', 1, acceptance.stopReason || '尚未停止'],
+              ['规则覆盖', 1, `${acceptance.coveredRules.length}/${acceptance.ruleCount}（实际断言，含失败）`],
+              [
+                '判定口径',
+                1,
+                '仅对已确认规则判定；预算耗尽、中断和待确认不能视为完整验收。原始失败不因补测通过而消除。',
+              ],
+            ]);
+            for (const [name, value] of Object.entries({
+              文档来源: workflow.document,
+              用户确认记录: workflow.confirmed || null,
+              规则与依据: workflow.rules,
+              执行范围及预算: { allowedOperationIds: workflow.allowedOperationIds, limits: workflow.limits },
+              各轮生成与补测原因: workflow.rounds,
+              用例来源与轮次: task.plan.cases.map((item) => ({
+                caseId: item.caseId,
+                title: item.title,
+                key: item.key,
+                purpose: item.purpose,
+                scenario: item.scenario,
+                ruleIds: item.ruleIds,
+                round: item.round,
+                reason: item.reason,
+                evidenceCaseIds: item.evidenceCaseIds,
+              })),
+              排除的用例: workflow.excludedCases || [],
+              待确认内容: workflow.pending || { questions: workflow.questions },
+              验收与未完成内容: acceptance,
+            })) {
+              const text = JSON.stringify(protectConfiguration(redact(value)), null, 2);
+              for (let offset = 0; offset < text.length; offset += 30000)
+                document.addRow([name, offset / 30000 + 1, text.slice(offset, offset + 30000)]);
+            }
+          }
           for (const sheet of workbook.worksheets) {
             sheet.views = [{ state: 'frozen', ySplit: 1 }];
             sheet.getRow(1).font = { bold: true };

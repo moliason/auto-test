@@ -15,7 +15,13 @@ import AgentPlanEditor from './AgentPlanEditor';
 import AgentReport from './AgentReport';
 import { agentRequest } from '@/utils/agentControl';
 import Config from '@/config/config';
-import { agentStateLabels, type AgentHistory, type AgentTask } from '@/types/agent';
+import {
+  agentStateLabels,
+  agentLimitFields,
+  defaultAgentLimits,
+  type AgentHistory,
+  type AgentTask,
+} from '@/types/agent';
 
 type Props = {
   runId: string;
@@ -36,6 +42,9 @@ export default function AgentDialog({ runId, token, caseIds, canManage, canEditC
   const [environmentLoaded, setEnvironmentLoaded] = useState(false);
   const [environmentDirty, setEnvironmentDirty] = useState(false);
   const [description, setDescription] = useState('');
+  const [sourceMode, setSourceMode] = useState(caseIds.length ? 'selected' : 'document');
+  const [importedDocument, setDocument] = useState<{ name: string; content: string } | null>(null);
+  const [limits, setLimits] = useState(defaultAgentLimits);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
@@ -139,7 +148,9 @@ export default function AgentDialog({ runId, token, caseIds, canManage, canEditC
       <ModalContent>
         <ModalHeader className="flex-col gap-1">
           <span>接口测试 Agent</span>
-          <span className="text-xs font-normal text-default-500">准备计划 → 补充并确认 → 自动执行 → 查看报告</span>
+          <span className="text-xs font-normal text-default-500">
+            导入文档或选择用例 → 审核确认 → 执行与补测 → 验收报告
+          </span>
         </ModalHeader>
         <ModalBody className="space-y-5 pb-6">
           {!environmentLoaded && !error && (
@@ -238,13 +249,89 @@ export default function AgentDialog({ runId, token, caseIds, canManage, canEditC
             </div>
           </details>
           <section className="space-y-3" aria-label="创建 Agent 任务">
-            <p className="text-sm">
-              本次选中 <strong>{caseIds.length}</strong> 条用例。每次最多 20 条，请同时选中依赖的前置用例。
-            </p>
+            <label className="flex flex-col gap-1 text-sm">
+              任务来源
+              <select
+                aria-label="任务来源"
+                className="rounded-medium border border-default-200 bg-background p-2"
+                value={sourceMode}
+                disabled={busy || !!active}
+                onChange={(event) => setSourceMode(event.target.value)}
+              >
+                <option value="document" disabled={!canEditCase}>
+                  导入接口文档，生成用例并自动补测
+                </option>
+                <option value="selected">执行已选中的用例</option>
+              </select>
+            </label>
+            {sourceMode === 'document' ? (
+              <>
+                <label className="block space-y-2 text-sm">
+                  <span className="font-medium">接口文档（Markdown / OpenAPI）</span>
+                  <input
+                    aria-label="接口文档文件"
+                    type="file"
+                    accept=".md,.json,.yaml,.yml"
+                    disabled={busy || !!active || !canEditCase}
+                    className="block w-full min-w-0 rounded-medium border border-default-200 p-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-default-100 file:px-3 file:py-1 focus-visible:outline-primary"
+                    onChange={async (event) => {
+                      const file = event.target.files?.[0];
+                      setDocument(null);
+                      setError('');
+                      if (!file) return;
+                      try {
+                        if (!/\.(md|json|ya?ml)$/i.test(file.name) || file.size > 65536 || !file.size)
+                          throw new Error('请选择 1 至 64 KiB 的 Markdown 或 OpenAPI 文件');
+                        const content = new TextDecoder('utf-8', { fatal: true }).decode(await file.arrayBuffer());
+                        setDocument({ name: file.name, content });
+                      } catch (error) {
+                        setError(error instanceof Error ? error.message : '文档读取失败，请使用 UTF-8 编码');
+                      }
+                    }}
+                  />
+                </label>
+                <p className="text-xs text-default-500">
+                  UTF-8，最多 64 KiB、30
+                  个接口。生成的用例会加入当前测试运行；审核确认后才会发送请求。认证信息使用变量引用。
+                </p>
+                {importedDocument && (
+                  <details className="text-sm">
+                    <summary className="cursor-pointer">已选择：{importedDocument.name}</summary>
+                    <pre className="mt-2 max-h-56 overflow-auto whitespace-pre-wrap break-all rounded-medium bg-default-100 p-3 text-xs">
+                      {importedDocument.content}
+                    </pre>
+                  </details>
+                )}
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {agentLimitFields.map((field) => (
+                    <Input
+                      key={field.key}
+                      label={field.label}
+                      type="number"
+                      min={field.min}
+                      max={field.max}
+                      step="1"
+                      value={String(limits[field.key] / field.scale)}
+                      isDisabled={busy || !!active}
+                      onValueChange={(value) =>
+                        setLimits((current) => ({ ...current, [field.key]: Number(value) * field.scale }))
+                      }
+                    />
+                  ))}
+                </div>
+                <p className="text-xs text-default-500">
+                  模型预算包含生成与执行；时间从确认执行起计算。范围和预算内的补测会自动进行。
+                </p>
+              </>
+            ) : (
+              <p className="text-sm">
+                本次选中 <strong>{caseIds.length}</strong> 条用例。每次最多 20 条，请同时选中依赖的前置用例。
+              </p>
+            )}
             <Textarea
-              label="接口说明与业务规则（可选）"
+              label={sourceMode === 'document' ? '补充业务要求（可选）' : '接口说明与业务规则（可选）'}
               placeholder="粘贴接口方法、路径、参数约束及明确的业务规则，帮助 Agent 补充执行信息。"
-              maxLength={20000}
+              maxLength={sourceMode === 'document' ? 6000 : 20000}
               value={description}
               onValueChange={setDescription}
               isDisabled={busy || !!active}
@@ -252,17 +339,29 @@ export default function AgentDialog({ runId, token, caseIds, canManage, canEditC
             <Button
               color="primary"
               isLoading={busy}
-              isDisabled={!!active || !environmentLoaded || environmentDirty || !caseIds.length || caseIds.length > 20}
+              isDisabled={
+                !!active ||
+                !environmentLoaded ||
+                environmentDirty ||
+                (sourceMode === 'document' ? !importedDocument || !canEditCase : !caseIds.length || caseIds.length > 20)
+              }
               onPress={async () => {
                 if (planDirty && !window.confirm('当前计划尚未保存，确定创建新任务吗？')) return;
                 setBusy(true);
                 setError('');
                 setNotice('');
                 try {
-                  const created = await agentRequest<AgentTask>(token, `/runs/${runId}/tasks`, 'POST', {
-                    caseIds,
-                    interfaceDescription: description,
-                  });
+                  const created = await agentRequest<AgentTask>(
+                    token,
+                    `/runs/${runId}/tasks${sourceMode === 'document' ? '/document' : ''}`,
+                    'POST',
+                    sourceMode === 'document'
+                      ? { document: importedDocument, requirements: description, limits }
+                      : {
+                          caseIds,
+                          interfaceDescription: description,
+                        }
+                  );
                   setTask(created);
                   setPlanDirty(false);
                   setConfirmed(false);
@@ -275,9 +374,9 @@ export default function AgentDialog({ runId, token, caseIds, canManage, canEditC
                 }
               }}
             >
-              整理选中用例的测试计划
+              {sourceMode === 'document' ? '从文档生成测试用例' : '整理选中用例的测试计划'}
             </Button>
-            {!caseIds.length && (
+            {!caseIds.length && sourceMode === 'selected' && (
               <p className="text-xs text-default-500">关闭面板后在原运行列表勾选用例；也可以直接查看下面的历史报告。</p>
             )}
           </section>
@@ -366,11 +465,54 @@ export default function AgentDialog({ runId, token, caseIds, canManage, canEditC
                 </Button>
               </div>
               {active && (
-                <p role="status" className="animate-pulse text-sm text-primary">
-                  {task.state === 'preparing'
-                    ? 'Agent 正在读取用例并整理缺失信息，尚未执行接口。'
-                    : '正在执行已确认计划，结果会逐条更新。关闭面板后任务仍会继续。'}
-                </p>
+                <div className="flex flex-wrap items-center gap-3">
+                  <p role="status" className="text-sm text-primary">
+                    {task.state === 'preparing'
+                      ? 'Agent 正在读取用例并整理缺失信息，尚未执行接口。'
+                      : '正在执行已确认计划，结果会逐条更新。关闭面板后任务仍会继续。'}
+                  </p>
+                  <Button
+                    size="sm"
+                    color="danger"
+                    variant="flat"
+                    isDisabled={busy}
+                    onPress={async () => {
+                      setBusy(true);
+                      setError('');
+                      try {
+                        setTask(
+                          await agentRequest<AgentTask>(token, `/runs/${runId}/tasks/${task.id}/stop`, 'POST', {})
+                        );
+                        setNotice('停止请求已发送，正在保存已有证据。');
+                      } catch (error) {
+                        setError(error instanceof Error ? error.message : '停止失败');
+                      } finally {
+                        setBusy(false);
+                      }
+                    }}
+                  >
+                    停止当前任务
+                  </Button>
+                </div>
+              )}
+              {task.plan.workflow && !active && task.state !== 'awaiting_confirmation' && canEditCase && (
+                <div className="rounded-medium bg-default-100 p-3 text-sm space-y-2">
+                  <p>需要补充业务规则或扩大范围时，可以沿用文档创建新任务并重新确认。当前任务和原始证据会保留。</p>
+                  <Button
+                    size="sm"
+                    variant="flat"
+                    onPress={() => {
+                      const workflow = task.plan.workflow!;
+                      setSourceMode('document');
+                      setDocument({ name: workflow.document.name, content: workflow.document.content });
+                      setDescription(workflow.document.requirements);
+                      setLimits(workflow.limits);
+                      setNotice('已填入原文档，请在上方补充业务要求后重新生成。');
+                    }}
+                  >
+                    沿用文档补充要求
+                  </Button>
+                </div>
               )}
               {task.state !== 'preparing' && !task.startedAt && (
                 <AgentPlanEditor
@@ -404,7 +546,9 @@ export default function AgentDialog({ runId, token, caseIds, canManage, canEditC
                     isDisabled={planDirty || environmentDirty || busy}
                     onValueChange={setConfirmed}
                   >
-                    已核对用例、请求参数、断言和测试环境
+                    {task.plan.workflow
+                      ? '已核对接口范围、允许的操作、规则依据和自动补测预算'
+                      : '已核对用例、请求参数、断言和测试环境'}
                   </Checkbox>
                   <Checkbox
                     isSelected={preconditionsConfirmed}

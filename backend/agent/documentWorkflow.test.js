@@ -8,6 +8,8 @@ import { runAgent } from './runner.js';
 import { saveDocumentCases } from './documentCases.js';
 import { createDemoServer } from '../../demo/server.mjs';
 import { documentAcceptance } from './documentPlan.js';
+import downloadRoute from '../routes/runs/download.js';
+import ExcelJS from 'exceljs';
 
 let db, app, launch;
 let server, baseUrl;
@@ -65,6 +67,7 @@ beforeEach(async () => {
   app = express();
   app.use(express.json());
   app.use('/agent', tasksRoute(db, { launch }));
+  app.use('/runs', downloadRoute(db));
 });
 
 async function confirmedDocument({ path = '/plain', expected = 200, limits = {} } = {}) {
@@ -93,6 +96,54 @@ async function confirmedDocument({ path = '/plain', expected = 200, limits = {} 
 }
 
 describe('feedback loop against real HTTP', () => {
+  it('lets a human narrow and restore the operation scope before freezing it', async () => {
+    const created = await request(app)
+      .post('/agent/runs/1/tasks/document')
+      .set('Authorization', auth())
+      .send({ document: { name: 'two.md', content: input.document.content + '\nGET /echo\n回显返回 200。' } });
+    const draft = structuredClone(proposal);
+    draft.operations.push({ id: 'echo', method: 'GET', path: '/echo', evidence: 'GET /echo' });
+    draft.rules.push({
+      id: 'echo-ok',
+      operationId: 'echo',
+      description: '回显成功',
+      evidence: '回显返回 200',
+      assertion: { type: 'status', expected: 200 },
+    });
+    draft.cases.push({
+      ...structuredClone(draft.cases[0]),
+      key: 'echo',
+      ruleIds: ['echo-ok'],
+      executionInfo: { method: 'GET', path: '/echo', assertions: [{ type: 'status', expected: 200 }] },
+    });
+    await saveDocumentCases(db, created.body.id, draft);
+    const task = await db.models.AgentTask.findByPk(created.body.id);
+    const narrowed = await request(app)
+      .put(`/agent/runs/1/tasks/${task.id}/plan`)
+      .set('Authorization', auth())
+      .send({
+        version: task.version,
+        cases: task.plan.cases,
+        allowedOperationIds: ['plain'],
+        limits: { ...task.plan.workflow.limits, maxRounds: 1 },
+      });
+    expect(narrowed.status).toBe(200);
+    expect(narrowed.body.plan.cases).toHaveLength(1);
+    expect(narrowed.body.plan.workflow.excludedCases).toHaveLength(1);
+    expect(narrowed.body.state).toBe('awaiting_confirmation');
+    const restored = await request(app)
+      .put(`/agent/runs/1/tasks/${task.id}/plan`)
+      .set('Authorization', auth())
+      .send({
+        version: narrowed.body.version,
+        cases: narrowed.body.plan.cases,
+        allowedOperationIds: ['plain', 'echo'],
+      });
+    expect(restored.status).toBe(200);
+    expect(restored.body.plan.cases).toHaveLength(2);
+    expect(restored.body.plan.workflow.excludedCases).toHaveLength(0);
+    expect(restored.body.plan.workflow.limits.maxRounds).toBe(1);
+  });
   it('executes, discovers a new validation point, supplements and stops without replacing failures', async () => {
     const task = await confirmedDocument({ expected: 201 });
     const first = task.plan.cases[0];
@@ -147,6 +198,25 @@ describe('feedback loop against real HTTP', () => {
     const read = await request(app).get(`/agent/runs/1/tasks/${task.id}`).set('Authorization', auth());
     expect(read.body.acceptance).toEqual(documentAcceptance(task));
     expect(read.body.summary).toMatchObject({ total: 2, passed: 0, failed: 2, unexecuted: 0 });
+    const exported = await request(app)
+      .get(`/runs/download/1?type=xlsx&agentTaskId=${task.id}`)
+      .set('Authorization', auth())
+      .buffer(true)
+      .parse((res, callback) => {
+        const chunks = [];
+        res.on('data', (chunk) => chunks.push(chunk));
+        res.on('end', () => callback(null, Buffer.concat(chunks)));
+      });
+    expect(exported.status).toBe(200);
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(exported.body);
+    const sheet = workbook.getWorksheet('文档验收');
+    expect(sheet.getCell('C2').value).toBe(read.body.acceptance.verdict);
+    expect(sheet.getCell('C3').value).toBe(read.body.acceptance.stopReason);
+    const rows = [];
+    sheet.eachRow((row) => rows.push(row.values));
+    expect(JSON.stringify(rows)).toContain(supplement.reason);
+    expect(workbook.getWorksheet('用例结果').getCell('C2').value).toBe('失败');
   });
   it('deduplicates a renamed case and stops when no effective new point remains', async () => {
     const task = await confirmedDocument();

@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import type { AgentTask } from '@/types/agent';
-import { agentStateLabels } from '@/types/agent';
+import { agentStateLabels, agentStopLabels } from '@/types/agent';
 
 export default function AgentReport({ task }: { task: AgentTask }) {
   const [onlyProblems, setOnlyProblems] = useState(false);
@@ -28,6 +28,135 @@ export default function AgentReport({ task }: { task: AgentTask }) {
         失败数量包含 {task.summary.requestErrors}{' '}
         条请求异常。统计来自本次实际执行记录，未执行包含前置失败跳过及尚无执行记录的用例。
       </p>
+      {task.plan.workflow && (
+        <section aria-label="文档验收" className="space-y-3 rounded-medium border border-primary-200 p-4">
+          <h3 className="font-semibold">
+            文档验收 ·{' '}
+            {!task.startedAt
+              ? '尚未执行'
+              : task.acceptance?.verdict === 'passed'
+                ? '已确认规则验证通过'
+                : task.acceptance?.verdict === 'failed'
+                  ? '存在失败项'
+                  : '证据不足，尚不能验收'}
+          </h3>
+          <p className="text-sm">
+            停止原因：
+            {task.plan.workflow.stopReason
+              ? agentStopLabels[task.plan.workflow.stopReason] || task.plan.workflow.stopReason
+              : '尚未停止'}
+          </p>
+          <dl className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
+            <div>
+              <dt className="text-default-500">文档规则覆盖</dt>
+              <dd>
+                {task.acceptance?.coveredRules.length || 0} / {task.acceptance?.ruleCount || 0}{' '}
+                条（实际请求已完成断言，含失败）
+              </dd>
+            </div>
+            <div>
+              <dt className="text-default-500">补测轮次</dt>
+              <dd>
+                {Math.max(0, task.plan.workflow.rounds.length - 1)} / {task.plan.workflow.limits.maxRounds}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-default-500">用例预算</dt>
+              <dd>
+                {task.plan.cases.length} / {task.plan.workflow.limits.maxCases}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-default-500">模型调用预算（含生成）</dt>
+              <dd>
+                {task.events.filter((event) => event.type === 'model').length} /{' '}
+                {task.plan.workflow.limits.maxModelCalls}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-default-500">执行时间上限</dt>
+              <dd>{task.plan.workflow.limits.timeoutMs / 1000} 秒</dd>
+            </div>
+            <div>
+              <dt className="text-default-500">确认范围</dt>
+              <dd className="break-all">
+                {task.plan.workflow.operations
+                  .filter((op) => task.plan.workflow?.allowedOperationIds.includes(op.id))
+                  .map((op) => `${op.method} ${op.path}`)
+                  .join('；') || '尚未确认'}
+              </dd>
+            </div>
+          </dl>
+          {!!task.plan.workflow.pending?.questions.length && (
+            <div role="status" className="rounded-medium bg-warning-50 p-3 text-sm text-warning-800">
+              <p className="font-semibold">待确认问题</p>
+              <ul className="list-disc pl-5">
+                {task.plan.workflow.pending.questions.map((question, i) => (
+                  <li key={i} className="break-words">
+                    {question}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {!!task.acceptance?.uncoveredRules.length && (
+            <details open>
+              <summary className="cursor-pointer text-sm font-medium">尚未验证的规则</summary>
+              <ul className="mt-2 list-disc pl-5 text-sm">
+                {task.acceptance.uncoveredRules.map((rule) => (
+                  <li key={rule.id}>
+                    {rule.id} · {rule.description}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+          {!!task.acceptance?.unexecutedCaseIds.length && (
+            <p className="text-sm text-warning-700">
+              未完成请求的用例：{task.acceptance.unexecutedCaseIds.map((id) => `#${id}`).join('、')}
+            </p>
+          )}
+          <div className="space-y-2">
+            {task.plan.workflow.rounds.map((round) => (
+              <div key={round.index} className="rounded-medium bg-default-100 p-3 text-sm">
+                <p className="font-medium">{round.index === 0 ? '初始用例' : `第 ${round.index} 轮补测`}</p>
+                <p className="whitespace-pre-wrap break-words">{round.reason}</p>
+                <p className="mt-1">用例：{round.caseIds.map((id) => `#${id}`).join('、') || '未生成'}</p>
+                {!!round.duplicateKeys.length && <p>已排除重复候选：{round.duplicateKeys.join('、')}</p>}
+              </div>
+            ))}
+          </div>
+          {!!task.plan.workflow.excludedCases?.length && (
+            <p className="text-xs text-default-500">
+              用户从本次执行范围排除：
+              {task.plan.workflow.excludedCases.map((item) => `#${item.caseId} ${item.title}`).join('；')}
+            </p>
+          )}
+          <details>
+            <summary className="cursor-pointer text-sm font-medium">规则依据与原始文档</summary>
+            <div className="mt-3 space-y-3 text-sm">
+              <p className="break-all">
+                {task.plan.workflow.document.name} · SHA-256：{task.plan.workflow.document.sha256}
+              </p>
+              <p className="whitespace-pre-wrap break-words">
+                补充要求：{task.plan.workflow.document.requirements || '无'}
+              </p>
+              {task.plan.workflow.rules.map((rule) => (
+                <div key={rule.id} className="border-l-2 border-default-300 pl-3">
+                  <p className="font-medium">
+                    {rule.id} · {rule.description}
+                  </p>
+                  <blockquote className="whitespace-pre-wrap break-all text-default-600">{rule.evidence}</blockquote>
+                  <pre className="overflow-x-auto text-xs">{JSON.stringify(rule.assertion)}</pre>
+                </div>
+              ))}
+              <pre className="max-h-72 overflow-auto whitespace-pre-wrap break-all rounded-medium bg-default-100 p-3 text-xs">
+                {task.plan.workflow.document.content}
+              </pre>
+            </div>
+          </details>
+        </section>
+      )}
       <dl className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
         <div>
           <dt className="font-medium">执行来源 / 状态</dt>
