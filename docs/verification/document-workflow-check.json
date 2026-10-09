@@ -1,0 +1,664 @@
+{
+  "verifiedAt": "2026-10-09T13:42:01.327Z",
+  "projectId": 19,
+  "runId": 24,
+  "taskId": 54,
+  "model": "deepseek-flash",
+  "provider": "DeepSeek",
+  "summary": {
+    "total": 8,
+    "passed": 7,
+    "failed": 1,
+    "unexecuted": 0,
+    "requestErrors": 0
+  },
+  "acceptance": {
+    "verdict": "failed",
+    "ruleCount": 11,
+    "coveredRules": [
+      "rule_echo_status",
+      "rule_echo_probe_empty",
+      "rule_echo_probe_alpha",
+      "rule_echo_probe_chinese",
+      "rule_echo_probe_zero",
+      "rule_echo_probe_space",
+      "rule_echo_probe_slash",
+      "rule_echo_probe_percent",
+      "rule_echo_query_contains",
+      "rule_broken_total_status",
+      "rule_broken_total_value"
+    ],
+    "uncoveredRules": [],
+    "failedCaseIds": [149],
+    "unexecutedCaseIds": [],
+    "rounds": [
+      {
+        "at": "2026-10-09T13:41:38.668Z",
+        "index": 0,
+        "reason": "文档共八个必测场景，初始批次上限 6 条。选取：/echo 的空字符串、alpha、中文、a b、% 五个场景（覆盖正常输入与空格、百分号、中文等字符边界），以及 /broken-total 的独立业务规则场景。每个 /echo 用例链接状态、query 对象存在与 probe 原样返回三个规则，executionInfo.assertions 与该三个规则完全一致；/broken-total 用例链接状态与 /total 规则并对应两个断言。保留未覆盖的文档场景（probe 为 \\\"0\\\"、probe 为 \\\"a/b\\\"）在分析初始执行结果后补测，规则已全部登记、无需重提。",
+        "caseIds": [144, 145, 146, 147, 148, 149],
+        "duplicateKeys": []
+      },
+      {
+        "at": "2026-10-09T13:41:50.675Z",
+        "index": 1,
+        "reason": "初始执行证据显示 rule_echo_probe_zero 与 rule_echo_probe_slash 两条已冻结规则仍未被覆盖（uncoveredRules），对应文档第 4、6 个必测场景。补测这两条即可完成文档全部八个必测场景的覆盖；执行证据同时显示 /echo 的编码/解码路径稳定，但 \"0\"（数字形态字符串）与 \"a/b\"（斜杠）仍需独立验证。不新增规则、不修改既有用例。",
+        "caseIds": [150, 151],
+        "duplicateKeys": []
+      }
+    ],
+    "stopReason": "no_new_cases",
+    "pending": null
+  },
+  "rounds": [
+    {
+      "at": "2026-10-09T13:41:38.668Z",
+      "index": 0,
+      "reason": "文档共八个必测场景，初始批次上限 6 条。选取：/echo 的空字符串、alpha、中文、a b、% 五个场景（覆盖正常输入与空格、百分号、中文等字符边界），以及 /broken-total 的独立业务规则场景。每个 /echo 用例链接状态、query 对象存在与 probe 原样返回三个规则，executionInfo.assertions 与该三个规则完全一致；/broken-total 用例链接状态与 /total 规则并对应两个断言。保留未覆盖的文档场景（probe 为 \\\"0\\\"、probe 为 \\\"a/b\\\"）在分析初始执行结果后补测，规则已全部登记、无需重提。",
+      "caseIds": [144, 145, 146, 147, 148, 149],
+      "duplicateKeys": []
+    },
+    {
+      "at": "2026-10-09T13:41:50.675Z",
+      "index": 1,
+      "reason": "初始执行证据显示 rule_echo_probe_zero 与 rule_echo_probe_slash 两条已冻结规则仍未被覆盖（uncoveredRules），对应文档第 4、6 个必测场景。补测这两条即可完成文档全部八个必测场景的覆盖；执行证据同时显示 /echo 的编码/解码路径稳定，但 \"0\"（数字形态字符串）与 \"a/b\"（斜杠）仍需独立验证。不新增规则、不修改既有用例。",
+      "caseIds": [150, 151],
+      "duplicateKeys": []
+    }
+  ],
+  "measurements": [
+    {
+      "phase": "prepare",
+      "calls": 5,
+      "completedCalls": 5,
+      "failedCalls": 0,
+      "durationMs": 18284,
+      "timedCalls": 5,
+      "tokens": {
+        "prompt_tokens": {
+          "value": 22119,
+          "recordedCalls": 5
+        },
+        "completion_tokens": {
+          "value": 5496,
+          "recordedCalls": 5
+        },
+        "total_tokens": {
+          "value": 27615,
+          "recordedCalls": 5
+        }
+      }
+    },
+    {
+      "phase": "execute",
+      "calls": 7,
+      "completedCalls": 7,
+      "failedCalls": 0,
+      "durationMs": 12365,
+      "timedCalls": 7,
+      "tokens": {
+        "prompt_tokens": {
+          "value": 96283,
+          "recordedCalls": 7
+        },
+        "completion_tokens": {
+          "value": 2195,
+          "recordedCalls": 7
+        },
+        "total_tokens": {
+          "value": 98478,
+          "recordedCalls": 7
+        }
+      }
+    }
+  ],
+  "note": "模型为真实官方 DeepSeek；HTTP 为本地可重复演示；不代表真实人员节省时间。",
+  "implementationCommit": "1e25a8319c283d472c025cded212e8cb041a0384",
+  "checks": {
+    "vitest": {
+      "command": "npx vitest run --maxWorkers=2 --minWorkers=1",
+      "files": 67,
+      "tests": 332
+    },
+    "backendBuild": "passed",
+    "frontendBuild": "passed",
+    "documentBrowser": {
+      "tests": 2,
+      "status": "passed"
+    },
+    "existingAgentBrowser": "passed before final document preparation change",
+    "draftBrowser": "passed",
+    "viewports": [320, 768, 1024, 1440],
+    "historyAndDates": "passed",
+    "excelMatchesApi": "passed"
+  },
+  "openapi": {
+    "taskId": 53,
+    "runId": 23,
+    "state": "awaiting_confirmation",
+    "format": "openapi",
+    "operations": 2,
+    "cases": 6,
+    "requests": 0,
+    "measurements": [
+      {
+        "phase": "prepare",
+        "calls": 4,
+        "completedCalls": 4,
+        "failedCalls": 0,
+        "durationMs": 11138,
+        "timedCalls": 4,
+        "tokens": {
+          "prompt_tokens": {
+            "value": 11816,
+            "recordedCalls": 4
+          },
+          "completion_tokens": {
+            "value": 2915,
+            "recordedCalls": 4
+          },
+          "total_tokens": {
+            "value": 14731,
+            "recordedCalls": 4
+          }
+        }
+      },
+      {
+        "phase": "execute",
+        "calls": 0,
+        "completedCalls": 0,
+        "failedCalls": 0,
+        "durationMs": null,
+        "timedCalls": 0,
+        "tokens": {
+          "prompt_tokens": {
+            "value": null,
+            "recordedCalls": 0
+          },
+          "completion_tokens": {
+            "value": null,
+            "recordedCalls": 0
+          },
+          "total_tokens": {
+            "value": null,
+            "recordedCalls": 0
+          }
+        }
+      }
+    ]
+  },
+  "source": {
+    "name": "interface-testing.md",
+    "sha256": "f66929045bd44522af5a2cd3da815de6df8d26aa747ec0348d865dbd7b826894"
+  },
+  "caseEvidence": [
+    {
+      "caseId": 144,
+      "title": "GET /echo probe 为空字符串返回 200 且原样返回空字符串",
+      "round": 0,
+      "ruleIds": ["rule_echo_status", "rule_echo_query_contains", "rule_echo_probe_empty"],
+      "evidenceCaseIds": [],
+      "status": "passed",
+      "request": {
+        "url": "http://127.0.0.1:4010/echo?probe=",
+        "body": null,
+        "method": "GET",
+        "headers": {}
+      },
+      "response": {
+        "body": {
+          "body": null,
+          "query": {
+            "probe": ""
+          },
+          "method": "GET"
+        },
+        "bytes": 49,
+        "status": 200,
+        "headers": {
+          "date": "Fri, 09 Oct 2026 13:41:45 GMT",
+          "connection": "keep-alive",
+          "keep-alive": "timeout=5",
+          "content-type": "application/json",
+          "content-length": "49"
+        },
+        "truncated": false
+      },
+      "assertions": [
+        {
+          "type": "status",
+          "actual": 200,
+          "exists": true,
+          "passed": true,
+          "expected": 200
+        },
+        {
+          "path": "/query",
+          "type": "jsonExists",
+          "actual": {
+            "probe": ""
+          },
+          "exists": true,
+          "passed": true
+        },
+        {
+          "path": "/query/probe",
+          "type": "jsonEquals",
+          "actual": "",
+          "exists": true,
+          "passed": true,
+          "expected": ""
+        }
+      ]
+    },
+    {
+      "caseId": 145,
+      "title": "GET /echo probe 为 alpha 时返回 200 且原样返回",
+      "round": 0,
+      "ruleIds": ["rule_echo_status", "rule_echo_query_contains", "rule_echo_probe_alpha"],
+      "evidenceCaseIds": [],
+      "status": "passed",
+      "request": {
+        "url": "http://127.0.0.1:4010/echo?probe=alpha",
+        "body": null,
+        "method": "GET",
+        "headers": {}
+      },
+      "response": {
+        "body": {
+          "body": null,
+          "query": {
+            "probe": "alpha"
+          },
+          "method": "GET"
+        },
+        "bytes": 54,
+        "status": 200,
+        "headers": {
+          "date": "Fri, 09 Oct 2026 13:41:45 GMT",
+          "connection": "keep-alive",
+          "keep-alive": "timeout=5",
+          "content-type": "application/json",
+          "content-length": "54"
+        },
+        "truncated": false
+      },
+      "assertions": [
+        {
+          "type": "status",
+          "actual": 200,
+          "exists": true,
+          "passed": true,
+          "expected": 200
+        },
+        {
+          "path": "/query",
+          "type": "jsonExists",
+          "actual": {
+            "probe": "alpha"
+          },
+          "exists": true,
+          "passed": true
+        },
+        {
+          "path": "/query/probe",
+          "type": "jsonEquals",
+          "actual": "alpha",
+          "exists": true,
+          "passed": true,
+          "expected": "alpha"
+        }
+      ]
+    },
+    {
+      "caseId": 146,
+      "title": "GET /echo probe 为中文时返回 200 且原样返回",
+      "round": 0,
+      "ruleIds": ["rule_echo_status", "rule_echo_query_contains", "rule_echo_probe_chinese"],
+      "evidenceCaseIds": [],
+      "status": "passed",
+      "request": {
+        "url": "http://127.0.0.1:4010/echo?probe=%E4%B8%AD%E6%96%87",
+        "body": null,
+        "method": "GET",
+        "headers": {}
+      },
+      "response": {
+        "body": {
+          "body": null,
+          "query": {
+            "probe": "中文"
+          },
+          "method": "GET"
+        },
+        "bytes": 55,
+        "status": 200,
+        "headers": {
+          "date": "Fri, 09 Oct 2026 13:41:45 GMT",
+          "connection": "keep-alive",
+          "keep-alive": "timeout=5",
+          "content-type": "application/json",
+          "content-length": "55"
+        },
+        "truncated": false
+      },
+      "assertions": [
+        {
+          "type": "status",
+          "actual": 200,
+          "exists": true,
+          "passed": true,
+          "expected": 200
+        },
+        {
+          "path": "/query",
+          "type": "jsonExists",
+          "actual": {
+            "probe": "中文"
+          },
+          "exists": true,
+          "passed": true
+        },
+        {
+          "path": "/query/probe",
+          "type": "jsonEquals",
+          "actual": "中文",
+          "exists": true,
+          "passed": true,
+          "expected": "中文"
+        }
+      ]
+    },
+    {
+      "caseId": 147,
+      "title": "GET /echo probe 为 \"a b\" 时返回 200 且保留内部空格",
+      "round": 0,
+      "ruleIds": ["rule_echo_status", "rule_echo_query_contains", "rule_echo_probe_space"],
+      "evidenceCaseIds": [],
+      "status": "passed",
+      "request": {
+        "url": "http://127.0.0.1:4010/echo?probe=a+b",
+        "body": null,
+        "method": "GET",
+        "headers": {}
+      },
+      "response": {
+        "body": {
+          "body": null,
+          "query": {
+            "probe": "a b"
+          },
+          "method": "GET"
+        },
+        "bytes": 52,
+        "status": 200,
+        "headers": {
+          "date": "Fri, 09 Oct 2026 13:41:45 GMT",
+          "connection": "keep-alive",
+          "keep-alive": "timeout=5",
+          "content-type": "application/json",
+          "content-length": "52"
+        },
+        "truncated": false
+      },
+      "assertions": [
+        {
+          "type": "status",
+          "actual": 200,
+          "exists": true,
+          "passed": true,
+          "expected": 200
+        },
+        {
+          "path": "/query",
+          "type": "jsonExists",
+          "actual": {
+            "probe": "a b"
+          },
+          "exists": true,
+          "passed": true
+        },
+        {
+          "path": "/query/probe",
+          "type": "jsonEquals",
+          "actual": "a b",
+          "exists": true,
+          "passed": true,
+          "expected": "a b"
+        }
+      ]
+    },
+    {
+      "caseId": 148,
+      "title": "GET /echo probe 为 \"%\" 时返回 200 且原样返回百分号",
+      "round": 0,
+      "ruleIds": ["rule_echo_status", "rule_echo_query_contains", "rule_echo_probe_percent"],
+      "evidenceCaseIds": [],
+      "status": "passed",
+      "request": {
+        "url": "http://127.0.0.1:4010/echo?probe=%25",
+        "body": null,
+        "method": "GET",
+        "headers": {}
+      },
+      "response": {
+        "body": {
+          "body": null,
+          "query": {
+            "probe": "%"
+          },
+          "method": "GET"
+        },
+        "bytes": 50,
+        "status": 200,
+        "headers": {
+          "date": "Fri, 09 Oct 2026 13:41:45 GMT",
+          "connection": "keep-alive",
+          "keep-alive": "timeout=5",
+          "content-type": "application/json",
+          "content-length": "50"
+        },
+        "truncated": false
+      },
+      "assertions": [
+        {
+          "type": "status",
+          "actual": 200,
+          "exists": true,
+          "passed": true,
+          "expected": 200
+        },
+        {
+          "path": "/query",
+          "type": "jsonExists",
+          "actual": {
+            "probe": "%"
+          },
+          "exists": true,
+          "passed": true
+        },
+        {
+          "path": "/query/probe",
+          "type": "jsonEquals",
+          "actual": "%",
+          "exists": true,
+          "passed": true,
+          "expected": "%"
+        }
+      ]
+    },
+    {
+      "caseId": 149,
+      "title": "GET /broken-total 返回 200 且 /total 等于数字 100",
+      "round": 0,
+      "ruleIds": ["rule_broken_total_status", "rule_broken_total_value"],
+      "evidenceCaseIds": [],
+      "status": "failed",
+      "request": {
+        "url": "http://127.0.0.1:4010/broken-total",
+        "body": null,
+        "method": "GET",
+        "headers": {}
+      },
+      "response": {
+        "body": {
+          "total": 90
+        },
+        "bytes": 12,
+        "status": 200,
+        "headers": {
+          "date": "Fri, 09 Oct 2026 13:41:45 GMT",
+          "connection": "keep-alive",
+          "keep-alive": "timeout=5",
+          "content-type": "application/json",
+          "content-length": "12"
+        },
+        "truncated": false
+      },
+      "assertions": [
+        {
+          "type": "status",
+          "actual": 200,
+          "exists": true,
+          "passed": true,
+          "expected": 200
+        },
+        {
+          "path": "/total",
+          "type": "jsonEquals",
+          "actual": 90,
+          "exists": true,
+          "passed": false,
+          "expected": 100
+        }
+      ]
+    },
+    {
+      "caseId": 150,
+      "title": "GET /echo probe 为 \"0\" 时返回 200 且原样返回字符串 0",
+      "round": 1,
+      "ruleIds": ["rule_echo_status", "rule_echo_query_contains", "rule_echo_probe_zero"],
+      "evidenceCaseIds": [],
+      "status": "passed",
+      "request": {
+        "url": "http://127.0.0.1:4010/echo?probe=0",
+        "body": null,
+        "method": "GET",
+        "headers": {}
+      },
+      "response": {
+        "body": {
+          "body": null,
+          "query": {
+            "probe": "0"
+          },
+          "method": "GET"
+        },
+        "bytes": 50,
+        "status": 200,
+        "headers": {
+          "date": "Fri, 09 Oct 2026 13:41:51 GMT",
+          "connection": "keep-alive",
+          "keep-alive": "timeout=5",
+          "content-type": "application/json",
+          "content-length": "50"
+        },
+        "truncated": false
+      },
+      "assertions": [
+        {
+          "type": "status",
+          "actual": 200,
+          "exists": true,
+          "passed": true,
+          "expected": 200
+        },
+        {
+          "path": "/query",
+          "type": "jsonExists",
+          "actual": {
+            "probe": "0"
+          },
+          "exists": true,
+          "passed": true
+        },
+        {
+          "path": "/query/probe",
+          "type": "jsonEquals",
+          "actual": "0",
+          "exists": true,
+          "passed": true,
+          "expected": "0"
+        }
+      ]
+    },
+    {
+      "caseId": 151,
+      "title": "GET /echo probe 为 \"a/b\" 时返回 200 且原样返回斜杠",
+      "round": 1,
+      "ruleIds": ["rule_echo_status", "rule_echo_query_contains", "rule_echo_probe_slash"],
+      "evidenceCaseIds": [],
+      "status": "passed",
+      "request": {
+        "url": "http://127.0.0.1:4010/echo?probe=a%2Fb",
+        "body": null,
+        "method": "GET",
+        "headers": {}
+      },
+      "response": {
+        "body": {
+          "body": null,
+          "query": {
+            "probe": "a/b"
+          },
+          "method": "GET"
+        },
+        "bytes": 52,
+        "status": 200,
+        "headers": {
+          "date": "Fri, 09 Oct 2026 13:41:51 GMT",
+          "connection": "keep-alive",
+          "keep-alive": "timeout=5",
+          "content-type": "application/json",
+          "content-length": "52"
+        },
+        "truncated": false
+      },
+      "assertions": [
+        {
+          "type": "status",
+          "actual": 200,
+          "exists": true,
+          "passed": true,
+          "expected": 200
+        },
+        {
+          "path": "/query",
+          "type": "jsonExists",
+          "actual": {
+            "probe": "a/b"
+          },
+          "exists": true,
+          "passed": true
+        },
+        {
+          "path": "/query/probe",
+          "type": "jsonEquals",
+          "actual": "a/b",
+          "exists": true,
+          "passed": true,
+          "expected": "a/b"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "文档语义与模型提取规则仍需人工审核。",
+    "固定模型响应测试用于验证程序控制逻辑，真实模型与真实 HTTP 验收单独记录。",
+    "这是演示服务验收，不代表真实人员效率。"
+  ],
+  "regressionNotes": [
+    "同时运行高并发全量测试与前端构建时有两项超时；使用两个测试 worker 后通过，未放宽功能断言。",
+    "真实联调暴露的未关联断言、准备阶段漏规则、时间序列化与历史状态更新已修复并重新验证。"
+  ]
+}

@@ -1,5 +1,7 @@
 # 本地接口测试演示
 
+文档驱动流程可直接上传 [interface-testing.md](interface-testing.md) 或 [interface-testing.yaml](interface-testing.yaml)，使用独立空运行；步骤与预期见[文档工作流](../docs/document-workflow.md)。下方为原有“选择八条现成用例”流程。
+
 先按根目录 README 启动 PostgreSQL 并执行迁移，然后在仓库根目录运行：
 
 ```sh
