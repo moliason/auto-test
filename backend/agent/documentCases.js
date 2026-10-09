@@ -27,12 +27,14 @@ export async function saveDocumentCases(sequelize, taskId, proposal) {
     )
       throw new Error('待确认问题格式无效');
     if (initial) {
-      if (!Array.isArray(proposal.operations) || !Array.isArray(proposal.rules))
+      const operations = workflow.rulesPrepared ? workflow.operations : proposal.operations;
+      const rules = workflow.rulesPrepared ? workflow.rules : proposal.rules;
+      if (!Array.isArray(operations) || !Array.isArray(rules))
         throw new Error('初始计划必须包含 operations 和 rules 数组');
-      workflow.operations = proposal.operations;
-      workflow.rules = proposal.rules;
-      workflow.allowedOperationIds = Array.isArray(proposal.operations) ? proposal.operations.map((op) => op?.id) : [];
-      workflow.questions = proposal.questions;
+      workflow.operations = operations;
+      workflow.rules = rules;
+      workflow.allowedOperationIds = operations.map((op) => op?.id);
+      workflow.questions = [...new Set([...(workflow.questions || []), ...proposal.questions])];
     } else {
       if (proposal.operations !== undefined || proposal.rules !== undefined)
         throw new Error('已确认的接口与规则不能由模型修改');

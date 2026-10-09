@@ -8,6 +8,35 @@ export const readCasesTool = {
   },
 };
 
+export const documentRulesTool = {
+  type: 'function',
+  function: {
+    name: 'submit_document_rules',
+    description:
+      'Preparation step ONE: extract ALL documented operations and assertion rules, including rules for scenarios that will only be tested in later rounds. No cases here, and no six-case limit on rules. Each assertion needs a separate rule with an exact source quote. No HTTP requests.',
+    parameters: {
+      type: 'object',
+      properties: {
+        operations: {
+          type: 'array',
+          items: { type: 'object' },
+          description: 'Each item: id, method, path, evidence (exact quote containing method and path for Markdown).',
+        },
+        rules: {
+          type: 'array',
+          items: { type: 'object' },
+          description:
+            'Each item: id, operationId, description including input applicability, evidence (exact source substring), assertion (ONE status/jsonEquals/jsonExists). Include EVERY explicit scenario, even if not selected in the initial batch. Expected values must appear in evidence.',
+        },
+        questions: { type: 'array', items: { type: 'string' } },
+        reason: { type: 'string' },
+      },
+      required: ['operations', 'rules', 'questions', 'reason'],
+      additionalProperties: false,
+    },
+  },
+};
+
 export const documentCasesTool = {
   type: 'function',
   function: {
@@ -17,18 +46,6 @@ export const documentCasesTool = {
     parameters: {
       type: 'object',
       properties: {
-        operations: {
-          type: 'array',
-          description:
-            'Initial preparation only. Each item: id, method, path, evidence (exact source quote including method/path for Markdown).',
-          items: { type: 'object' },
-        },
-        rules: {
-          type: 'array',
-          description:
-            'Initial preparation only. Each item: id, operationId, description (include applicability/input conditions), evidence (exact source quote), assertion (one status/jsonEquals/jsonExists assertion). Every expected value MUST appear in evidence. No invented rules.',
-          items: { type: 'object' },
-        },
         reason: {
           type: 'string',
           description:

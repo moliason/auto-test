@@ -53,7 +53,20 @@ const proposal = {
 };
 const tool = (name, args = {}) => ({
   message: {
-    tool_calls: [{ id: `call_${name}`, type: 'function', function: { name, arguments: JSON.stringify(args) } }],
+    tool_calls: [
+      {
+        id: `call_${name}`,
+        type: 'function',
+        function: {
+          name,
+          arguments: JSON.stringify(
+            name === 'submit_document_cases'
+              ? Object.fromEntries(Object.entries(args).filter(([key]) => !['operations', 'rules'].includes(key)))
+              : args
+          ),
+        },
+      },
+    ],
   },
   finish_reason: 'tool_calls',
 });
@@ -442,6 +455,14 @@ describe('document generation and confirmation', () => {
     const completion = vi
       .fn()
       .mockResolvedValueOnce(tool('read_cases'))
+      .mockResolvedValueOnce(
+        tool('submit_document_rules', {
+          operations: proposal.operations,
+          rules: proposal.rules,
+          questions: [],
+          reason: '先提取完整规则',
+        })
+      )
       .mockResolvedValueOnce(tool('submit_document_cases', invalid))
       .mockImplementationOnce(async (messages) => {
         expect(JSON.parse(messages.at(-1).content).error).toContain('请修正生成结构');
@@ -451,7 +472,7 @@ describe('document generation and confirmation', () => {
     await runAgent(db, created.body.id, 'prepare', { completion });
     const task = await db.models.AgentTask.findByPk(created.body.id);
     expect(task.state).toBe('awaiting_confirmation');
-    expect(task.events.filter((event) => event.type === 'model')).toHaveLength(3);
+    expect(task.events.filter((event) => event.type === 'model')).toHaveLength(4);
     expect(await db.models.Case.count()).toBe(1);
   });
   it('requires the actual run project developer, validates imports and makes no requests', async () => {
@@ -481,6 +502,14 @@ describe('document generation and confirmation', () => {
     const completion = vi
       .fn()
       .mockResolvedValueOnce(tool('read_cases'))
+      .mockResolvedValueOnce(
+        tool('submit_document_rules', {
+          operations: proposal.operations,
+          rules: proposal.rules,
+          questions: [],
+          reason: '先提取完整规则',
+        })
+      )
       .mockResolvedValueOnce(tool('submit_document_cases', proposal));
     await runAgent(db, created.body.id, 'prepare', { completion });
     const task = await db.models.AgentTask.findByPk(created.body.id);
