@@ -2,7 +2,7 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: './e2e',
-  testMatch: ['agent.spec.ts', 'ai-drafts.spec.ts'],
+  testMatch: ['agent.spec.ts', 'ai-drafts.spec.ts', 'document-agent.spec.ts'],
   timeout: 600000,
   expect: { timeout: 15000 },
   workers: 1,

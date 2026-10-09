@@ -88,10 +88,11 @@ describe('interface document import', () => {
   });
   it('bounds repeated reference expansion before allocating an oversized document', () => {
     const root = { a: { value: 'leaf' } };
-    for (let i = 0; i < 16; i++) root[`n${i}`] = {
-      left: { $ref: i ? `#/n${i - 1}` : '#/a' },
-      right: { $ref: i ? `#/n${i - 1}` : '#/a' },
-    };
+    for (let i = 0; i < 16; i++)
+      root[`n${i}`] = {
+        left: { $ref: i ? `#/n${i - 1}` : '#/a' },
+        right: { $ref: i ? `#/n${i - 1}` : '#/a' },
+      };
     expect(() => resolveApiReferences({ $ref: '#/n15' }, root)).toThrow(/上限|嵌套/);
     expect(() => resolveApiReferences({ $ref: '#/value' }, { value: 1 })).toThrow('对象');
   });

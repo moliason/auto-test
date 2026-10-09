@@ -1,0 +1,45 @@
+openapi: 3.0.3
+info:
+  title: 本地接口测试演示
+  version: '1.0'
+paths:
+  /echo:
+    get:
+      summary: 查询参数回显
+      description: 所有请求返回 200。传入 probe 时，响应 query.probe 原样返回输入字符串。
+      parameters:
+        - name: probe
+          in: query
+          required: false
+          schema:
+            type: string
+          example: alpha
+      responses:
+        '200':
+          description: 回显成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [query]
+                properties:
+                  query:
+                    type: object
+                    properties:
+                      probe:
+                        type: string
+  /broken-total:
+    get:
+      description: 返回 200，响应 JSON 的 total 必须等于数字 100。
+      responses:
+        '200':
+          description: 汇总结果
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [total]
+                properties:
+                  total:
+                    type: integer
+                    enum: [100]
