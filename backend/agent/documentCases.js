@@ -27,6 +27,8 @@ export async function saveDocumentCases(sequelize, taskId, proposal) {
     )
       throw new Error('待确认问题格式无效');
     if (initial) {
+      if (!Array.isArray(proposal.operations) || !Array.isArray(proposal.rules))
+        throw new Error('初始计划必须包含 operations 和 rules 数组');
       workflow.operations = proposal.operations;
       workflow.rules = proposal.rules;
       workflow.allowedOperationIds = Array.isArray(proposal.operations) ? proposal.operations.map((op) => op?.id) : [];
@@ -75,6 +77,7 @@ export async function saveDocumentCases(sequelize, taskId, proposal) {
         fingerprints.add(fingerprint);
       }
     }
+    if (initial && accepted.length > 6) throw new Error('首轮最多生成 6 条用例，其他有效场景在读取执行结果后补测');
     if (!initial && !accepted.length) return { stopReason: 'no_new_cases', duplicateKeys };
     if (!initial && round > workflow.limits.maxRounds) return { stopReason: 'max_rounds', duplicateKeys };
     if (task.plan.cases.length + accepted.length > workflow.limits.maxCases) {
@@ -160,7 +163,22 @@ export async function saveDocumentCases(sequelize, taskId, proposal) {
         : { cases: [], order: [], issues: ['文档信息不足，尚未生成可执行用例'] }),
       workflow,
     };
-    plan.issues.push(...documentPlanIssues(plan));
+    const contractIssues = documentPlanIssues(plan);
+    if (initial) {
+      const invalid = contractIssues.filter(
+        (issue) =>
+          !issue.startsWith('文档待确认：') &&
+          !(
+            snapshots.length === 0 &&
+            ['尚未提取可执行的接口规则，请补全文档后重新生成', '请选择文档内允许执行的接口操作'].includes(issue)
+          )
+      );
+      if (invalid.length)
+        throw new Error(
+          `请修正生成结构后重新提交：${invalid.join('；')}。每条断言（包括 status）都要有单独的 rule 及对应 ruleId；不要给用例添加未关联的断言。`
+        );
+    }
+    plan.issues.push(...contractIssues);
     if (!initial && plan.issues.length) throw Object.assign(new Error(plan.issues.join('；')), { needsInput: true });
     workflow.rounds.push({
       index: round,

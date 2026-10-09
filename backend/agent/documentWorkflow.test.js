@@ -96,6 +96,34 @@ async function confirmedDocument({ path = '/plain', expected = 200, limits = {} 
 }
 
 describe('feedback loop against real HTTP', () => {
+  it('counts preparation calls against the same model budget', async () => {
+    const task = await confirmedDocument({ limits: { maxModelCalls: 2 } });
+    await task.update({
+      events: [...task.events, { type: 'model', phase: 'prepare' }, { type: 'model', phase: 'prepare' }],
+    });
+    const completion = vi.fn();
+    await runAgent(db, task.id, 'execute', { completion });
+    await task.reload();
+    expect(completion).not.toHaveBeenCalled();
+    expect(task.plan.workflow.stopReason).toBe('max_model_calls');
+    expect(task.results[0].request).toBeNull();
+  });
+  it('uses a confirmed ten-minute execution budget without an implicit five-minute cutoff', async () => {
+    const task = await confirmedDocument({ limits: { timeoutMs: 600000, maxRounds: 0 } });
+    const timer = vi.spyOn(AbortSignal, 'timeout');
+    try {
+      const completion = vi
+        .fn()
+        .mockResolvedValueOnce(tool('read_cases'))
+        .mockResolvedValueOnce(tool('execute_case', { caseId: task.plan.cases[0].caseId }))
+        .mockResolvedValueOnce(tool('get_results'));
+      await runAgent(db, task.id, 'execute', { completion });
+      expect(timer.mock.calls[0][0]).toBeGreaterThan(300000);
+      expect(timer.mock.calls[0][0]).toBeLessThanOrEqual(600000);
+    } finally {
+      timer.mockRestore();
+    }
+  });
   it('lets a human narrow and restore the operation scope before freezing it', async () => {
     const created = await request(app)
       .post('/agent/runs/1/tasks/document')
@@ -374,6 +402,25 @@ afterEach(async () => {
 });
 
 describe('document generation and confirmation', () => {
+  it('returns model structure errors for repair before publishing managed cases', async () => {
+    const created = await request(app).post('/agent/runs/1/tasks/document').set('Authorization', auth()).send(input);
+    const invalid = structuredClone(proposal);
+    invalid.cases[0].executionInfo.assertions.push({ type: 'jsonExists', path: '/invented' });
+    const completion = vi
+      .fn()
+      .mockResolvedValueOnce(tool('read_cases'))
+      .mockResolvedValueOnce(tool('submit_document_cases', invalid))
+      .mockImplementationOnce(async (messages) => {
+        expect(JSON.parse(messages.at(-1).content).error).toContain('请修正生成结构');
+        expect(await db.models.Case.count()).toBe(0);
+        return tool('submit_document_cases', proposal);
+      });
+    await runAgent(db, created.body.id, 'prepare', { completion });
+    const task = await db.models.AgentTask.findByPk(created.body.id);
+    expect(task.state).toBe('awaiting_confirmation');
+    expect(task.events.filter((event) => event.type === 'model')).toHaveLength(3);
+    expect(await db.models.Case.count()).toBe(1);
+  });
   it('requires the actual run project developer, validates imports and makes no requests', async () => {
     expect(
       (await request(app).post('/agent/runs/1/tasks/document?projectId=2').set('Authorization', auth(2)).send(input))
@@ -440,10 +487,14 @@ describe('document generation and confirmation', () => {
     changed.rules[0].assertion.expected = 201;
     changed.cases[0].executionInfo.assertions[0].expected = 201;
     changed.questions = ['请确认异常返回状态码'];
+    await expect(saveDocumentCases(db, created.body.id, changed)).rejects.toThrow('预期值未出现在原文');
+    expect(await db.models.Case.count()).toBe(0);
+    changed.rules[0].assertion.expected = 200;
+    changed.cases[0].executionInfo.assertions[0].expected = 200;
     await saveDocumentCases(db, created.body.id, changed);
     const task = await db.models.AgentTask.findByPk(created.body.id);
     expect(task.state).toBe('needs_input');
-    expect(task.plan.issues.join('；')).toContain('预期值未出现在原文');
+    expect(task.plan.issues.join('；')).toContain('请确认异常返回状态码');
     expect(task.results).toEqual([]);
   });
   it('remaps stable dependencies and rolls back incomplete supplemental batches', async () => {
