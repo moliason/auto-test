@@ -142,6 +142,7 @@ export function documentPlanIssues(plan) {
       issues.push(`#${item.caseId} 请求方法或路径超出文档接口范围`);
     try {
       const decoded = decodeURIComponent(spec.path);
+      if (!new RegExp(`^${pathPattern}$`).test(decoded)) issues.push(`#${item.caseId} 路径解码后超出文档接口范围`);
       if (
         /[\\?#%]/.test(decoded) ||
         decoded.split('/').some((part) => part === '.' || part === '..') ||

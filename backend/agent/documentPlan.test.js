@@ -35,6 +35,7 @@ describe('document execution contract', () => {
       { method: 'DELETE' },
       { path: '/admin/1' },
       { path: '/items/%2e%2e' },
+      { path: '/items/a%2Fb' },
       { path: '/items/%252e%252e' },
       { assertions: [{ type: 'status', expected: 201 }] },
       { headers: { Authorization: 'Bearer literal' } },

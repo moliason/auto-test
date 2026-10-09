@@ -96,6 +96,39 @@ async function confirmedDocument({ path = '/plain', expected = 200, limits = {} 
 }
 
 describe('feedback loop against real HTTP', () => {
+  it.each(['..', 'x/y'])('checks resolved path variables against the confirmed route: %s', async (value) => {
+    await db.models.Run.update({ agentEnvironment: { baseUrl, variables: { ID: value } } }, { where: { id: 1 } });
+    const created = await request(app)
+      .post('/agent/runs/1/tasks/document')
+      .set('Authorization', auth())
+      .send({ document: { name: 'path.md', content: 'GET /items/{id}\n正常查询返回 200。' } });
+    const draft = structuredClone(proposal);
+    Object.assign(draft.operations[0], { path: '/items/{id}', evidence: 'GET /items/{id}' });
+    draft.cases[0].executionInfo.path = '/items/{{ID}}';
+    await saveDocumentCases(db, created.body.id, draft);
+    const task = await db.models.AgentTask.findByPk(created.body.id);
+    const confirmed = await request(app)
+      .post(`/agent/runs/1/tasks/${task.id}/confirm`)
+      .set('Authorization', auth())
+      .send({ version: task.version, confirmed: true, preconditionsConfirmed: true });
+    expect(confirmed.status).toBe(202);
+    const observed = vi.fn();
+    server.on('request', observed);
+    try {
+      const completion = vi
+        .fn()
+        .mockResolvedValueOnce(tool('read_cases'))
+        .mockResolvedValueOnce(tool('execute_case', { caseId: task.plan.cases[0].caseId }));
+      await runAgent(db, task.id, 'execute', { completion });
+      await task.reload();
+      expect(task.state).toBe('needs_input');
+      expect(task.plan.workflow.stopReason).toBe('needs_confirmation');
+      expect(observed).not.toHaveBeenCalled();
+      expect(task.results).toEqual([]);
+    } finally {
+      server.off('request', observed);
+    }
+  });
   it('counts preparation calls against the same model budget', async () => {
     const task = await confirmedDocument({ limits: { maxModelCalls: 2 } });
     await task.update({
