@@ -5,8 +5,9 @@ import defineRun from '../models/runs.js';
 import { chatCompletion } from './deepseek.js';
 import { executeHttpCase, redact } from './execution.js';
 import { buildPlan, environmentVariables, reportSummary } from './plan.js';
-import { executionTools, prepareTools } from './tools.js';
+import { executionTools, prepareTools, documentCasesTool, readCasesTool } from './tools.js';
 import { protectConfiguration } from './credentials.js';
+import { saveDocumentCases } from './documentCases.js';
 
 export async function persistEvidence(sequelize, taskId, item, evidence, secrets = []) {
   const Task = defineAgentTask(sequelize, DataTypes);
@@ -75,7 +76,9 @@ export async function runAgent(
   const task = await Task.findByPk(taskId);
   if (!task || task.state !== (mode === 'prepare' ? 'preparing' : 'running')) return;
   const signal = AbortSignal.timeout(timeoutMs);
-  const tools = mode === 'prepare' ? prepareTools : executionTools;
+  const documentMode = !!task.plan.workflow;
+  const tools =
+    mode === 'prepare' ? (documentMode ? [readCasesTool, documentCasesTool] : prepareTools) : executionTools;
   const allowedNames = new Set(tools.map((tool) => tool.function.name));
   const run = await defineRun(sequelize, DataTypes).findByPk(task.runId);
   const {
@@ -106,6 +109,8 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
           : '用户已确认保存的计划和前置条件。请执行并整理报告。',
     },
   ];
+  if (documentMode)
+    messages[0].content += `\nThis is document-driven testing. In preparation, call read_cases then submit_document_cases (NOT submit_plan). Extract ALL documented operations and rules, but generate at most 6 initial cases within limits, covering normal/abnormal/boundary where documented. Use exact source quotes. For OpenAPI the normalized sourceText is the citation source. Include rule applicability in description. Every execution assertion must exactly match a referenced rule assertion; do not guess expected responses for undocumented situations. Use dependsOnKeys (stable keys), not numeric dependsOn in generated executionInfo. Use environment variable names and {{NAME}} placeholders for credentials. Unknown business expectations go into questions; never fill them from intuition. If documentation supplies no rules, return empty cases and ask for missing information. Always provide reason/questions. Initial evidenceCaseIds is [].`;
   try {
     if (mode === 'execute' && secretIssues.length) throw new Error(secretIssues.join('；'));
     for (let callIndex = 0; callIndex < maxCalls && !finished; callIndex++) {
@@ -168,13 +173,15 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
           if (!args || typeof args !== 'object' || Array.isArray(args) || !allowedNames.has(call.function.name))
             throw new Error('不允许的工具或参数');
           const fields =
-            call.function.name === 'execute_case'
-              ? ['caseId']
-              : call.function.name === 'submit_plan'
-                ? ['cases', 'notes']
-                : call.function.name === 'submit_report'
-                  ? ['analysis']
-                  : [];
+            call.function.name === 'submit_document_cases'
+              ? ['cases', 'reason', 'questions', 'operations', 'rules']
+              : call.function.name === 'execute_case'
+                ? ['caseId']
+                : call.function.name === 'submit_plan'
+                  ? ['cases', 'notes']
+                  : call.function.name === 'submit_report'
+                    ? ['analysis']
+                    : [];
           if (Object.keys(args).some((key) => !fields.includes(key))) throw new Error('工具包含不允许的参数');
           if (finished) throw new Error('任务已经结束');
           await task.update({
@@ -194,9 +201,14 @@ First call read_cases. ${mode === 'prepare' ? 'Then submit_plan with every selec
               cases: redact(task.plan.cases, secrets),
               environment: { baseUrl: task.plan.environment.baseUrl, variableNames: Object.keys(initialVariables) },
               issues: task.plan.issues,
+              ...(documentMode ? { workflow: task.plan.workflow } : {}),
             };
           } else if (!read) {
             throw new Error('请先调用 read_cases');
+          } else if (call.function.name === 'submit_document_cases') {
+            output = await saveDocumentCases(sequelize, task.id, protectConfiguration(args));
+            await task.reload();
+            finished = true;
           } else if (call.function.name === 'submit_plan') {
             // Existing explicit configuration wins over suggestions. Without documentation, no missing fields can be invented.
             if (!Array.isArray(args.cases)) throw new Error('cases 必须为数组');

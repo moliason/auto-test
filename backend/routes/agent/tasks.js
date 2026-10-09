@@ -13,6 +13,8 @@ import { buildPlan, reportSummary } from '../../agent/plan.js';
 import { runAgent } from '../../agent/runner.js';
 import { modelMeasurements, executionMeasurements } from '../../agent/measurements.js';
 import { configurationIssues, protectConfiguration } from '../../agent/credentials.js';
+import { parseInterfaceDocument } from '../../agent/documents.js';
+import { documentBudget, documentPlanIssues, documentAcceptance } from '../../agent/documentPlan.js';
 
 export default function (sequelize, { launch = runAgent } = {}) {
   const router = express.Router();
@@ -26,7 +28,7 @@ export default function (sequelize, { launch = runAgent } = {}) {
   Case.belongsTo(Folder, { foreignKey: 'folderId' });
   Case.belongsToMany(Step, { through: CaseStep, foreignKey: 'caseId', otherKey: 'stepId' });
   const { verifySignedIn } = authMiddleware(sequelize);
-  const { verifyProjectReporterFromRunId } = editableMiddleware(sequelize);
+  const { verifyProjectReporterFromRunId, verifyProjectDeveloperFromProjectId } = editableMiddleware(sequelize);
   router.use('/runs/:runId/tasks', verifySignedIn, (req, res, next) => {
     if (!/^[1-9]\d*$/.test(req.params.runId)) return res.status(400).json({ error: '测试运行编号无效' });
     return verifyProjectReporterFromRunId(req, res, next).catch(next);
@@ -34,6 +36,78 @@ export default function (sequelize, { launch = runAgent } = {}) {
   router.param('taskId', (req, res, next, value) =>
     /^[1-9]\d*$/.test(value) ? next() : res.status(400).json({ error: '任务编号无效' })
   );
+
+  router.use(
+    ['/runs/:runId/tasks/document', '/runs/:runId/tasks/:taskId/plan', '/runs/:runId/tasks/:taskId/confirm'],
+    async (req, res, next) => {
+      if (!['POST', 'PUT'].includes(req.method)) return next();
+      try {
+        const task = req.params.taskId
+          ? await Task.findOne({ where: { id: req.params.taskId, runId: req.params.runId } })
+          : null;
+        if (req.params.taskId && !task?.plan.workflow) return next();
+        const run = await Run.findByPk(req.params.runId);
+        req.query.projectId = run.projectId;
+        return await verifyProjectDeveloperFromProjectId(req, res, next);
+      } catch (error) {
+        return next(error);
+      }
+    }
+  );
+
+  router.post('/runs/:runId/tasks/document', async (req, res) => {
+    let document;
+    let limits;
+    try {
+      document = parseInterfaceDocument(req.body?.document, req.body?.requirements || '');
+      limits = { ...documentBudget, ...req.body?.limits };
+      const issues = documentPlanIssues({
+        cases: [],
+        workflow: { document, limits, operations: [], rules: [], allowedOperationIds: [], questions: [] },
+      });
+      if (issues.some((issue) => /^(max|timeoutMs)/.test(issue)))
+        throw new Error(issues.filter((issue) => /^(max|timeoutMs)/.test(issue)).join('；'));
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
+    try {
+      const run = await Run.findByPk(req.params.runId);
+      const task = await Task.create({
+        runId: run.id,
+        createdBy: req.userId,
+        state: 'preparing',
+        plan: {
+          environment: run.agentEnvironment || {},
+          cases: [],
+          order: [],
+          issues: [],
+          notes: '',
+          model: process.env.DEEPSEEK_MODEL || 'deepseek-flash',
+          provider: (process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com').startsWith('https://api.deepseek.com')
+            ? 'DeepSeek'
+            : 'configured-proxy',
+          workflow: { document, limits, operations: [], rules: [], allowedOperationIds: [], questions: [], rounds: [] },
+        },
+        events: [
+          { type: 'document_imported', name: document.name, sha256: document.sha256, at: new Date().toISOString() },
+        ],
+      });
+      void launch(sequelize, task.id, 'prepare').catch(() =>
+        console.error('Agent document task could not persist state:', task.id)
+      );
+      return res
+        .status(202)
+        .json({
+          ...protectConfiguration(task.toJSON()),
+          summary: reportSummary(task),
+          measurements: modelMeasurements(task.events),
+          executionMeasurements: executionMeasurements(task),
+          acceptance: documentAcceptance(task),
+        });
+    } catch {
+      return res.status(500).json({ error: '创建文档测试任务失败' });
+    }
+  });
 
   router.post('/runs/:runId/tasks', async (req, res) => {
     const { caseIds, interfaceDescription = '' } = req.body || {};
@@ -105,6 +179,7 @@ export default function (sequelize, { launch = runAgent } = {}) {
         summary: reportSummary(task),
         measurements: modelMeasurements(task.events),
         executionMeasurements: executionMeasurements(task),
+        acceptance: documentAcceptance(task),
       });
     } catch {
       return res.status(500).json({ error: '创建 Agent 任务失败，请检查数据库及用例配置' });
@@ -150,6 +225,7 @@ export default function (sequelize, { launch = runAgent } = {}) {
         summary: reportSummary(task),
         measurements: modelMeasurements(task.events),
         executionMeasurements: executionMeasurements(task),
+        acceptance: documentAcceptance(task),
       });
     } catch {
       return res.status(500).json({ error: '读取 Agent 任务失败' });
@@ -187,6 +263,14 @@ export default function (sequelize, { launch = runAgent } = {}) {
               run.projectId
             ),
           };
+          if (plan.workflow) {
+            plan.workflow = {
+              ...plan.workflow,
+              limits: req.body.limits ?? plan.workflow.limits,
+              allowedOperationIds: req.body.allowedOperationIds ?? plan.workflow.allowedOperationIds,
+            };
+            plan.issues.push(...documentPlanIssues(plan));
+          }
         } catch (error) {
           throw Object.assign(error, { status: 400 });
         }
@@ -208,6 +292,7 @@ export default function (sequelize, { launch = runAgent } = {}) {
         summary: reportSummary(updated),
         measurements: modelMeasurements(updated.events),
         executionMeasurements: executionMeasurements(updated),
+        acceptance: documentAcceptance(updated),
       });
     } catch (error) {
       return res.status(error.status || 500).json({ error: error.status ? error.message : '保存计划失败' });
@@ -236,6 +321,22 @@ export default function (sequelize, { launch = runAgent } = {}) {
           ...current.plan,
           ...buildPlan(current.plan.cases, current.plan.environment, null, current.plan.notes, run.projectId),
         };
+        if (plan.workflow) {
+          plan.issues.push(...documentPlanIssues(plan));
+          plan.workflow = {
+            ...plan.workflow,
+            confirmed: {
+              at: new Date().toISOString(),
+              userId: req.userId,
+              version: current.version,
+              documentSha256: plan.workflow.document.sha256,
+              limits: structuredClone(plan.workflow.limits),
+              allowedOperationIds: [...plan.workflow.allowedOperationIds],
+              rules: structuredClone(plan.workflow.rules),
+              initialCaseIds: plan.cases.map((item) => item.caseId),
+            },
+          };
+        }
         if (plan.issues.length) throw Object.assign(new Error(plan.issues.join('；')), { status: 400 });
         const ids = plan.cases.map((item) => item.caseId);
         const cases = await Case.count({
@@ -271,6 +372,7 @@ export default function (sequelize, { launch = runAgent } = {}) {
         summary: reportSummary(task),
         measurements: modelMeasurements(task.events),
         executionMeasurements: executionMeasurements(task),
+        acceptance: documentAcceptance(task),
       });
     } catch (error) {
       if (error.name === 'SequelizeUniqueConstraintError')
